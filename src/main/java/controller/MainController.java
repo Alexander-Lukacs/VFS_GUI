@@ -16,7 +16,7 @@ public class MainController {
     private Button btnSettings;
 
    public void onClick(ActionEvent e) throws RuntimeException, IOException{
-       FXMLLoader lob_loader = new FXMLLoader(getClass().getResource("settings.fxml"));
+       FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("settings.fxml"));
        AnchorPane lob_pane = lob_loader.load();
             Scene lob_scene = new Scene(lob_pane);
             Stage lob_stage = new Stage();

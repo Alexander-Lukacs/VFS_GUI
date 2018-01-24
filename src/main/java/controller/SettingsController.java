@@ -34,7 +34,7 @@ public class SettingsController {
     public void loadChangePW(ActionEvent event) throws IOException {
         if(gob_lvOptions.getSelectionModel().getSelectedItem() == "ChangePW")
         {
-            FXMLLoader lob_loader = new FXMLLoader(getClass().getResource("ChangePW.fxml"));
+            FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("ChangePW.fxml"));
             AnchorPane lob_pane = lob_loader.load();
             gob_rootPane.getChildren().setAll(lob_pane);
             /*Scene lob_scene = new Scene(lob_pane);
