@@ -12,6 +12,8 @@ import javafx.scene.layout.AnchorPane;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 
+import static constants.SettingsConstants.*;
+
 
 public class SettingsController {
 
@@ -26,13 +28,13 @@ public class SettingsController {
     public void initialize()
     {
         gob_oblist = FXCollections.observableArrayList();
-        gob_oblist.add("ChangePW");
+        gob_oblist.add(CHANGE_PW);
         gob_lvOptions.setItems(gob_oblist);
         gob_lvOptions.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
     }
 
     public void loadChangePW(ActionEvent event) throws IOException {
-        if(gob_lvOptions.getSelectionModel().getSelectedItem() == "ChangePW")
+        if(gob_lvOptions.getSelectionModel().getSelectedItem() == CHANGE_PW)
         {
             FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("ChangePW.fxml"));
             AnchorPane lob_pane = lob_loader.load();
