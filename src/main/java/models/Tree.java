@@ -11,8 +11,8 @@ import java.util.List;
 
 public class Tree implements TreeInterface {
 
-    private static final String BASE_DIRECTORY = "C:\\\\Users\\\\Darth-Vader\\\\Documents\\\\Fileserver\\\\";
-    private static final String GC_ROOT_PATH = "C:\\Users\\Darth-Vader\\Documents\\Fileserver\\root";
+    private static final String BASE_DIRECTORY = "C:\\\\Users\\\\Mesut\\\\Documents\\\\Fileserver\\\\";
+    private static final String GC_ROOT_PATH = "C:\\Users\\Mesut\\Documents\\Fileserver\\root";
     private static final String GC_ROOT_NAME = "<ROOT>";
     private static final String GC_NODE_NOT_FOUND = "Node not found: ";
 

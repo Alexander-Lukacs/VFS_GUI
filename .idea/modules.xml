@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/VFS_GUI.iml" filepath="$PROJECT_DIR$/VFS_GUI.iml" />
+      <module fileurl="file://$PROJECT_DIR$/FileTree.iml" filepath="$PROJECT_DIR$/FileTree.iml" />
     </modules>
   </component>
 </project>

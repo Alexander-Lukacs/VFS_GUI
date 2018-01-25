@@ -1,4 +1,3 @@
-package main.java;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -6,15 +5,14 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class Main extends Application {
+public class MainApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root;
-        root = FXMLLoader.load(getClass().getClassLoader().getResource("main.fxml"));
+        root = FXMLLoader.load(getClass().getClassLoader().getResource("mainScreen.fxml"));
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
-      //  primaryStage.
     }
 
 
