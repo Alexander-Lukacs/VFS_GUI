@@ -14,4 +14,9 @@ public class SettingsConstants {
      * @param SETTINGS String fuer den Titel des Settings Views
      */
     public static final String SETTINGS = "Settings";
+
+    /**
+     * @param ADMIIN_LOGIN  String fuer das Settings Item "Admin Login"
+     */
+    public static final String ADMIN_LOGIN = "Admin Login";
 }

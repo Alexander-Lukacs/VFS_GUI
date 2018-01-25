@@ -7,9 +7,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-
-import java.awt.event.ActionEvent;
 import java.io.IOException;
 
 import static constants.SettingsConstants.*;
@@ -29,14 +28,15 @@ public class SettingsController {
     {
         gob_oblist = FXCollections.observableArrayList();
         gob_oblist.add(CHANGE_PW);
+        gob_oblist.add(ADMIN_LOGIN);
         gob_lvOptions.setItems(gob_oblist);
         gob_lvOptions.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
     }
 
-    public void loadChangePW(ActionEvent event) throws IOException {
+    public void loadChangePW(MouseEvent event) throws IOException {
         if(gob_lvOptions.getSelectionModel().getSelectedItem() == CHANGE_PW)
         {
-            FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("ChangePW.fxml"));
+            FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("changePW.fxml"));
             AnchorPane lob_pane = lob_loader.load();
             gob_rootPane.getChildren().setAll(lob_pane);
             /*Scene lob_scene = new Scene(lob_pane);

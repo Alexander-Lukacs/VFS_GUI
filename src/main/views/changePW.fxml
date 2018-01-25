@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane fx:id="gob_rootPane" prefWidth="550.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ChangePWController">
+    <children>
+        <HBox alignment="CENTER" prefHeight="400.0" prefWidth="550.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <HBox alignment="CENTER_LEFT" prefHeight="400.0" prefWidth="108.0">
+                    <children>
+                        <ListView fx:id="gob_lvOptions" />
+                    </children>
+                </HBox>
+                <HBox prefHeight="400.0" prefWidth="454.0">
+                    <children>
+                        <VBox alignment="TOP_CENTER" prefWidth="476.0" spacing="20.0">
+                            <children>
+                                <Label alignment="CENTER" text="Old Password">
+                                    <VBox.margin>
+                                        <Insets top="40.0" />
+                                    </VBox.margin>
+                                </Label>
+                                <TextField fx:id="txtOldPassword" promptText=" ">
+                                    <VBox.margin>
+                                        <Insets left="100.0" right="100.0" />
+                                    </VBox.margin>
+                                </TextField>
+                                <Label alignment="CENTER" text="New Password" />
+                                <TextField fx:id="txtNewPassword" layoutX="110.0" layoutY="87.0" promptText=" ">
+                                    <VBox.margin>
+                                        <Insets left="100.0" right="100.0" />
+                                    </VBox.margin>
+                                </TextField>
+                                <Label alignment="CENTER" text="Confirm Password" />
+                                <TextField fx:id="txtConfirmPassword" layoutX="10.0" layoutY="169.0" promptText=" ">
+                                    <VBox.margin>
+                                        <Insets left="100.0" right="100.0" />
+                                    </VBox.margin>
+                                </TextField>
+                                <Button fx:id="gob_btnSave" mnemonicParsing="false" text="Save" />
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+            </children>
+        </HBox>
+    </children>
+</AnchorPane>
