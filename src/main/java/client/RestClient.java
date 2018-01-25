@@ -17,4 +17,5 @@ public class RestClient {
         Client client = ClientBuilder.newClient();
         webTarget = client.target(baseUrl);
     }
+
 }
