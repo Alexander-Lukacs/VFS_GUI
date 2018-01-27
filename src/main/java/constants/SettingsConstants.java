@@ -19,4 +19,29 @@ public class SettingsConstants {
      * @param ADMIIN_LOGIN  String fuer das Settings Item "Admin Login"
      */
     public static final String ADMIN_LOGIN = "Admin Login";
+
+    /**
+     * @param USER_NAME  String fuer das Textfield "tfUserName"
+     */
+    public static final String USER_NAME = "asdf";
+
+    /**
+     * @param PASSWORD  String fuer das Passwordfield "pwPassword"
+     */
+    public static final String PASSWORD = "asdf";
+
+    /**
+     * @param ADMIN_LOGOUT  String fuer das Settings Item "Logout"
+     */
+    public static final String ADMIN_LOGOUT = "Logout";
+
+    /**
+     * @param ADMIN_ADD  String fuer das Settings Item "Admin hinzufügen"
+     */
+    public static final String ADMIN_ADD = "Admin hinzufügen";
+
+    /**
+     * @param VFS  String fuer den Titel der Main Views
+     */
+    public static final String VFS = "VFS";
 }

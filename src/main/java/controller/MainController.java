@@ -10,13 +10,16 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-import static constants.SettingsConstants.CHANGE_PW;
 import static constants.SettingsConstants.SETTINGS;
 
 public class MainController {
 
     @FXML
     private Button btnSettings;
+
+    /**
+     Beim Klicken des Buttons wird die View settings.fxml geöffnet
+     */
 
    public void onClick(ActionEvent e) throws RuntimeException, IOException{
        FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("settings.fxml"));

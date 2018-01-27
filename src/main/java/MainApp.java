@@ -5,6 +5,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import static constants.SettingsConstants.*;
+
 public class MainApp extends Application {
 
     @Override
@@ -12,6 +14,7 @@ public class MainApp extends Application {
         Parent root;
         root = FXMLLoader.load(getClass().getClassLoader().getResource("mainScreen.fxml"));
         primaryStage.setScene(new Scene(root));
+        primaryStage.setTitle(VFS);
         primaryStage.show();
     }
 
