@@ -17,6 +17,8 @@ public class MainController {
     @FXML
     private Button btnSettings;
 
+    private boolean close = false;
+
     /**
      Beim Klicken des Buttons wird die View settings.fxml geöffnet
      */
@@ -31,5 +33,15 @@ public class MainController {
             lob_stage.setScene(lob_scene);
             lob_stage.show();
 
+    }
+
+    public boolean getClose()
+    {
+        return close;
+    }
+
+    public void setClose(boolean close)
+    {
+        this.close = close;
     }
 }

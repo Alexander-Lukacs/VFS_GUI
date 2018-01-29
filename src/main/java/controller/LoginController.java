@@ -5,15 +5,17 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 
 
 import java.io.IOException;
 
 import static constants.SettingsConstants.*;
 
-public class AdminLoginController {
+public class LoginController {
 
     @FXML
     private AnchorPane gob_rootPane;
@@ -27,7 +29,7 @@ public class AdminLoginController {
     @FXML
     private TextField tfUserName;
 
-    private boolean admin = false;
+    private boolean isAdmin = false;
 
     public void initialize()
     {
@@ -42,21 +44,30 @@ public class AdminLoginController {
 
     public void onClick(ActionEvent event) throws IOException
     {
-        if(!USER_NAME.equals(tfUserName.getText()) || !PASSWORD.equals(pwPasswort.getText()))
+        if(!NAME.equals(tfUserName.getText()) || !PASSWORD.equals(pwPasswort.getText()))
         {
             System.out.println("Benutzername oder Passwort falsch!");
         }
 
-        if(USER_NAME.equals(tfUserName.getText()) && PASSWORD.equals(pwPasswort.getText()))
+ /*       if(NAME.equals(tfUserName.getText()) && PASSWORD.equals(pwPasswort.getText()))
         {
-            admin = true;
+            admin = getAdmin();
+        }*/
+    else{
+            FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("mainScreen.fxml"));
+            SplitPane lob_pane = lob_loader.load();
+            Scene lob_scene = new Scene(lob_pane);
+            Stage lob_stage = new Stage();
+            lob_stage.setTitle(VFS);
+            lob_stage.setResizable(false);
+            lob_stage.setScene(lob_scene);
+            lob_stage.show();
+            //lob_stage.getScene().getWindow().
         }
+    }
 
-        if(admin)
-        {
-            FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("settingsAdmin.fxml"));
-            AnchorPane lob_pane = lob_loader.load();
-            gob_rootPane.getChildren().setAll(lob_pane);
-        }
+    public boolean getIsAdmin()
+    {
+        return isAdmin;
     }
 }

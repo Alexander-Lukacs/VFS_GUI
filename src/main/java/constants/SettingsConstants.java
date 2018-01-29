@@ -16,24 +16,19 @@ public class SettingsConstants {
     public static final String SETTINGS = "Settings";
 
     /**
-     * @param ADMIIN_LOGIN  String fuer das Settings Item "Admin Login"
+     * @param USER_NAME  String fuer das Textfield "tfUserName" Test
      */
-    public static final String ADMIN_LOGIN = "Admin Login";
+    public static final String NAME = "admin";
 
     /**
-     * @param USER_NAME  String fuer das Textfield "tfUserName"
+     * @param PASSWORD  String fuer das Passwordfield "pwPassword" Test
      */
-    public static final String USER_NAME = "asdf";
-
-    /**
-     * @param PASSWORD  String fuer das Passwordfield "pwPassword"
-     */
-    public static final String PASSWORD = "asdf";
+    public static final String PASSWORD = "admin";
 
     /**
      * @param ADMIN_LOGOUT  String fuer das Settings Item "Logout"
      */
-    public static final String ADMIN_LOGOUT = "Logout";
+    public static final String LOGOUT = "Logout";
 
     /**
      * @param ADMIN_ADD  String fuer das Settings Item "Admin hinzufügen"
