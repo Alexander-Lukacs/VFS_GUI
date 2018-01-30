@@ -1,7 +1,5 @@
 package controller;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -29,7 +27,7 @@ public class LoginController {
     @FXML
     private TextField tfUserName;
 
-    private boolean isAdmin = false;
+    private boolean isAdmin = true;
 
     public void initialize()
     {
@@ -44,6 +42,7 @@ public class LoginController {
 
     public void onClick(ActionEvent event) throws IOException
     {
+
         if(!NAME.equals(tfUserName.getText()) || !PASSWORD.equals(pwPasswort.getText()))
         {
             System.out.println("Benutzername oder Passwort falsch!");
@@ -54,20 +53,28 @@ public class LoginController {
             admin = getAdmin();
         }*/
     else{
+            tfUserName.setText("");
+            pwPasswort.setText("");
             FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("mainScreen.fxml"));
             SplitPane lob_pane = lob_loader.load();
             Scene lob_scene = new Scene(lob_pane);
             Stage lob_stage = new Stage();
             lob_stage.setTitle(VFS);
-            lob_stage.setResizable(false);
+           // lob_stage.setResizable(false);
             lob_stage.setScene(lob_scene);
             lob_stage.show();
-            //lob_stage.getScene().getWindow().
+
+            //gob_rootPane.getChildren().setAll(lob_pane);
         }
     }
 
     public boolean getIsAdmin()
     {
         return isAdmin;
+    }
+
+    public void close() {
+        //gob_rootPane = gob_rootPane.getScene().getWindow();
+        ((Stage)tfUserName.getScene().getWindow()).close();
     }
 }

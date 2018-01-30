@@ -1,30 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.*?>
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane fx:id="gob_rootPane" prefWidth="550.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LoginController">
+<AnchorPane fx:id="gob_rootPane" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LoginController">
    <children>
-      <VBox alignment="CENTER" prefHeight="400.0" prefWidth="550.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <StackPane prefHeight="150.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Label text="Benutzername" />
-            <TextField fx:id="tfUserName">
-               <VBox.margin>
-                  <Insets left="150.0" right="150.0" />
-               </VBox.margin>
-            </TextField>
-            <Label text="Passwort" />
-            <PasswordField fx:id="pwPasswort">
-               <VBox.margin>
-                  <Insets left="150.0" right="150.0" />
-               </VBox.margin>
-            </PasswordField>
-            <Button fx:id="btnLogin" mnemonicParsing="false" onAction="#onClick" text="Login" />
+            <VBox alignment="CENTER" spacing="20.0">
+               <children>
+                  <Label text="Benutzername" />
+                  <TextField fx:id="tfUserName">
+                     <VBox.margin>
+                        <Insets left="250.0" right="250.0" />
+                     </VBox.margin>
+                  </TextField>
+                  <Label text="Passwort" />
+                  <PasswordField fx:id="pwPasswort">
+                     <VBox.margin>
+                        <Insets left="250.0" right="250.0" />
+                     </VBox.margin>
+                  </PasswordField>
+                  <Button fx:id="btnLogin" mnemonicParsing="false" onAction="#onClick" text="Login" />
+               </children>
+            </VBox>
          </children>
-      </VBox>
+      </StackPane>
    </children>
 </AnchorPane>

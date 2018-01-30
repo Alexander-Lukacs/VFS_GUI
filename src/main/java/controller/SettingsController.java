@@ -37,8 +37,8 @@ public class SettingsController {
         if(loginController.getIsAdmin()){
         gob_oblist = FXCollections.observableArrayList();
         gob_oblist.add(CHANGE_PW);
-        gob_oblist.add(LOGOUT);
         gob_oblist.add(ADMIN_ADD);
+        gob_oblist.add(LOGOUT);
         gob_lvOptions.setItems(gob_oblist);
         gob_lvOptions.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
     }else {
@@ -59,19 +59,12 @@ public class SettingsController {
      */
 
     public void loadView(MouseEvent event) throws IOException {
-        if(loginController.getIsAdmin()) {
+
             if (gob_lvOptions.getSelectionModel().getSelectedItem() == CHANGE_PW) {
-                FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("adminChangePW.fxml"));
+                FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("ChangePW.fxml"));
                 AnchorPane lob_pane = lob_loader.load();
                 gob_rootPane.getChildren().setAll(lob_pane);
             }
-        }else{
-            if (gob_lvOptions.getSelectionModel().getSelectedItem() == CHANGE_PW) {
-                FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("UserChangePW.fxml"));
-                AnchorPane lob_pane = lob_loader.load();
-                gob_rootPane.getChildren().setAll(lob_pane);
-            }
-        }
 
         if(gob_lvOptions.getSelectionModel().getSelectedItem() == LOGOUT)
         {

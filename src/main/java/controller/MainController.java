@@ -14,10 +14,16 @@ import static constants.SettingsConstants.SETTINGS;
 
 public class MainController {
 
+    private LoginController loginController = new LoginController();
     @FXML
     private Button btnSettings;
 
     private boolean close = false;
+
+    public void initialize()
+    {
+        loginController.close();
+    }
 
     /**
      Beim Klicken des Buttons wird die View settings.fxml geöffnet

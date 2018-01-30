@@ -4,17 +4,19 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 
 import static constants.SettingsConstants.*;
 
-public class AdminChangePWController {
+public class ChangePWController {
 
     @FXML
     private ListView<String> gob_lvOptions;
@@ -26,20 +28,28 @@ public class AdminChangePWController {
 
     @FXML
     private AnchorPane gob_rootPane;
+    private LoginController loginController = new LoginController();
 
     /**
      * Initiallisiert die ListView
      */
-    public void initialize()
-    {
-        gob_oblist = FXCollections.observableArrayList();
-        gob_oblist.add(CHANGE_PW);
-        gob_oblist.add(LOGOUT);
-        gob_oblist.add(ADMIN_ADD);
-        gob_lvOptions.setItems(gob_oblist);
-        gob_lvOptions.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+    public void initialize() {
+        if (loginController.getIsAdmin()) {
+            gob_oblist = FXCollections.observableArrayList();
+            gob_oblist.add(CHANGE_PW);
+            gob_oblist.add(ADMIN_ADD);
+            gob_oblist.add(LOGOUT);
+            gob_lvOptions.setItems(gob_oblist);
+            gob_lvOptions.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        }
+        else{
+            gob_oblist = FXCollections.observableArrayList();
+            gob_oblist.add(CHANGE_PW);
+            gob_oblist.add(LOGOUT);
+            gob_lvOptions.setItems(gob_oblist);
+            gob_lvOptions.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        }
     }
-
     /**
      * Öffnet die View die ausgewählt wurde
      *
@@ -51,11 +61,15 @@ public class AdminChangePWController {
         {
             FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("loginScreen.fxml"));
             AnchorPane lob_pane = lob_loader.load();
-            gob_rootPane.getChildren().setAll(lob_pane);
+            Scene lob_scene = new Scene(lob_pane);
+            Stage lob_stage = new Stage();
+            lob_stage.setTitle(VFS);
+            lob_stage.setScene(lob_scene);
+            lob_stage.show();
         }
         if(gob_lvOptions.getSelectionModel().getSelectedItem() == CHANGE_PW)
         {
-            FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("adminChangePW.fxml"));
+            FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("ChangePW.fxml"));
             AnchorPane lob_pane = lob_loader.load();
             gob_rootPane.getChildren().setAll(lob_pane);
         }
