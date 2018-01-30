@@ -1,4 +1,5 @@
 
+import controller.LoginController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -9,28 +10,16 @@ import static constants.SettingsConstants.*;
 
 public class MainApp extends Application {
 
-    private Stage primaryStage;
+    private LoginController loginController = new LoginController();
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        this.primaryStage = primaryStage;
-        Parent root;
-        root = FXMLLoader.load(getClass().getClassLoader().getResource("loginScreen.fxml"));
-        primaryStage.setScene(new Scene(root));
-        primaryStage.setTitle(VFS);
-        //primaryStage.setResizable(false);
-        primaryStage.show();
-
+        loginController.start(primaryStage);
     }
 
 
     public static void main(String[] args) {
         launch(args);
-    }
-
-    public void close(){
-        primaryStage.close();
-
     }
 }
 

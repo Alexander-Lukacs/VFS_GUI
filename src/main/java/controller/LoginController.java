@@ -3,6 +3,7 @@ package controller;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
@@ -29,6 +30,10 @@ public class LoginController {
 
     private boolean isAdmin = true;
 
+    private Stage stage = new Stage();
+
+    private MainController mainController = new MainController();
+
     public void initialize()
     {
 
@@ -47,26 +52,23 @@ public class LoginController {
         {
             System.out.println("Benutzername oder Passwort falsch!");
         }
-
- /*       if(NAME.equals(tfUserName.getText()) && PASSWORD.equals(pwPasswort.getText()))
-        {
-            admin = getAdmin();
-        }*/
-    else{
+        else {
             tfUserName.setText("");
             pwPasswort.setText("");
-            FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("mainScreen.fxml"));
-            SplitPane lob_pane = lob_loader.load();
-            Scene lob_scene = new Scene(lob_pane);
-            Stage lob_stage = new Stage();
-            lob_stage.setTitle(VFS);
-           // lob_stage.setResizable(false);
-            lob_stage.setScene(lob_scene);
-            lob_stage.show();
-
-            //gob_rootPane.getChildren().setAll(lob_pane);
+            mainController.start(stage);
+            close();
         }
     }
+
+/*    public void update() throws IOException{
+        Stage stage = new Stage();
+        Parent root;
+        root = FXMLLoader.load(getClass().getClassLoader().getResource("loginScreen.fxml"));
+        stage.setScene(new Scene(root));
+        stage.setTitle(VFS);
+        //stage.setResizable(false);
+        stage.show();
+    }*/
 
     public boolean getIsAdmin()
     {
@@ -76,5 +78,14 @@ public class LoginController {
     public void close() {
         //gob_rootPane = gob_rootPane.getScene().getWindow();
         ((Stage)tfUserName.getScene().getWindow()).close();
+    }
+
+    public void start(Stage stage) throws IOException{
+        Parent root;
+        root = FXMLLoader.load(getClass().getClassLoader().getResource("loginScreen.fxml"));
+        stage.setScene(new Scene(root));
+        stage.setTitle(VFS);
+        //stage.setResizable(false);
+        stage.show();
     }
 }

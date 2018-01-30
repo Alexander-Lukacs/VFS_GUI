@@ -5,25 +5,23 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.SplitPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 
-import static constants.SettingsConstants.SETTINGS;
+import static constants.SettingsConstants.*;
 
 public class MainController {
 
-    private LoginController loginController = new LoginController();
     @FXML
     private Button btnSettings;
+    private Button btnLogout;
 
     private boolean close = false;
+    Stage lob_stage = new Stage();
 
-    public void initialize()
-    {
-        loginController.close();
-    }
 
     /**
      Beim Klicken des Buttons wird die View settings.fxml geöffnet
@@ -38,8 +36,11 @@ public class MainController {
             lob_stage.setResizable(false);
             lob_stage.setScene(lob_scene);
             lob_stage.show();
-
     }
+
+    public void logoutClick(ActionEvent e){
+        ((Stage)btnLogout.getScene().getWindow()).close();
+   }
 
     public boolean getClose()
     {
@@ -49,5 +50,17 @@ public class MainController {
     public void setClose(boolean close)
     {
         this.close = close;
+    }
+
+    public void start(Stage lob_stage) throws  IOException{
+
+            FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("mainScreen.fxml"));
+            SplitPane lob_pane = lob_loader.load();
+            Scene lob_scene = new Scene(lob_pane);
+            lob_stage.setTitle(VFS);
+            // lob_stage.setResizable(false);
+            lob_stage.setScene(lob_scene);
+            lob_stage.show();
+            //gob_rootPane.getChildren().setAll(lob_pane);
     }
 }

@@ -38,14 +38,12 @@ public class ChangePWController {
             gob_oblist = FXCollections.observableArrayList();
             gob_oblist.add(CHANGE_PW);
             gob_oblist.add(ADMIN_ADD);
-            gob_oblist.add(LOGOUT);
             gob_lvOptions.setItems(gob_oblist);
             gob_lvOptions.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         }
         else{
             gob_oblist = FXCollections.observableArrayList();
             gob_oblist.add(CHANGE_PW);
-            gob_oblist.add(LOGOUT);
             gob_lvOptions.setItems(gob_oblist);
             gob_lvOptions.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         }
@@ -57,16 +55,7 @@ public class ChangePWController {
      * @throws IOException
      */
     public void loadView(MouseEvent event) throws IOException {
-        if(gob_lvOptions.getSelectionModel().getSelectedItem() == LOGOUT)
-        {
-            FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("loginScreen.fxml"));
-            AnchorPane lob_pane = lob_loader.load();
-            Scene lob_scene = new Scene(lob_pane);
-            Stage lob_stage = new Stage();
-            lob_stage.setTitle(VFS);
-            lob_stage.setScene(lob_scene);
-            lob_stage.show();
-        }
+
         if(gob_lvOptions.getSelectionModel().getSelectedItem() == CHANGE_PW)
         {
             FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("ChangePW.fxml"));
