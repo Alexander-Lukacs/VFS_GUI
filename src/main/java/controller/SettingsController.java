@@ -37,11 +37,13 @@ public class SettingsController {
         gob_oblist = FXCollections.observableArrayList();
         gob_oblist.add(CHANGE_PW);
         gob_oblist.add(ADMIN_ADD);
+        gob_oblist.add(CHANGE_IP_PORT);
         gob_lvOptions.setItems(gob_oblist);
         gob_lvOptions.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
     }else {
         gob_oblist = FXCollections.observableArrayList();
         gob_oblist.add(CHANGE_PW);
+        gob_oblist.add(CHANGE_IP_PORT);
         gob_lvOptions.setItems(gob_oblist);
         gob_lvOptions.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
     }

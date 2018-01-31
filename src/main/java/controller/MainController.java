@@ -3,9 +3,11 @@ package controller;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
@@ -28,28 +30,27 @@ public class MainController {
      */
 
    public void onClick(ActionEvent e) throws RuntimeException, IOException{
-       FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("settings.fxml"));
-       AnchorPane lob_pane = lob_loader.load();
-            Scene lob_scene = new Scene(lob_pane);
-            Stage lob_stage = new Stage();
-            lob_stage.setTitle(SETTINGS);
-            lob_stage.setResizable(false);
-            lob_stage.setScene(lob_scene);
-            lob_stage.show();
-    }
 
-    public void logoutClick(ActionEvent e){
-        ((Stage)btnLogout.getScene().getWindow()).close();
-   }
+      System.out.println(((Button)e.getSource()).getText().equals(SETTINGS));
 
-    public boolean getClose()
-    {
-        return close;
-    }
 
-    public void setClose(boolean close)
-    {
-        this.close = close;
+           if( ((Button)e.getSource()).getText().equals(SETTINGS) ) {
+
+               FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("settings.fxml"));
+               AnchorPane lob_pane = lob_loader.load();
+               Scene lob_scene = new Scene(lob_pane);
+               Stage lob_stage = new Stage();
+               lob_stage.setTitle(SETTINGS);
+               lob_stage.setResizable(false);
+               lob_stage.setScene(lob_scene);
+               lob_stage.show();
+           }
+
+           else if( ((Button)e.getSource()).getText().equals(LOGOUT) ){
+               Stage stage = ((Stage)btnSettings.getScene().getWindow());
+               stage.close();
+               startLogin(stage);
+           }
     }
 
     public void start(Stage lob_stage) throws  IOException{
@@ -62,5 +63,15 @@ public class MainController {
             lob_stage.setScene(lob_scene);
             lob_stage.show();
             //gob_rootPane.getChildren().setAll(lob_pane);
+    }
+
+
+    public void startLogin(Stage stage) throws IOException{
+        Parent root;
+        root = FXMLLoader.load(getClass().getClassLoader().getResource("loginScreen.fxml"));
+        stage.setScene(new Scene(root));
+        stage.setTitle(VFS);
+        //stage.setResizable(false);
+        stage.show();
     }
 }

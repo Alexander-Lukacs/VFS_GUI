@@ -4,13 +4,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
 
 import java.io.IOException;
 
@@ -38,12 +36,14 @@ public class ChangePWController {
             gob_oblist = FXCollections.observableArrayList();
             gob_oblist.add(CHANGE_PW);
             gob_oblist.add(ADMIN_ADD);
+            gob_oblist.add(CHANGE_IP_PORT);
             gob_lvOptions.setItems(gob_oblist);
             gob_lvOptions.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         }
         else{
             gob_oblist = FXCollections.observableArrayList();
             gob_oblist.add(CHANGE_PW);
+            gob_oblist.add(CHANGE_IP_PORT);
             gob_lvOptions.setItems(gob_oblist);
             gob_lvOptions.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         }

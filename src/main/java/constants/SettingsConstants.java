@@ -33,10 +33,15 @@ public class SettingsConstants {
     /**
      * @param ADMIN_ADD  String fuer das Settings Item "Admin hinzufügen"
      */
-    public static final String ADMIN_ADD = "Admin hinzufügen";
+    public static final String ADMIN_ADD = "Add Admin";
 
     /**
      * @param VFS  String fuer den Titel der Main Views
      */
     public static final String VFS = "VFS";
+
+    /**
+     * @param VFS  String fuer das Settings Item "Ändere IP / Port"
+     */
+    public static final String CHANGE_IP_PORT = "Change IP/Port";
 }

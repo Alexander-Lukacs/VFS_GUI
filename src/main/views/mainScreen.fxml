@@ -19,7 +19,7 @@
                <StackPane.margin>
                   <Insets bottom="10.0" left="10.0" right="100.0" top="10.0" />
                </StackPane.margin></Button>
-            <Button fx:id="btnLogout" mnemonicParsing="false" onAction="#logoutClick" text="Logout">
+            <Button fx:id="btnLogout" mnemonicParsing="false" onAction="#onClick" text="Logout">
                <StackPane.margin>
                   <Insets bottom="10.0" right="10.0" top="10.0" />
                </StackPane.margin>
