@@ -31,8 +31,6 @@ public class MainController {
 
    public void onClick(ActionEvent e) throws RuntimeException, IOException{
 
-      System.out.println(((Button)e.getSource()).getText().equals(SETTINGS));
-
 
            if( ((Button)e.getSource()).getText().equals(SETTINGS) ) {
 

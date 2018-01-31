@@ -62,5 +62,15 @@ public class ChangePWController {
             AnchorPane lob_pane = lob_loader.load();
             gob_rootPane.getChildren().setAll(lob_pane);
         }
+        if (gob_lvOptions.getSelectionModel().getSelectedItem() == ADMIN_ADD) {
+            FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("addAdmin.fxml"));
+            AnchorPane lob_pane = lob_loader.load();
+            gob_rootPane.getChildren().setAll(lob_pane);
+        }
+        if (gob_lvOptions.getSelectionModel().getSelectedItem() == CHANGE_IP_PORT) {
+            FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("changeIpPort.fxml"));
+            AnchorPane lob_pane = lob_loader.load();
+            gob_rootPane.getChildren().setAll(lob_pane);
+        }
     }
 }
