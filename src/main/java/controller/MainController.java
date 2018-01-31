@@ -7,7 +7,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
@@ -21,16 +20,11 @@ public class MainController {
     private Button btnSettings;
     private Button btnLogout;
 
-    private boolean close = false;
-    Stage lob_stage = new Stage();
-
-
     /**
      Beim Klicken des Buttons wird die View settings.fxml geöffnet
      */
 
    public void onClick(ActionEvent e) throws RuntimeException, IOException{
-
 
            if( ((Button)e.getSource()).getText().equals(SETTINGS) ) {
 
@@ -43,7 +37,6 @@ public class MainController {
                lob_stage.setScene(lob_scene);
                lob_stage.show();
            }
-
            else if( ((Button)e.getSource()).getText().equals(LOGOUT) ){
                Stage stage = ((Stage)btnSettings.getScene().getWindow());
                stage.close();
@@ -57,10 +50,8 @@ public class MainController {
             SplitPane lob_pane = lob_loader.load();
             Scene lob_scene = new Scene(lob_pane);
             lob_stage.setTitle(VFS);
-            // lob_stage.setResizable(false);
             lob_stage.setScene(lob_scene);
             lob_stage.show();
-            //gob_rootPane.getChildren().setAll(lob_pane);
     }
 
 
@@ -69,7 +60,6 @@ public class MainController {
         root = FXMLLoader.load(getClass().getClassLoader().getResource("loginScreen.fxml"));
         stage.setScene(new Scene(root));
         stage.setTitle(VFS);
-        //stage.setResizable(false);
         stage.show();
     }
 }

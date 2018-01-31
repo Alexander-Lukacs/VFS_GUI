@@ -1,12 +1,9 @@
 package controller;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 
@@ -19,34 +16,20 @@ public class ChangePWController {
     @FXML
     private ListView<String> gob_lvOptions;
 
-    private ObservableList<String> gob_oblist;
-
     @FXML
     private Button gob_btnSave;
 
     @FXML
     private AnchorPane gob_rootPane;
-    private LoginController loginController = new LoginController();
+
+    private controller.ListView listView = new controller.ListView();
 
     /**
      * Initiallisiert die ListView
      */
-    public void initialize() {
-        if (loginController.getIsAdmin()) {
-            gob_oblist = FXCollections.observableArrayList();
-            gob_oblist.add(CHANGE_PW);
-            gob_oblist.add(ADMIN_ADD);
-            gob_oblist.add(CHANGE_IP_PORT);
-            gob_lvOptions.setItems(gob_oblist);
-            gob_lvOptions.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        }
-        else{
-            gob_oblist = FXCollections.observableArrayList();
-            gob_oblist.add(CHANGE_PW);
-            gob_oblist.add(CHANGE_IP_PORT);
-            gob_lvOptions.setItems(gob_oblist);
-            gob_lvOptions.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        }
+    public void initialize()
+    {
+        listView.loadList(gob_lvOptions);
     }
     /**
      * Öffnet die View die ausgewählt wurde

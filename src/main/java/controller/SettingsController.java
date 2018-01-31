@@ -1,12 +1,8 @@
 package controller;
 
-
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 
@@ -17,36 +13,20 @@ import static constants.SettingsConstants.*;
 
 public class SettingsController {
 
-    private LoginController loginController = new LoginController();
-    private MainController mainController = new MainController();
-
     @FXML
     private ListView<String> gob_lvOptions;
 
-    private ObservableList<String> gob_oblist;
-
     @FXML
     private AnchorPane gob_rootPane;
+
+    private controller.ListView listView = new controller.ListView();
 
     /**
      * Initiallisiert die ListView
      */
     public void initialize()
     {
-        if(loginController.getIsAdmin()){
-        gob_oblist = FXCollections.observableArrayList();
-        gob_oblist.add(CHANGE_PW);
-        gob_oblist.add(ADMIN_ADD);
-        gob_oblist.add(CHANGE_IP_PORT);
-        gob_lvOptions.setItems(gob_oblist);
-        gob_lvOptions.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-    }else {
-        gob_oblist = FXCollections.observableArrayList();
-        gob_oblist.add(CHANGE_PW);
-        gob_oblist.add(CHANGE_IP_PORT);
-        gob_lvOptions.setItems(gob_oblist);
-        gob_lvOptions.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-    }
+        listView.loadList(gob_lvOptions);
     }
 
 
@@ -56,7 +36,6 @@ public class SettingsController {
      * @param event
      * @throws IOException
      */
-
     public void loadView(MouseEvent event) throws IOException {
 
         if (gob_lvOptions.getSelectionModel().getSelectedItem() == CHANGE_PW) {

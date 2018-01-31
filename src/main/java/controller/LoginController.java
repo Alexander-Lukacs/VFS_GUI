@@ -60,23 +60,12 @@ public class LoginController {
         }
     }
 
-/*    public void update() throws IOException{
-        Stage stage = new Stage();
-        Parent root;
-        root = FXMLLoader.load(getClass().getClassLoader().getResource("loginScreen.fxml"));
-        stage.setScene(new Scene(root));
-        stage.setTitle(VFS);
-        //stage.setResizable(false);
-        stage.show();
-    }*/
-
     public boolean getIsAdmin()
     {
         return isAdmin;
     }
 
     public void close() {
-        //gob_rootPane = gob_rootPane.getScene().getWindow();
         ((Stage)tfUserName.getScene().getWindow()).close();
     }
 
@@ -85,7 +74,6 @@ public class LoginController {
         root = FXMLLoader.load(getClass().getClassLoader().getResource("loginScreen.fxml"));
         stage.setScene(new Scene(root));
         stage.setTitle(VFS);
-        //stage.setResizable(false);
         stage.show();
     }
 }

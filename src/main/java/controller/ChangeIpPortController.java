@@ -1,19 +1,14 @@
 package controller;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
 
-import static constants.SettingsConstants.ADMIN_ADD;
-import static constants.SettingsConstants.CHANGE_IP_PORT;
-import static constants.SettingsConstants.CHANGE_PW;
+import static constants.SettingsConstants.*;
 
 /**
  * Created by Mesut on 31.01.2018.
@@ -21,32 +16,17 @@ import static constants.SettingsConstants.CHANGE_PW;
 public class ChangeIpPortController {
 
 
-    private LoginController loginController = new LoginController();
-
     @FXML
     private ListView<String> gob_lvOptions;
-
-    private ObservableList<String> gob_oblist;
 
     @FXML
     private AnchorPane gob_rootPane;
 
+    private controller.ListView listView = new controller.ListView();
 
     public void initialize(){
-        if(loginController.getIsAdmin()){
-            gob_oblist = FXCollections.observableArrayList();
-            gob_oblist.add(CHANGE_PW);
-            gob_oblist.add(ADMIN_ADD);
-            gob_oblist.add(CHANGE_IP_PORT);
-            gob_lvOptions.setItems(gob_oblist);
-            gob_lvOptions.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        }else {
-            gob_oblist = FXCollections.observableArrayList();
-            gob_oblist.add(CHANGE_PW);
-            gob_oblist.add(CHANGE_IP_PORT);
-            gob_lvOptions.setItems(gob_oblist);
-            gob_lvOptions.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        }
+
+        listView.loadList(gob_lvOptions);
     }
 
     /**
