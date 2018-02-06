@@ -3,18 +3,22 @@ package controller;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 
+import java.awt.event.KeyListener;
 import java.io.IOException;
 
 import static constants.SettingsConstants.*;
 
-public class LoginController {
+public class LoginController{
 
     @FXML
     private AnchorPane gob_rootPane;
@@ -28,6 +32,7 @@ public class LoginController {
     @FXML
     private TextField tfUserName;
 
+
     private boolean isAdmin = false;
 
     private Stage stage = new Stage();
@@ -36,7 +41,13 @@ public class LoginController {
 
     public void initialize()
     {
-
+        btnLogin.setOnKeyPressed(
+                event -> {
+                    switch(event.getCode()) {
+                        case ENTER: btnLogin.fire();
+                    }
+                }
+        );
     }
 
     /**
@@ -48,17 +59,18 @@ public class LoginController {
     public void onClick(ActionEvent event) throws IOException
     {
 
-        if(!NAME.equals(tfUserName.getText()) || !PASSWORD.equals(pwPasswort.getText()))
+        /**if(!NAME.equals(tfUserName.getText()) || !PASSWORD.equals(pwPasswort.getText()))
         {
             System.out.println("Benutzername oder Passwort falsch!");
         }
         else {
             tfUserName.setText("");
-            pwPasswort.setText("");
+            pwPasswort.setText("");*/
             mainController.start(stage);
             close();
         }
-    }
+   // }
+
 
     public boolean getIsAdmin()
     {
@@ -76,4 +88,5 @@ public class LoginController {
         stage.setTitle(VFS);
         stage.show();
     }
+
 }

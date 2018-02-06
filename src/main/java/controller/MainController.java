@@ -1,5 +1,6 @@
 package controller;
 
+import fileTree.models.TreeImpl;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -7,18 +8,33 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static constants.SettingsConstants.*;
+import static fileTree.models.TreeImpl.*;
 
 public class MainController {
 
     @FXML
     private Button btnSettings;
+    @FXML
     private Button btnLogout;
+    @FXML
+    private TreeView<Path> treeView;
+    @FXML
+    private VBox vbox = new VBox();
+
 
     /**
      Beim Klicken des Buttons wird die View settings.fxml geöffnet
@@ -40,26 +56,47 @@ public class MainController {
            else if( ((Button)e.getSource()).getText().equals(LOGOUT) ){
                Stage stage = ((Stage)btnSettings.getScene().getWindow());
                stage.close();
-               startLogin(stage);
+               LoginController ob_x = new LoginController();
+               ob_x.start(stage);
            }
     }
 
     public void start(Stage lob_stage) throws  IOException{
 
-            FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("mainScreen.fxml"));
-            SplitPane lob_pane = lob_loader.load();
-            Scene lob_scene = new Scene(lob_pane);
-            lob_stage.setTitle(VFS);
-            lob_stage.setScene(lob_scene);
-            lob_stage.show();
+        FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("mainScreen.fxml"));
+        try {
+                TreeImpl x = new TreeImpl("c:/Users/Robin/Documents/FileSystem");
+                TreeItem<Path> root = new TreeItem<Path>(Paths.get(x.getRoot().getCanonicalPath()));
+                createTree(root);
+                treeView = new TreeView<Path>(root);
+                SplitPane lob_pane = lob_loader.load();
+                Scene lob_scene = new Scene(lob_pane);
+                vbox.getChildren().add(treeView);
+                lob_stage.setTitle(VFS);
+                lob_stage.setScene(lob_scene);
+                lob_stage.show();
+            }
+            catch (IOException e){
+                throw new RuntimeException(e);
+            }
     }
 
+    public static void createTree(TreeItem<Path> rootItem) throws IOException {
 
-    public void startLogin(Stage stage) throws IOException{
-        Parent root;
-        root = FXMLLoader.load(getClass().getClassLoader().getResource("loginScreen.fxml"));
-        stage.setScene(new Scene(root));
-        stage.setTitle(VFS);
-        stage.show();
+        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(rootItem.getValue())) {
+
+            for (Path path : directoryStream) {
+
+                TreeItem<Path> newItem = new TreeItem<Path>(path);
+                newItem.setExpanded(true);
+
+                rootItem.getChildren().add(newItem);
+
+                if (Files.isDirectory(path)) {
+                    createTree(newItem);
+                }
+            }
+        }
     }
+
 }

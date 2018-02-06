@@ -24,6 +24,10 @@ public class TreeImpl implements Tree {
         this.gva_basePath = this.gva_rootDirectory.replaceFirst("[^\\\\]*$", "");
     }
 
+    public String getBasePath (){
+        return gva_basePath;
+    }
+
     public FileNode getRootNode() {
         return this.gob_rootNode;
     }
