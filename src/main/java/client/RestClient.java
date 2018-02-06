@@ -20,6 +20,4 @@ public class RestClient {
 
     public void registerNewUser(){}
 
-
-
 }
