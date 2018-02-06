@@ -15,7 +15,11 @@ public class RestClient {
 
     public RestClient(String baseUrl) {
         Client client = ClientBuilder.newClient();
-        webTarget = client.target(baseUrl);
+        webTarget = client.target("10.9.40.180/api/user/addNewUser");
     }
+
+    public void registerNewUser(){}
+
+
 
 }

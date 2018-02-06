@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
 
 <AnchorPane fx:id="gob_rootPane" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LoginController">
    <children>
@@ -28,7 +28,7 @@
                               </HBox>
                               <VBox alignment="CENTER" spacing="20.0">
                                  <children>
-                                    <Label text="Username" />
+                                    <Label text="E-Mail" />
                                     <TextField fx:id="tfUserName">
                                        <VBox.margin>
                                           <Insets left="250.0" right="250.0" />
@@ -59,6 +59,12 @@
                                  <children>
                                     <Label text="Username" />
                                     <TextField fx:id="tfNewUserName">
+                                       <VBox.margin>
+                                          <Insets left="250.0" right="250.0" />
+                                       </VBox.margin>
+                                    </TextField>
+                                    <Label layoutX="377.0" layoutY="138.0" text="E-Mail" />
+                                    <TextField fx:id="tfNewUserName1" layoutX="260.0" layoutY="158.0">
                                        <VBox.margin>
                                           <Insets left="250.0" right="250.0" />
                                        </VBox.margin>

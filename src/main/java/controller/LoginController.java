@@ -28,7 +28,7 @@ public class LoginController {
     @FXML
     private TextField tfUserName;
 
-    private boolean isAdmin = false;
+    private boolean isAdmin = true;
 
     private Stage stage = new Stage();
 
