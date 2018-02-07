@@ -6,7 +6,7 @@ import models.interfaces.User;
 /**
  * Created by Mesut on 07.02.2018.
  */
-public class ModelBuilder {
+public class ModelObjectBuilder {
     public static User getUserObject() {
         return new UserImpl();
     }

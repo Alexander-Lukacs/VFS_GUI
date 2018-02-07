@@ -13,6 +13,7 @@ import javafx.scene.control.TreeView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import tools.Utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,7 +66,7 @@ public class MainController {
 
     public void initialize()throws  IOException
     {
-        TreeImpl x = new TreeImpl("c:/Users/Mesut/FileSystem");
+        TreeImpl x = new TreeImpl(Utils.getUserBasePath());
         TreeItem<Path> root = new TreeItem<Path>(Paths.get(x.getRoot().getCanonicalPath()));
         createTree(root);
         treeView = new TreeView<>(root);

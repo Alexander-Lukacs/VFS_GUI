@@ -1,8 +1,8 @@
 package controller;
 
-import builder.ModelBuilder;
+import builder.ModelObjectBuilder;
 import builder.RestClientBuilder;
-import cache.UserDataCache;
+import cache.DataCache;
 import client.HttpMessage;
 import client.RestClient;
 import javafx.event.ActionEvent;
@@ -10,20 +10,21 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import models.interfaces.User;
 import tools.Validation;
 
-
 import java.io.IOException;
 
-import static constants.SettingsConstants.*;
+import static cache.DataCache.GC_IP_KEY;
+import static cache.DataCache.GC_PORT_KEY;
+import static constants.SettingsConstants.VFS;
 
-public class LoginController{
+public class LoginController {
 
     @FXML
     private AnchorPane gob_rootPane;
@@ -65,77 +66,91 @@ public class LoginController{
 
     private MainController mainController = new MainController();
 
-    public void initialize()
-    {
+    private DataCache dataCache;
+
+    public void initialize() {
+        DataCache dataCache = DataCache.getDataCache();
+
         btnLogin.setOnKeyPressed(
                 event -> {
-                    switch(event.getCode()) {
-                        case ENTER: btnLogin.fire();
+                    switch (event.getCode()) {
+                        case ENTER:
+                            btnLogin.fire();
                     }
                 }
         );
     }
 
     /**
-        Beim Klicken des Buttons wird geprüft ob der User ein Admin ist,
-        falls ja, dann öffne die View settingAdmin.fxml
-        falls nein, dann kommt eine Fehlermeldung
+     * Beim Klicken des Buttons wird geprüft ob der User ein Admin ist,
+     * falls ja, dann öffne die View settingAdmin.fxml
+     * falls nein, dann kommt eine Fehlermeldung
      */
 
-    public void onClick(ActionEvent event) throws IOException
-    {
-        User user = ModelBuilder.getUserObject();
+    public void onClick(ActionEvent event) throws IOException {
+        User lob_user = ModelObjectBuilder.getUserObject();
+        String lva_ip = tfIPAdress.getText();
+        String lva_port = tfPort.getText();
+        String lva_password = pwPasswort.getText();
+        String lva_email = tfUserName.getText();
 
-            String ip = tfIPAdress.getText();
-            String port = tfPort.getText();
+        dataCache.put(GC_IP_KEY, lva_ip);
+        dataCache.put(GC_PORT_KEY, lva_port);
 
-            //TODO Vom Server uebergebenes Objekt auseinanderziehen und dann in den Cache setzen motherfucker
-            if(Validation.ipValidation(ip) && Validation.portValidation(port)) {
-                System.out.println("ip und Port gehen klar");
+        //TODO Vom Server uebergebenes Objekt auseinanderziehen und dann in den Cache setzen motherfucker
+        if (Validation.ipValidation(lva_ip) && Validation.portValidation(lva_port)) {
 
-                if (Validation.passwordValidation(pwPasswort.getText()) && Validation.emailValidation(tfUserName.getText())) {
+            System.out.println("ip und Port gehen klar");
 
-                    RestClient restClient = RestClientBuilder.buildRestClientWithAuth(user.getEmail(), user.getPassword(), ip, port);
-                    restClient.loginUser(user);
+            if (Validation.passwordValidation(lva_password) && Validation.emailValidation(lva_email)) {
 
-                    if(/*was wir von flo bekommen ==*/ true) {
+                RestClient restClient = RestClientBuilder.buildRestClientWithAuth(lob_user.getEmail(),
+                        lob_user.getPassword(), lva_ip, lva_port);
 
-                        UserDataCache.put("IP", ip);
-                        UserDataCache.put("PORT", port);
-                        //UserDataCache.put("NAME",);
-                        //passwort
-                        //email
-                        //admin
-                        //... usw
-                        tfUserName.setText("");
-                        pwPasswort.setText("");
-                        mainController.start(stage);
-                        close();
-                    }
+                restClient.loginUser(lob_user);
+
+                if (/*was wir von flo bekommen ==*/ true) {
+
+                    //UserDataCache.put("NAME",);
+                    //passwort
+                    //email
+                    //admin
+                    //... usw
+                    tfUserName.setText("");
+                    pwPasswort.setText("");
+                    mainController.start(stage);
+                    close();
                 }
             }
-            else{
-                System.out.println("User setzt Login ein......... schlug fehl!");
-            }
+        } else {
+            System.out.println("User setzt Login ein......... schlug fehl!");
+        }
     }
 
     //TODO Messege Objekt statt println im Switch bitch case mase
     public void onClickRegister(ActionEvent event) throws IOException {
-        User user;
-
-        String ip = tfIPAdress.getText();
-        String port = tfPort.getText();
+        String ip = dataCache.get(GC_IP_KEY);
+        String port = dataCache.get(GC_PORT_KEY);
+        User lob_user;
 
         if (tfNewUserName.getText().length() >= 3) {
+
             if (Validation.emailValidation(tfNewUserEmail.getText())) {
+
                 if (Validation.passwordValidation(pwNewPassword.getText()) && pwNewPassword.getText().equals(pwNewPassword1.getText())) {
-                    user = ModelBuilder.getUserObject(tfNewUserEmail.getText(), pwNewPassword.getText(), tfNewUserName.getText());
+
+                    lob_user = ModelObjectBuilder.getUserObject(tfNewUserEmail.getText(), pwNewPassword.getText(),
+                            tfNewUserName.getText());
+
+
                     System.out.println("Userdaten Korrekt");
-                    if(Validation.ipValidation(ip) && Validation.portValidation(port)) {
+
+                    if (Validation.ipValidation(ip) && Validation.portValidation(port)) {
                         RestClient restClient = RestClientBuilder.buildRestClient(ip, port);
-                        HttpMessage httpMessage = restClient.registerNewUser(user);
+                        HttpMessage httpMessage = restClient.registerNewUser(lob_user);
                         printMessage(httpMessage);
                     }
+
                 } else {
                     System.out.println("Kein korrektes Passwort oder Passwort stimmt nicht überein");
                 }
@@ -147,7 +162,7 @@ public class LoginController{
         }
     }
 
-    private void printMessage(HttpMessage status){
+    private void printMessage(HttpMessage status) {
         switch (status.getHttpStatus()) {
             case 200:
                 System.out.println("User registriert");
@@ -167,16 +182,15 @@ public class LoginController{
 //    }
 
 
-    public boolean getIsAdmin()
-    {
+    public boolean getIsAdmin() {
         return isAdmin;
     }
 
-    public void close() {
-        ((Stage)tfUserName.getScene().getWindow()).close();
+    private void close() {
+        ((Stage) tfUserName.getScene().getWindow()).close();
     }
 
-    public void start(Stage stage) throws IOException{
+    public void start(Stage stage) throws IOException {
         Parent root;
         root = FXMLLoader.load(getClass().getClassLoader().getResource("loginScreen.fxml"));
         stage.setScene(new Scene(root));

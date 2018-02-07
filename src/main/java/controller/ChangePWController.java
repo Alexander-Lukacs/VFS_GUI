@@ -1,8 +1,6 @@
 package controller;
 
-import builder.RestClientBuilder;
-import cache.UserDataCache;
-import client.RestClient;
+import cache.DataCache;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -12,8 +10,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 
-import javax.sound.midi.Soundbank;
+import javax.xml.crypto.Data;
 import java.io.IOException;
+import java.util.Map;
 
 import static constants.SettingsConstants.*;
 
@@ -81,7 +80,8 @@ public class ChangePWController {
 
         if(lva_pwNew.equals(lva_pwConfirm)){
             //RestClient restclient = RestClientBuilder.buildRestClientWithAuth(email, password, ip, port);
-   //TODO         System.out.println(UserDataCache.getValue("IP"));
+            DataCache dataCache = DataCache.getDataCache();
+            System.out.println(dataCache.get(DataCache.GC_IP_KEY));
         }
     }
 }
