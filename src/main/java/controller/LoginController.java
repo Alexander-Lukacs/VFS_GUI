@@ -1,5 +1,9 @@
 package controller;
 
+import builder.ModelBuilder;
+import builder.RestClientBuilder;
+import cache.UserDataCache;
+import client.HttpMessage;
 import client.RestClient;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -11,7 +15,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import models.classes.UserImpl;
+import models.interfaces.User;
 
 
 import java.io.IOException;
@@ -47,6 +51,7 @@ public class LoginController{
     @FXML
     private TextField pwNewPassword1;
 
+
     @FXML
     private TextField tfIPAdress;
 
@@ -54,7 +59,7 @@ public class LoginController{
     private TextField tfPort;
 
 
-    private boolean isAdmin = false;
+    private boolean isAdmin = true;
 
     private Pattern pattern;
     private Matcher matcher;
@@ -62,7 +67,6 @@ public class LoginController{
     private String encodedString;
 
     private Stage stage = new Stage();
-    private UserImpl user = new UserImpl();
 
     private MainController mainController = new MainController();
 
@@ -85,29 +89,62 @@ public class LoginController{
 
     public void onClick(ActionEvent event) throws IOException
     {
+        User user = ModelBuilder.getUserObject();
 
-        if(!NAME.equals(tfUserName.getText()) || !PASSWORD.equals(pwPasswort.getText()))
-        {
-            System.out.println("Benutzername oder Passwort falsch!");
-        }
-        else {
-            tfUserName.setText("");
-            pwPasswort.setText("");
-            mainController.start(stage);
-            close();
-        }
+            String ip = tfIPAdress.getText();
+            String port = tfPort.getText();
+
+            RestClient restClient = RestClientBuilder.buildRestClientWithAuth(user.getEmail(), user.getPassword(), ip, port);
+            restClient.loginUser(user);
+
+
+            //TODO Vom Server uebergebenes Objekt auseinanderziehen und dann in den Cache setzen motherfucker
+            if(true) {
+
+                UserDataCache.put("IP",ip);
+                UserDataCache.put("PORT",port);
+                //UserDataCache.put("NAME",);
+                //passwort
+                //email
+                //admin
+                //... usw
+                tfUserName.setText("");
+                pwPasswort.setText("");
+                mainController.start(stage);
+                close();
+            }
+            else{
+                System.out.println("User setzt Login ein......... schlug fehl!");
+            }
     }
 
+    //TODO Messege Objekt statt println im Switch bitch case mase
     public void onClickRegister(ActionEvent event) throws IOException {
+        User user;
 
-        RestClient restClient = buildRestClient();
+        String ip = tfIPAdress.getText();
+        String port = tfPort.getText();
 
         if (tfNewUserName.getText().length() >= 3) {
             if (validateEmail(tfNewUserEmail.getText())) {
                 if (validatePasswort(pwNewPassword.getText()) && pwNewPassword.getText().equals(pwNewPassword1.getText())) {
-                    user = new UserImpl(tfNewUserEmail.getText(), pwNewPassword.getText(), tfNewUserName.getText());
-                    System.out.println("User registriert");
-                    restClient.registerNewUser(user);
+                    user = ModelBuilder.getUserObject(tfNewUserEmail.getText(), pwNewPassword.getText(), tfNewUserName.getText());
+                    System.out.println("Userdaten Korrekt");
+                    RestClient restClient = RestClientBuilder.buildRestClient(ip, port);
+                    HttpMessage httpMessage = restClient.registerNewUser(user);
+
+                    switch (httpMessage.getHttpStatus()){
+                        case 200:
+                            System.out.println("User registriert");
+                            break;
+                        case 400:
+                            System.out.println("Email wird bereits benutzt");
+                            break;
+
+                        case 409:
+                            System.out.println(httpMessage.getUserAddStatus());
+                    }
+
                 } else {
                     System.out.println("Kein korrektes Passwort oder Passwort stimmt nicht überein");
                 }
@@ -135,13 +172,6 @@ public class LoginController{
         pattern = Pattern.compile(VALID_PASSWORD_REGEX);
         matcher = pattern.matcher(password);
         return matcher.find();
-    }
-
-    private RestClient buildRestClient(){
-        String IP = tfIPAdress.getText();
-        String Port = tfPort.getText();
-        return new RestClient("http://"+IP+":"+Port+"/api");
-
     }
 
 

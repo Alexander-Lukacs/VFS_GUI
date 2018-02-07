@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
@@ -16,7 +12,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane fx:id="gob_rootPane" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LoginController">
+<AnchorPane fx:id="gob_rootPane" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LoginController">
    <children>
       <VBox spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -25,9 +21,9 @@
                   <HBox prefHeight="37.0" prefWidth="400.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
                         <Label text="Server" />
-                        <TextField fx:id="tfIPAdress" />
+                        <TextField fx:id="tfIPAdress" text="10.9.40.235" />
                         <Label text="Port" />
-                        <TextField fx:id="tfPort" prefHeight="31.0" prefWidth="66.0" />
+                        <TextField fx:id="tfPort" prefHeight="31.0" prefWidth="66.0" text="8080" />
                      </children>
                      <padding>
                         <Insets left="5.0" top="10.0" />
@@ -46,13 +42,13 @@
                                     <VBox alignment="CENTER" spacing="20.0">
                                        <children>
                                           <Label text="E-Mail" />
-                                          <TextField fx:id="tfUserName">
+                                          <TextField fx:id="tfUserName" text="Onur_93@yahoo.de">
                                              <VBox.margin>
                                                 <Insets left="250.0" right="250.0" />
                                              </VBox.margin>
                                           </TextField>
                                           <Label text="Password" />
-                                          <PasswordField fx:id="pwPasswort">
+                                          <PasswordField fx:id="pwPasswort" text="Pimmel123!">
                                              <VBox.margin>
                                                 <Insets left="250.0" right="250.0" />
                                              </VBox.margin>

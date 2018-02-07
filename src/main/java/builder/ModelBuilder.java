@@ -10,4 +10,8 @@ public class ModelBuilder {
     public static User getUserObject() {
         return new UserImpl();
     }
+
+    public static User getUserObject(String email, String password, String name) {
+        return new UserImpl(email, password, name);
+    }
 }
