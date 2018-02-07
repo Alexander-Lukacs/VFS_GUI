@@ -50,6 +50,8 @@ public class RestClient {
 
         lva_jsonInString = response.readEntity(String.class);
 
+        // TODO return value
+
         try {
             if (response.getStatus() == GC_HTTP_OK) {
                 lob_user = lob_mapper.readValue(lva_jsonInString, User.class);
