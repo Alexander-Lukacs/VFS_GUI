@@ -1,10 +1,7 @@
 package client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import models.classes.UserImpl;
 import models.interfaces.User;
-import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.MediaType;

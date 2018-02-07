@@ -4,7 +4,6 @@ import fileTree.models.TreeImpl;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
@@ -15,7 +14,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import tools.Utils;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -23,7 +21,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static constants.SettingsConstants.*;
-import static fileTree.models.TreeImpl.*;
 
 public class MainController {
 
