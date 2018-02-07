@@ -30,8 +30,10 @@ public class MainController {
     private Button btnSettings;
     @FXML
     private Button btnLogout;
+
     @FXML
     private TreeView<Path> treeView;
+
     @FXML
     private VBox vbox = new VBox();
 
@@ -61,17 +63,21 @@ public class MainController {
            }
     }
 
-    public void start(Stage lob_stage) throws  IOException{
+    public void initialize()throws  IOException
+    {
+        TreeImpl x = new TreeImpl("c:/Users/Robin/Documents/FileSystem");
+        TreeItem<Path> root = new TreeItem<Path>(Paths.get(x.getRoot().getCanonicalPath()));
+        createTree(root);
+        treeView = new TreeView<>(root);
+        vbox.getChildren().add(treeView);
+    }
+
+    public void start(Stage lob_stage) {
 
         FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("mainScreen.fxml"));
         try {
-                TreeImpl x = new TreeImpl("c:/Users/Robin/Documents/FileSystem");
-                TreeItem<Path> root = new TreeItem<Path>(Paths.get(x.getRoot().getCanonicalPath()));
-                createTree(root);
-                treeView = new TreeView<Path>(root);
                 SplitPane lob_pane = lob_loader.load();
                 Scene lob_scene = new Scene(lob_pane);
-                vbox.getChildren().add(treeView);
                 lob_stage.setTitle(VFS);
                 lob_stage.setScene(lob_scene);
                 lob_stage.show();
