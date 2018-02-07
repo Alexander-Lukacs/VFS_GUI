@@ -1,8 +1,12 @@
 package client;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
+import builder.ModelBuilder;
+import models.interfaces.User;
+
+import javax.swing.text.html.HTML;
+import javax.ws.rs.client.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 /**
  * Created by Mesut on 25.01.2018.
@@ -15,9 +19,21 @@ public class RestClient {
 
     public RestClient(String baseUrl) {
         Client client = ClientBuilder.newClient();
-        webTarget = client.target("10.9.40.180/api/user/addNewUser");
+        webTarget = client.target(baseUrl);
     }
 
-    public void registerNewUser(){}
+    public void registerNewUser(User user){
+        Response response = webTarget.path("/user/addNewUser").request().
+                put(Entity.entity(user, MediaType.APPLICATION_JSON));
+
+        System.out.println(response.readEntity(String.class));
+    }
+
+    public void loginUser (User user){
+        Response response = webTarget.path("/user/auth/login").request().
+                put(Entity.entity(user, MediaType.APPLICATION_JSON));
+
+        System.out.println(response.readEntity(String.class));
+    }
 
 }

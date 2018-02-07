@@ -1,25 +1,20 @@
 package controller;
 
+import client.RestClient;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import models.classes.UserImpl;
 
 
-import java.awt.*;
-import java.awt.event.KeyListener;
 import java.io.IOException;
-import java.util.Base64;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,6 +46,12 @@ public class LoginController{
 
     @FXML
     private TextField pwNewPassword1;
+
+    @FXML
+    private TextField tfIPAdress;
+
+    @FXML
+    private TextField tfPort;
 
 
     private boolean isAdmin = false;
@@ -99,11 +100,14 @@ public class LoginController{
 
     public void onClickRegister(ActionEvent event) throws IOException {
 
+        RestClient restClient = buildRestClient();
+
         if (tfNewUserName.getText().length() >= 3) {
             if (validateEmail(tfNewUserEmail.getText())) {
                 if (validatePasswort(pwNewPassword.getText()) && pwNewPassword.getText().equals(pwNewPassword1.getText())) {
                     user = new UserImpl(tfNewUserEmail.getText(), pwNewPassword.getText(), tfNewUserName.getText());
                     System.out.println("User registriert");
+                    restClient.registerNewUser(user);
                 } else {
                     System.out.println("Kein korrektes Passwort oder Passwort stimmt nicht überein");
                 }
@@ -115,16 +119,12 @@ public class LoginController{
         }
     }
 
-    public String encode(String input){
-        encodedString = Base64.getEncoder().encodeToString(input.getBytes());
-        return encodedString;
-    }
+//    public String encode(String input){
+//        encodedString = Base64.getEncoder().encodeToString(input.getBytes());
+//        return encodedString;
+//    }
 
     private boolean validateEmail(String email) {
-        System.out.println("Case1: " + pwNewPassword.getText());
-        System.out.println("Case2: " + pwNewPassword.getText());
-        System.out.println("equal: " + pwNewPassword.getText().equals(pwNewPassword1.getText()));
-        System.out.println("validation: " + validatePasswort(pwNewPassword.getText()));
 
         pattern = Pattern.compile(VALID_EMAIL_ADDRESS_REGEX, Pattern.CASE_INSENSITIVE);
         matcher = pattern.matcher(email);
@@ -137,7 +137,12 @@ public class LoginController{
         return matcher.find();
     }
 
+    private RestClient buildRestClient(){
+        String IP = tfIPAdress.getText();
+        String Port = tfPort.getText();
+        return new RestClient("http://"+IP+":"+Port+"/api");
 
+    }
 
 
     public boolean getIsAdmin()

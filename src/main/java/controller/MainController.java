@@ -65,7 +65,7 @@ public class MainController {
 
     public void initialize()throws  IOException
     {
-        TreeImpl x = new TreeImpl("c:/Users/Robin/Documents/FileSystem");
+        TreeImpl x = new TreeImpl("c:/Users/Mesut/FileSystem");
         TreeItem<Path> root = new TreeItem<Path>(Paths.get(x.getRoot().getCanonicalPath()));
         createTree(root);
         treeView = new TreeView<>(root);
