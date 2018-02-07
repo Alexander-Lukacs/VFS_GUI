@@ -78,9 +78,12 @@ public class LoginController {
     }
 
     /**
-     * Beim Klicken des Buttons wird geprüft ob der User ein Admin ist,
-     * falls ja, dann öffne die View settingAdmin.fxml
-     * falls nein, dann kommt eine Fehlermeldung
+     * reads the Textfields on Button Click
+     *
+     * Validate inputs
+     *
+     * sends inputs to Server, to Login.
+     *
      */
 
     public void onClick(ActionEvent event) throws IOException {
@@ -94,7 +97,7 @@ public class LoginController {
         if (Validation.ipValidation(lva_ip) && Validation.portValidation(lva_port)) {
             gob_dataCache.put(GC_IP_KEY, lva_ip);
             gob_dataCache.put(GC_PORT_KEY, lva_port);
-            System.out.println("ip und Port gehen klar");
+            System.out.println("ip und Port Validation gehen klar");
 
             if (Validation.passwordValidation(lva_password) && Validation.emailValidation(lva_email)) {
 

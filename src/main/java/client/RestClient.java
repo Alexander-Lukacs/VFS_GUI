@@ -31,7 +31,7 @@ public class RestClient {
         ObjectMapper mapper = new ObjectMapper();
         String jsonInString = response.readEntity(String.class);
 
-//JSON from String to Object
+        //JSON from String to Object
         HttpMessage obj = mapper.readValue(jsonInString, HttpMessage.class);
         obj.setHttpStatus(response.getStatus());
         return obj;

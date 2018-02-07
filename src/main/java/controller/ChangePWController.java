@@ -46,7 +46,7 @@ public class ChangePWController {
 
 
     /**
-     * Initiallisiert die ListView
+     * Initialisation of ListView
      */
     public void initialize() {
         listView.loadList(gob_lvOptions);
@@ -54,7 +54,7 @@ public class ChangePWController {
     }
 
     /**
-     * Öffnet die View die ausgewählt wurde
+     * open choosen View
      *
      * @param event
      * @throws IOException

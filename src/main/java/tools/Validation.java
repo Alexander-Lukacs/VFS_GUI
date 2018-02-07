@@ -2,7 +2,7 @@ package tools;
 
 import java.util.regex.*;
 
-import static models.constants.UserConstants.*;
+import static tools.constants.ValidationConstants.*;
 
 /**
  * Created by Mesut on 07.02.2018.

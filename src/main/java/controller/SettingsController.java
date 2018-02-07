@@ -22,7 +22,7 @@ public class SettingsController {
     private controller.ListView listView = new controller.ListView();
 
     /**
-     * Initiallisiert die ListView
+     * Initialize of ListView
      */
     public void initialize()
     {
@@ -31,7 +31,7 @@ public class SettingsController {
 
 
     /**
-     * Öffnet die View die ausgewählt wurde
+     * shows the choosen Settings View
      *
      * @param event
      * @throws IOException

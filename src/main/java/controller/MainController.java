@@ -40,7 +40,7 @@ public class MainController {
 
 
     /**
-     Beim Klicken des Buttons wird die View settings.fxml geöffnet
+     * Beim Klicken des Buttons wird die View settings.fxml geöffnet
      */
 
    public void onClick(ActionEvent e) throws RuntimeException, IOException{
