@@ -19,63 +19,57 @@ import models.interfaces.User;
 import tools.Validation;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import static cache.DataCache.GC_IP_KEY;
 import static cache.DataCache.GC_PORT_KEY;
 import static constants.SettingsConstants.VFS;
 
 public class LoginController {
-
     @FXML
     private AnchorPane gob_rootPane;
 
     @FXML
-    private Button btnLogin;
+    private Button gob_btnLogin;
 
     @FXML
-    private PasswordField pwPasswort;
+    private PasswordField gob_tf_loginPassword;
 
     @FXML
-    private TextField tfUserName;
+    private TextField gob_tf_userName;
 
     @FXML
-    private TextField tfNewUserName;
+    private TextField gob_tf_newUserName;
 
     @FXML
-    private TextField tfNewUserEmail;
+    private TextField gob_tf_newUserEmail;
 
     @FXML
-    private TextField pwNewPassword;
+    private TextField gob_tf_registerPassword;
 
     @FXML
-    private TextField pwNewPassword1;
-
-
-    @FXML
-    private TextField tfIPAdress;
+    private TextField gob_tf_confirmPassword1;
 
     @FXML
-    private TextField tfPort;
+    private TextField gob_tf_ipAddress;
 
+    @FXML
+    private TextField gob_tf_port;
 
     private boolean isAdmin = true;
-
     private String encodedString;
-
     private Stage stage = new Stage();
-
     private MainController mainController = new MainController();
-
     private DataCache dataCache;
 
     public void initialize() {
-        DataCache dataCache = DataCache.getDataCache();
+        dataCache = DataCache.getDataCache();
 
-        btnLogin.setOnKeyPressed(
+        gob_btnLogin.setOnKeyPressed(
                 event -> {
                     switch (event.getCode()) {
                         case ENTER:
-                            btnLogin.fire();
+                            gob_btnLogin.fire();
                     }
                 }
         );
@@ -89,17 +83,15 @@ public class LoginController {
 
     public void onClick(ActionEvent event) throws IOException {
         User lob_user = ModelObjectBuilder.getUserObject();
-        String lva_ip = tfIPAdress.getText();
-        String lva_port = tfPort.getText();
-        String lva_password = pwPasswort.getText();
-        String lva_email = tfUserName.getText();
-
-        dataCache.put(GC_IP_KEY, lva_ip);
-        dataCache.put(GC_PORT_KEY, lva_port);
+        String lva_ip = gob_tf_ipAddress.getText();
+        String lva_port = gob_tf_port.getText();
+        String lva_password = gob_tf_loginPassword.getText();
+        String lva_email = gob_tf_userName.getText();
 
         //TODO Vom Server uebergebenes Objekt auseinanderziehen und dann in den Cache setzen motherfucker
         if (Validation.ipValidation(lva_ip) && Validation.portValidation(lva_port)) {
-
+            dataCache.put(GC_IP_KEY, lva_ip);
+            dataCache.put(GC_PORT_KEY, lva_port);
             System.out.println("ip und Port gehen klar");
 
             if (Validation.passwordValidation(lva_password) && Validation.emailValidation(lva_email)) {
@@ -116,8 +108,8 @@ public class LoginController {
                     //email
                     //admin
                     //... usw
-                    tfUserName.setText("");
-                    pwPasswort.setText("");
+                    gob_tf_userName.setText("");
+                    gob_tf_loginPassword.setText("");
                     mainController.start(stage);
                     close();
                 }
@@ -129,24 +121,29 @@ public class LoginController {
 
     //TODO Messege Objekt statt println im Switch bitch case mase
     public void onClickRegister(ActionEvent event) throws IOException {
-        String ip = dataCache.get(GC_IP_KEY);
-        String port = dataCache.get(GC_PORT_KEY);
+        String lva_ip = dataCache.get(GC_IP_KEY);
+        String lva_port = dataCache.get(GC_PORT_KEY);
+        String lva_name = gob_tf_newUserName.getText();
+        String lva_email = gob_tf_newUserEmail.getText();
+        String lva_password = gob_tf_registerPassword.getText();
+        String lva_confirmPassword = gob_tf_confirmPassword1.getText();
+
         User lob_user;
 
-        if (tfNewUserName.getText().length() >= 3) {
+        if (Validation.nameValidation(lva_name)) {
+            if (Validation.emailValidation(lva_email)) {
 
-            if (Validation.emailValidation(tfNewUserEmail.getText())) {
+                if (Validation.passwordValidation(lva_password) &&
+                    Validation.passwordEqualsValidation(lva_password, lva_confirmPassword)) {
 
-                if (Validation.passwordValidation(pwNewPassword.getText()) && pwNewPassword.getText().equals(pwNewPassword1.getText())) {
-
-                    lob_user = ModelObjectBuilder.getUserObject(tfNewUserEmail.getText(), pwNewPassword.getText(),
-                            tfNewUserName.getText());
-
-
+                    lob_user = ModelObjectBuilder.getUserObject(lva_email, lva_password, lva_name);
                     System.out.println("Userdaten Korrekt");
 
-                    if (Validation.ipValidation(ip) && Validation.portValidation(port)) {
-                        RestClient restClient = RestClientBuilder.buildRestClient(ip, port);
+                    if (Validation.ipValidation(lva_ip) && Validation.portValidation(lva_port)) {
+                        dataCache.put(GC_IP_KEY, lva_ip);
+                        dataCache.put(GC_PORT_KEY, lva_port);
+
+                        RestClient restClient = RestClientBuilder.buildRestClient(lva_ip, lva_port);
                         HttpMessage httpMessage = restClient.registerNewUser(lob_user);
                         printMessage(httpMessage);
                     }
@@ -165,14 +162,15 @@ public class LoginController {
     private void printMessage(HttpMessage status) {
         switch (status.getHttpStatus()) {
             case 200:
-                System.out.println("User registriert");
+                System.out.println(status.getUserAddStatus());
                 break;
             case 400:
-                System.out.println("Email wird bereits benutzt");
+                System.out.println(status.getUserAddStatus());
                 break;
 
             case 409:
                 System.out.println(status.getUserAddStatus());
+                break;
         }
     }
 
@@ -187,12 +185,12 @@ public class LoginController {
     }
 
     private void close() {
-        ((Stage) tfUserName.getScene().getWindow()).close();
+        ((Stage) gob_tf_userName.getScene().getWindow()).close();
     }
 
     public void start(Stage stage) throws IOException {
         Parent root;
-        root = FXMLLoader.load(getClass().getClassLoader().getResource("loginScreen.fxml"));
+        root = FXMLLoader.load(Objects.requireNonNull(getClass().getClassLoader().getResource("loginScreen.fxml")));
         stage.setScene(new Scene(root));
         stage.setTitle(VFS);
         stage.show();

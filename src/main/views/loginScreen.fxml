@@ -21,9 +21,9 @@
                   <HBox prefHeight="37.0" prefWidth="400.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
                         <Label text="Server" />
-                        <TextField fx:id="tfIPAdress" text="10.9.40.235" />
+                        <TextField fx:id="gob_tf_ipAddress" text="10.9.40.235" />
                         <Label text="Port" />
-                        <TextField fx:id="tfPort" prefHeight="31.0" prefWidth="66.0" text="8080" />
+                        <TextField fx:id="gob_tf_port" prefHeight="31.0" prefWidth="66.0" text="8080" />
                      </children>
                      <padding>
                         <Insets left="5.0" top="10.0" />
@@ -42,18 +42,18 @@
                                     <VBox alignment="CENTER" spacing="20.0">
                                        <children>
                                           <Label text="E-Mail" />
-                                          <TextField fx:id="tfUserName" text="Onur_93@yahoo.de">
+                                          <TextField fx:id="gob_tf_userName" text="Onur_93@yahoo.de">
                                              <VBox.margin>
                                                 <Insets left="250.0" right="250.0" />
                                              </VBox.margin>
                                           </TextField>
                                           <Label text="Password" />
-                                          <PasswordField fx:id="pwPasswort" text="Pimmel123!">
+                                          <PasswordField fx:id="gob_tf_loginPassword" text="Pimmel123!">
                                              <VBox.margin>
                                                 <Insets left="250.0" right="250.0" />
                                              </VBox.margin>
                                           </PasswordField>
-                                          <Button fx:id="btnLogin" mnemonicParsing="false" onAction="#onClick" text="Login" />
+                                          <Button fx:id="gob_btnLogin" mnemonicParsing="false" onAction="#onClick" text="Login" />
                                        </children>
                                     </VBox>
                                  </children>
@@ -71,25 +71,25 @@
                                     <VBox alignment="CENTER" spacing="20.0">
                                        <children>
                                           <Label text="Username" />
-                                          <TextField fx:id="tfNewUserName">
+                                          <TextField fx:id="gob_tf_newUserName">
                                              <VBox.margin>
                                                 <Insets left="250.0" right="250.0" />
                                              </VBox.margin>
                                           </TextField>
                                           <Label layoutX="377.0" layoutY="138.0" text="E-Mail" />
-                                          <TextField fx:id="tfNewUserEmail" layoutX="260.0" layoutY="158.0">
+                                          <TextField fx:id="gob_tf_newUserEmail" layoutX="260.0" layoutY="158.0">
                                              <VBox.margin>
                                                 <Insets left="250.0" right="250.0" />
                                              </VBox.margin>
                                           </TextField>
                                           <Label text="Password" />
-                                          <PasswordField fx:id="pwNewPassword">
+                                          <PasswordField fx:id="gob_tf_registerPassword">
                                              <VBox.margin>
                                                 <Insets left="250.0" right="250.0" />
                                              </VBox.margin>
                                           </PasswordField>
                                           <Label layoutX="377.0" layoutY="184.0" text="Repeat Password" />
-                                          <PasswordField fx:id="pwNewPassword1">
+                                          <PasswordField fx:id="gob_tf_confirmPassword1">
                                              <VBox.margin>
                                                 <Insets left="250.0" right="250.0" />
                                              </VBox.margin>

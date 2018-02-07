@@ -34,4 +34,12 @@ public class Validation {
         matcher = pattern.matcher(password);
         return matcher.find();
     }
+
+    public static boolean nameValidation(String iva_name) {
+        return iva_name.trim().length() >= 3;
+    }
+
+    public static boolean passwordEqualsValidation(String iva_password1, String iva_password2) {
+        return iva_password1.equals(iva_password2);
+    }
 }
