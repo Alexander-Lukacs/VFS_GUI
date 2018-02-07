@@ -16,14 +16,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import models.interfaces.User;
+import tools.Validation;
 
 
 import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static constants.SettingsConstants.*;
-import static models.constants.UserConstants.*;
 
 public class LoginController{
 
@@ -61,9 +59,6 @@ public class LoginController{
 
     private boolean isAdmin = true;
 
-    private Pattern pattern;
-    private Matcher matcher;
-
     private String encodedString;
 
     private Stage stage = new Stage();
@@ -94,24 +89,30 @@ public class LoginController{
             String ip = tfIPAdress.getText();
             String port = tfPort.getText();
 
-            RestClient restClient = RestClientBuilder.buildRestClientWithAuth(user.getEmail(), user.getPassword(), ip, port);
-            restClient.loginUser(user);
-
-
             //TODO Vom Server uebergebenes Objekt auseinanderziehen und dann in den Cache setzen motherfucker
-            if(true) {
+            if(Validation.ipValidation(ip) && Validation.portValidation(port)) {
+                System.out.println("ip und Port gehen klar");
 
-                UserDataCache.put("IP",ip);
-                UserDataCache.put("PORT",port);
-                //UserDataCache.put("NAME",);
-                //passwort
-                //email
-                //admin
-                //... usw
-                tfUserName.setText("");
-                pwPasswort.setText("");
-                mainController.start(stage);
-                close();
+                if (Validation.passwordValidation(pwPasswort.getText()) && Validation.emailValidation(tfUserName.getText())) {
+
+                    RestClient restClient = RestClientBuilder.buildRestClientWithAuth(user.getEmail(), user.getPassword(), ip, port);
+                    restClient.loginUser(user);
+
+                    if(/*was wir von flo bekommen ==*/ true) {
+
+                        UserDataCache.put("IP", ip);
+                        UserDataCache.put("PORT", port);
+                        //UserDataCache.put("NAME",);
+                        //passwort
+                        //email
+                        //admin
+                        //... usw
+                        tfUserName.setText("");
+                        pwPasswort.setText("");
+                        mainController.start(stage);
+                        close();
+                    }
+                }
             }
             else{
                 System.out.println("User setzt Login ein......... schlug fehl!");
@@ -126,25 +127,15 @@ public class LoginController{
         String port = tfPort.getText();
 
         if (tfNewUserName.getText().length() >= 3) {
-            if (validateEmail(tfNewUserEmail.getText())) {
-                if (validatePasswort(pwNewPassword.getText()) && pwNewPassword.getText().equals(pwNewPassword1.getText())) {
+            if (Validation.emailValidation(tfNewUserEmail.getText())) {
+                if (Validation.passwordValidation(pwNewPassword.getText()) && pwNewPassword.getText().equals(pwNewPassword1.getText())) {
                     user = ModelBuilder.getUserObject(tfNewUserEmail.getText(), pwNewPassword.getText(), tfNewUserName.getText());
                     System.out.println("Userdaten Korrekt");
-                    RestClient restClient = RestClientBuilder.buildRestClient(ip, port);
-                    HttpMessage httpMessage = restClient.registerNewUser(user);
-
-                    switch (httpMessage.getHttpStatus()){
-                        case 200:
-                            System.out.println("User registriert");
-                            break;
-                        case 400:
-                            System.out.println("Email wird bereits benutzt");
-                            break;
-
-                        case 409:
-                            System.out.println(httpMessage.getUserAddStatus());
+                    if(Validation.ipValidation(ip) && Validation.portValidation(port)) {
+                        RestClient restClient = RestClientBuilder.buildRestClient(ip, port);
+                        HttpMessage httpMessage = restClient.registerNewUser(user);
+                        printMessage(httpMessage);
                     }
-
                 } else {
                     System.out.println("Kein korrektes Passwort oder Passwort stimmt nicht überein");
                 }
@@ -156,23 +147,24 @@ public class LoginController{
         }
     }
 
+    private void printMessage(HttpMessage status){
+        switch (status.getHttpStatus()) {
+            case 200:
+                System.out.println("User registriert");
+                break;
+            case 400:
+                System.out.println("Email wird bereits benutzt");
+                break;
+
+            case 409:
+                System.out.println(status.getUserAddStatus());
+        }
+    }
+
 //    public String encode(String input){
 //        encodedString = Base64.getEncoder().encodeToString(input.getBytes());
 //        return encodedString;
 //    }
-
-    private boolean validateEmail(String email) {
-
-        pattern = Pattern.compile(VALID_EMAIL_ADDRESS_REGEX, Pattern.CASE_INSENSITIVE);
-        matcher = pattern.matcher(email);
-        return matcher.find();
-    }
-
-    private boolean validatePasswort(String password){
-        pattern = Pattern.compile(VALID_PASSWORD_REGEX);
-        matcher = pattern.matcher(password);
-        return matcher.find();
-    }
 
 
     public boolean getIsAdmin()

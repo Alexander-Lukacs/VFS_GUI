@@ -3,16 +3,16 @@ package controller;
 import builder.RestClientBuilder;
 import cache.UserDataCache;
 import client.RestClient;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 
 import javax.sound.midi.Soundbank;
-import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.io.IOException;
 
 import static constants.SettingsConstants.*;
@@ -32,7 +32,7 @@ public class ChangePWController {
     private TextField txtNewPassword;
 
     @FXML
-    private TextField txtConfrmPassword;
+    private TextField txtConfirmPassword;
 
     @FXML
     private AnchorPane gob_rootPane;
@@ -77,11 +77,11 @@ public class ChangePWController {
     public void OnClick(ActionEvent event){
         String lva_pwOld = txtOldPassword.getText();
         String lva_pwNew = txtNewPassword.getText();
-        String lva_pwConfirm = txtConfrmPassword.getText();
+        String lva_pwConfirm = txtConfirmPassword.getText();
 
         if(lva_pwNew.equals(lva_pwConfirm)){
             //RestClient restclient = RestClientBuilder.buildRestClientWithAuth(email, password, ip, port);
-            System.out.println(UserDataCache.getValue("IP"));
+   //TODO         System.out.println(UserDataCache.getValue("IP"));
         }
     }
 }
