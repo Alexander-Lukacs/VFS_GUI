@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane fx:id="gob_rootPane" prefWidth="550.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ChangePWController">
+<AnchorPane fx:id="gob_rootPane" prefWidth="550.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ChangePWController">
     <children>
           <HBox alignment="CENTER_LEFT" prefHeight="400.0" prefWidth="550.0">
               <children>
@@ -21,24 +21,24 @@
                                   <Insets top="40.0" />
                               </VBox.margin>
                           </Label>
-                          <PasswordField fx:id="txtOldPassword" promptText=" ">
+                          <PasswordField fx:id="gob_tf_oldPassword" promptText=" ">
                               <VBox.margin>
                                   <Insets left="100.0" right="100.0" />
                               </VBox.margin>
                           </PasswordField>
                           <Label alignment="CENTER" text="New Password" />
-                          <PasswordField fx:id="txtNewPassword" layoutX="110.0" layoutY="87.0" promptText=" ">
+                          <PasswordField fx:id="gob_tf_newPassword" layoutX="110.0" layoutY="87.0" promptText=" ">
                               <VBox.margin>
                                   <Insets left="100.0" right="100.0" />
                               </VBox.margin>
                           </PasswordField>
                           <Label alignment="CENTER" text="Confirm Password" />
-                          <PasswordField fx:id="txtConfirmPassword" layoutX="10.0" layoutY="169.0" promptText=" ">
+                          <PasswordField fx:id="gob_tf_confirmPassword" layoutX="10.0" layoutY="169.0" promptText=" ">
                               <VBox.margin>
                                   <Insets left="100.0" right="100.0" />
                               </VBox.margin>
                           </PasswordField>
-                          <Button fx:id="gob_btnSave" mnemonicParsing="false" onAction="#OnClick" text="Save" />
+                          <Button fx:id="gob_btnSave" mnemonicParsing="false" onAction="#onChangePasswordButtonClick" text="Save" />
                       </children>
                   </VBox>
               </children>

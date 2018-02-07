@@ -1,6 +1,8 @@
 package controller;
 
+import builder.RestClientBuilder;
 import cache.DataCache;
+import client.RestClient;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -9,11 +11,13 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import tools.Validation;
 
-import javax.xml.crypto.Data;
 import java.io.IOException;
-import java.util.Map;
 
+import static cache.DataCache.GC_IP_KEY;
+import static cache.DataCache.GC_PASSWORD_KEY;
+import static cache.DataCache.GC_PORT_KEY;
 import static constants.SettingsConstants.*;
 
 public class ChangePWController {
@@ -25,28 +29,30 @@ public class ChangePWController {
     private Button gob_btnSave;
 
     @FXML
-    private TextField txtOldPassword;
+    private TextField gob_tf_oldPassword;
 
     @FXML
-    private TextField txtNewPassword;
+    private TextField gob_tf_newPassword;
 
     @FXML
-    private TextField txtConfirmPassword;
+    private TextField gob_tf_confirmPassword;
 
     @FXML
     private AnchorPane gob_rootPane;
 
     private controller.ListView listView = new controller.ListView();
+    private DataCache gob_dataCache;
 
 
 
     /**
      * Initiallisiert die ListView
      */
-    public void initialize()
-    {
+    public void initialize() {
         listView.loadList(gob_lvOptions);
+        gob_dataCache = DataCache.getDataCache();
     }
+
     /**
      * Öffnet die View die ausgewählt wurde
      *
@@ -54,18 +60,18 @@ public class ChangePWController {
      * @throws IOException
      */
     public void loadView(MouseEvent event) throws IOException {
-
-        if(gob_lvOptions.getSelectionModel().getSelectedItem().equals(CHANGE_PW))
-        {
+        if(gob_lvOptions.getSelectionModel().getSelectedItem().equals(CHANGE_PW)) {
             FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("ChangePW.fxml"));
             AnchorPane lob_pane = lob_loader.load();
             gob_rootPane.getChildren().setAll(lob_pane);
         }
+
         if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(ADMIN_ADD)) {
             FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("addAdmin.fxml"));
             AnchorPane lob_pane = lob_loader.load();
             gob_rootPane.getChildren().setAll(lob_pane);
         }
+
         if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(CHANGE_IP_PORT)) {
             FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("changeIpPort.fxml"));
             AnchorPane lob_pane = lob_loader.load();
@@ -73,15 +79,21 @@ public class ChangePWController {
         }
     }
 
-    public void OnClick(ActionEvent event){
-        String lva_pwOld = txtOldPassword.getText();
-        String lva_pwNew = txtNewPassword.getText();
-        String lva_pwConfirm = txtConfirmPassword.getText();
+    public void onChangePasswordButtonClick(ActionEvent event){
+        String lva_ip   = gob_dataCache.get(GC_IP_KEY);
+        String lva_port = gob_dataCache.get(GC_PORT_KEY);
 
-        if(lva_pwNew.equals(lva_pwConfirm)){
-            //RestClient restclient = RestClientBuilder.buildRestClientWithAuth(email, password, ip, port);
-            DataCache dataCache = DataCache.getDataCache();
-            System.out.println(dataCache.get(DataCache.GC_IP_KEY));
+        String lva_oldCachedPassword = gob_dataCache.get(GC_PASSWORD_KEY);
+        String lva_oldPassword       = gob_tf_oldPassword.getText();
+        String lva_newPassword       = gob_tf_newPassword.getText();
+        String lva_confirmPassword   = gob_tf_confirmPassword.getText();
+
+        if (Validation.passwordEqualsValidation(lva_oldPassword, lva_oldCachedPassword)) {
+            if(Validation.passwordEqualsValidation(lva_newPassword, lva_confirmPassword)){
+                RestClient restclient = RestClientBuilder.buildRestClient(lva_ip, lva_port);
+            }
         }
+
+
     }
 }
