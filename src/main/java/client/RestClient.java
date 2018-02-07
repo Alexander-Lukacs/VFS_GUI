@@ -19,16 +19,7 @@ public class RestClient {
     private WebTarget webTarget;
 
     public RestClient(String baseUrl) {
-       new RestClient(baseUrl,"","");
-    }
-
-    public RestClient(String baseUrl, String email, String password) {
-        ClientConfig clientConfig = new ClientConfig();
-        HttpAuthenticationFeature feature = HttpAuthenticationFeature.basicBuilder()
-        .nonPreemptive().credentials(email, password).build();
-        clientConfig.register(feature);
-
-        Client client = ClientBuilder.newClient(clientConfig);
+        Client client = ClientBuilder.newClient();
         webTarget = client.target(baseUrl);
     }
 

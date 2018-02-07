@@ -10,11 +10,6 @@ import java.awt.*;
  */
 
 public class RestClientBuilder {
-
-    public static RestClient buildRestClientWithAuth(String email, String password, String ip, String port){
-        return new RestClient("http://"+ip+":"+port+"/api", email, password);
-    }
-
     public static RestClient buildRestClient( String ip, String port){
         return new RestClient("http://"+ip+":"+port+"/api");
     }

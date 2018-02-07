@@ -60,10 +60,12 @@ public class LoginController {
     private String encodedString;
     private Stage stage = new Stage();
     private MainController mainController = new MainController();
-    private DataCache dataCache;
+    private DataCache gob_dataCache;
+    private RestClient gob_restClient;
+    private HttpMessage gob_httpMessage;
 
     public void initialize() {
-        dataCache = DataCache.getDataCache();
+        gob_dataCache = DataCache.getDataCache();
 
         gob_btnLogin.setOnKeyPressed(
                 event -> {
@@ -90,14 +92,13 @@ public class LoginController {
 
         //TODO Vom Server uebergebenes Objekt auseinanderziehen und dann in den Cache setzen motherfucker
         if (Validation.ipValidation(lva_ip) && Validation.portValidation(lva_port)) {
-            dataCache.put(GC_IP_KEY, lva_ip);
-            dataCache.put(GC_PORT_KEY, lva_port);
+            gob_dataCache.put(GC_IP_KEY, lva_ip);
+            gob_dataCache.put(GC_PORT_KEY, lva_port);
             System.out.println("ip und Port gehen klar");
 
             if (Validation.passwordValidation(lva_password) && Validation.emailValidation(lva_email)) {
 
-                RestClient restClient = RestClientBuilder.buildRestClientWithAuth(lob_user.getEmail(),
-                        lob_user.getPassword(), lva_ip, lva_port);
+                RestClient restClient = RestClientBuilder.buildRestClient(lva_ip, lva_port);
 
                 restClient.loginUser(lob_user);
 
@@ -119,10 +120,9 @@ public class LoginController {
         }
     }
 
-    //TODO Messege Objekt statt println im Switch bitch case mase
     public void onClickRegister(ActionEvent event) throws IOException {
-        String lva_ip = dataCache.get(GC_IP_KEY);
-        String lva_port = dataCache.get(GC_PORT_KEY);
+        String lva_ip = gob_tf_ipAddress.getText();
+        String lva_port = gob_tf_port.getText();
         String lva_name = gob_tf_newUserName.getText();
         String lva_email = gob_tf_newUserEmail.getText();
         String lva_password = gob_tf_registerPassword.getText();
@@ -137,15 +137,14 @@ public class LoginController {
                     Validation.passwordEqualsValidation(lva_password, lva_confirmPassword)) {
 
                     lob_user = ModelObjectBuilder.getUserObject(lva_email, lva_password, lva_name);
-                    System.out.println("Userdaten Korrekt");
 
                     if (Validation.ipValidation(lva_ip) && Validation.portValidation(lva_port)) {
-                        dataCache.put(GC_IP_KEY, lva_ip);
-                        dataCache.put(GC_PORT_KEY, lva_port);
+                        gob_dataCache.put(GC_IP_KEY, lva_ip);
+                        gob_dataCache.put(GC_PORT_KEY, lva_port);
 
-                        RestClient restClient = RestClientBuilder.buildRestClient(lva_ip, lva_port);
-                        HttpMessage httpMessage = restClient.registerNewUser(lob_user);
-                        printMessage(httpMessage);
+                        gob_restClient = RestClientBuilder.buildRestClient(lva_ip, lva_port);
+                        gob_httpMessage = gob_restClient.registerNewUser(lob_user);
+                        printMessage(gob_httpMessage);
                     }
 
                 } else {
@@ -160,6 +159,7 @@ public class LoginController {
     }
 
     private void printMessage(HttpMessage status) {
+        // TODO kein sout sondern Nachrichten im Client
         switch (status.getHttpStatus()) {
             case 200:
                 System.out.println(status.getUserAddStatus());
