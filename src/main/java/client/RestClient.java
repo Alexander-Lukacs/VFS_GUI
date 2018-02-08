@@ -2,10 +2,14 @@ package client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import models.interfaces.User;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
+import sun.security.provider.certpath.OCSPResponse;
 
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.ws.WebServiceException;
 import java.io.IOException;
 
 import static client.constants.HttpStatusCodes.GC_HTTP_OK;
@@ -15,12 +19,18 @@ import static client.constants.HttpStatusCodes.GC_HTTP_OK;
  */
 
 public class RestClient {
-
     private WebTarget webTarget;
 
     public RestClient(String baseUrl) {
         Client client = ClientBuilder.newClient();
         webTarget = client.target(baseUrl);
+    }
+
+    public RestClient(String baseUrl, String iva_email, String iva_password) {
+        HttpAuthenticationFeature authDetails = HttpAuthenticationFeature.basic(iva_email, iva_password);
+        ClientConfig config = new ClientConfig(authDetails);
+        Client client = ClientBuilder.newClient(config);
+        client.register(authDetails);
     }
 
     public HttpMessage registerNewUser(User user) throws IOException{
@@ -36,13 +46,13 @@ public class RestClient {
         return obj;
     }
 
-    public void loginUser (User user) {
+    public User loginUser (User user) {
         ObjectMapper lob_mapper = new ObjectMapper();
         String lva_jsonInString;
         HttpMessage lob_httpMessage;
-        User lob_user;
+        User lob_user = null;
 
-        Response response = webTarget.path("/user/login").request()
+        Response response = webTarget.path("/user/auth/login").request()
                 .put(Entity.entity(user, MediaType.APPLICATION_JSON));
 
         lva_jsonInString = response.readEntity(String.class);
@@ -55,13 +65,27 @@ public class RestClient {
             } else {
                 lob_httpMessage = lob_mapper.readValue(lva_jsonInString, HttpMessage.class);
                 lob_httpMessage.setHttpStatus(response.getStatus());
+                throw new IllegalArgumentException(lob_httpMessage.getUserLoginStatus());
             }
         } catch (IOException ex) {
             ex.printStackTrace();
         }
 
+        // TODO Löschen
+        System.out.println(response.readEntity(String.class));
 
+        return lob_user;
+    }
 
+    public void changePassword(User iob_user) {
+        String lva_jsonInString;
+
+        Response response = webTarget.path("user/auth/changePassword").request()
+                .put(Entity.entity(iob_user, MediaType.APPLICATION_JSON));
+
+        lva_jsonInString = response.readEntity(String.class);
+
+        // TODO Löschen
         System.out.println(response.readEntity(String.class));
     }
 

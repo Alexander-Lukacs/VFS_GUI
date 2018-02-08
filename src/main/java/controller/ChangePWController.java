@@ -1,5 +1,6 @@
 package controller;
 
+import builder.ModelObjectBuilder;
 import builder.RestClientBuilder;
 import cache.DataCache;
 import client.RestClient;
@@ -11,10 +12,12 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import models.interfaces.User;
 import tools.Validation;
 
 import java.io.IOException;
 
+import static cache.DataCache.*;
 import static cache.DataCache.GC_IP_KEY;
 import static cache.DataCache.GC_PASSWORD_KEY;
 import static cache.DataCache.GC_PORT_KEY;
@@ -80,9 +83,12 @@ public class ChangePWController {
     }
 
     public void onChangePasswordButtonClick(ActionEvent event){
+        User lob_user;
+
         String lva_ip   = gob_dataCache.get(GC_IP_KEY);
         String lva_port = gob_dataCache.get(GC_PORT_KEY);
 
+        String lva_email             = gob_dataCache.get(GC_EMAIL_KEY);
         String lva_oldCachedPassword = gob_dataCache.get(GC_PASSWORD_KEY);
         String lva_oldPassword       = gob_tf_oldPassword.getText();
         String lva_newPassword       = gob_tf_newPassword.getText();
@@ -90,10 +96,15 @@ public class ChangePWController {
 
         if (Validation.passwordEqualsValidation(lva_oldPassword, lva_oldCachedPassword)) {
             if(Validation.passwordEqualsValidation(lva_newPassword, lva_confirmPassword)){
-                RestClient restclient = RestClientBuilder.buildRestClient(lva_ip, lva_port);
+                RestClient restclient = RestClientBuilder.buildRestClientWithAuth(lva_ip, lva_port,
+                        lva_email, lva_oldCachedPassword);
+
+                lob_user = ModelObjectBuilder.getUserObject();
+                lob_user.setEmail(lva_email);
+                lob_user.setPassword(lva_newPassword);
+
+                restclient.changePassword(lob_user);
             }
         }
-
-
     }
 }

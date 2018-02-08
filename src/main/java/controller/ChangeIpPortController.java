@@ -37,13 +37,12 @@ public class ChangeIpPortController {
      */
     public void loadView(MouseEvent event) throws IOException {
 
-        if(gob_lvOptions.getSelectionModel().getSelectedItem() == CHANGE_PW)
-        {
+        if(gob_lvOptions.getSelectionModel().getSelectedItem().equals(CHANGE_PW)) {
             FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("ChangePW.fxml"));
             AnchorPane lob_pane = lob_loader.load();
             gob_rootPane.getChildren().setAll(lob_pane);
         }
-        if (gob_lvOptions.getSelectionModel().getSelectedItem() == ADMIN_ADD) {
+        if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(ADMIN_ADD)) {
             FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("addAdmin.fxml"));
             AnchorPane lob_pane = lob_loader.load();
             gob_rootPane.getChildren().setAll(lob_pane);
