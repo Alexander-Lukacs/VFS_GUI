@@ -93,7 +93,5 @@ public class ChangePWController {
                 RestClient restclient = RestClientBuilder.buildRestClient(lva_ip, lva_port);
             }
         }
-
-
     }
 }
