@@ -10,21 +10,17 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import models.interfaces.User;
 import tools.Validation;
 
-import javax.xml.ws.Response;
 import java.io.IOException;
 import java.util.Objects;
 
-import static cache.DataCache.GC_IP_KEY;
-import static cache.DataCache.GC_PORT_KEY;
-import static controller.constants.SettingsConstants.VFS;
+import static cache.DataCache.*;
+import static controller.constants.SettingsConstants.GC_VFS;
 
 public class LoginController {
     @FXML
@@ -57,7 +53,9 @@ public class LoginController {
     @FXML
     private TextField gob_tf_port;
 
-    private boolean isAdmin = true;
+    @FXML
+    private TabPane gob_tabPane = new TabPane();
+
     private String encodedString;
     private Stage stage = new Stage();
     private MainController mainController = new MainController();
@@ -104,23 +102,17 @@ public class LoginController {
 
                 RestClient restClient = RestClientBuilder.buildRestClientWithAuth(lva_ip, lva_port, lva_email, lva_password);
                 try {
+                    lob_user.setEmail(lva_email);
+                    lob_user.setPassword(lva_password);
                     lob_user = restClient.loginUser(lob_user);
                 } catch (IllegalArgumentException ex) {
                     System.out.println(ex.getMessage());
                 }
-
-                if (/*was wir von flo bekommen ==*/ true) {
-
-                    //UserDataCache.put("NAME",);
-                    //passwort
-                    //email
-                    //admin
-                    //... usw
-                    gob_tf_userName.setText("");
-                    gob_tf_loginPassword.setText("");
-                    mainController.start(stage);
-                    close();
-                }
+                cacheUser(lob_user);
+                gob_tf_userName.setText("");
+                gob_tf_loginPassword.setText("");
+                mainController.start(stage);
+                close();
             }
         } else {
             System.out.println("User setzt Login ein......... schlug fehl!");
@@ -152,6 +144,7 @@ public class LoginController {
                         gob_restClient = RestClientBuilder.buildRestClient(lva_ip, lva_port);
                         gob_httpMessage = gob_restClient.registerNewUser(lob_user);
                         printMessage(gob_httpMessage);
+                       gob_tabPane.getSelectionModel().selectFirst();
                     }
 
                 } else {
@@ -163,6 +156,16 @@ public class LoginController {
         } else {
             System.out.println("Username muss min. 3 Buchstaben lang sein");
         }
+    }
+
+    private void cacheUser(User iob_user){
+        gob_dataCache.put(GC_EMAIL_KEY, iob_user.getEmail());
+        gob_dataCache.put(GC_PASSWORD_KEY, iob_user.getPassword());
+        gob_dataCache.put(GC_NAME_KEY, iob_user.getName());
+        gob_dataCache.put(GC_ADMIN_ID_KEY, String.valueOf(iob_user.getAdminId()));
+        gob_dataCache.put(GC_USER_ID_KEY, String.valueOf(iob_user.getUserId()));
+        gob_dataCache.put(GC_IS_ADMIN_KEY, String.valueOf(iob_user.getIsAdmin()));
+
     }
 
     private void printMessage(HttpMessage status) {
@@ -188,7 +191,7 @@ public class LoginController {
 
 
     public boolean getIsAdmin() {
-        return isAdmin;
+        return Boolean.parseBoolean(gob_dataCache.get(GC_IS_ADMIN_KEY));
     }
 
     private void close() {
@@ -199,7 +202,7 @@ public class LoginController {
         Parent root;
         root = FXMLLoader.load(Objects.requireNonNull(getClass().getClassLoader().getResource("loginScreen.fxml")));
         stage.setScene(new Scene(root));
-        stage.setTitle(VFS);
+        stage.setTitle(GC_VFS);
         stage.show();
     }
 

@@ -12,9 +12,9 @@ public class UserImpl implements User {
     private String email;
     private String password;
     private String name;
-    private boolean gva_isAdmin;
-    private int gva_userId;
-    private int gva_adminId;
+    private boolean isAdmin;
+    private int userId;
+    private int adminId;
 
     public UserImpl() {
     }
@@ -28,7 +28,7 @@ public class UserImpl implements User {
         setEmail(iva_email);
         setPassword(iva_password);
         setName(iva_name);
-        this.gva_isAdmin = iva_isAdmin;
+        this.isAdmin = iva_isAdmin;
         setUserId(iva_userId);
 
         if (iva_isAdmin) {
@@ -47,16 +47,16 @@ public class UserImpl implements User {
     }
 
     public void setIsAdmin(boolean iva_isAdmin) {
-        this.gva_isAdmin = iva_isAdmin;
+        this.isAdmin = iva_isAdmin;
     }
 
     public void setUserId(int iva_userId) {
 
-        this.gva_userId = iva_userId;
+        this.userId = iva_userId;
     }
 
     public void setAdminId(int iva_adminId) {
-        this.gva_adminId = iva_adminId;
+        this.adminId = iva_adminId;
     }
 
     public void setName(String iva_name) {
@@ -73,15 +73,15 @@ public class UserImpl implements User {
     }
 
     public boolean getIsAdmin() {
-        return this.gva_isAdmin;
+        return this.isAdmin;
     }
 
     public int getUserId() {
-        return this.gva_userId;
+        return this.userId;
     }
 
     public int getAdminId() {
-        return this.gva_adminId;
+        return this.adminId;
     }
 
     public String getName() {
@@ -94,9 +94,9 @@ public class UserImpl implements User {
                 "email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", name='" + name + '\'' +
-                ", gva_isAdmin=" + gva_isAdmin +
-                ", gva_userId=" + gva_userId +
-                ", gva_adminId=" + gva_adminId +
+                ", isAdmin=" + isAdmin +
+                ", userId=" + userId +
+                ", adminId=" + adminId +
                 '}';
     }
 

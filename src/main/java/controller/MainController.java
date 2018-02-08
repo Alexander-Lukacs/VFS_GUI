@@ -1,5 +1,6 @@
 package controller;
 
+import cache.DataCache;
 import fileTree.models.TreeImpl;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -25,15 +26,18 @@ import static controller.constants.SettingsConstants.*;
 public class MainController {
 
     @FXML
-    private Button btnSettings;
+    private Button gob_btnSettings;
     @FXML
-    private Button btnLogout;
+    private Button gob_btnLogout;
 
     @FXML
-    private TreeView<Path> treeView;
+    private TreeView<Path> gob_treeView;
 
     @FXML
-    private VBox vbox = new VBox();
+    private VBox gob_vbox = new VBox();
+
+    private DataCache userCache;
+
 
 
     /**
@@ -42,19 +46,20 @@ public class MainController {
 
    public void onClick(ActionEvent e) throws RuntimeException, IOException{
 
-           if( ((Button)e.getSource()).getText().equals(SETTINGS) ) {
+           if( ((Button)e.getSource()).getText().equals(GC_SETTINGS) ) {
 
                FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("settings.fxml"));
                AnchorPane lob_pane = lob_loader.load();
                Scene lob_scene = new Scene(lob_pane);
                Stage lob_stage = new Stage();
-               lob_stage.setTitle(SETTINGS);
+               lob_stage.setTitle(GC_SETTINGS);
                lob_stage.setResizable(false);
                lob_stage.setScene(lob_scene);
                lob_stage.show();
            }
-           else if( ((Button)e.getSource()).getText().equals(LOGOUT) ){
-               Stage stage = ((Stage)btnSettings.getScene().getWindow());
+           else if( ((Button)e.getSource()).getText().equals(GC_LOGOUT) ){
+               userCache.clearDataCache();
+               Stage stage = ((Stage) gob_btnSettings.getScene().getWindow());
                stage.close();
                LoginController ob_x = new LoginController();
                ob_x.start(stage);
@@ -63,11 +68,12 @@ public class MainController {
 
     public void initialize()throws  IOException
     {
+        userCache = DataCache.getDataCache();
         TreeImpl x = new TreeImpl(Utils.getUserBasePath());
         TreeItem<Path> root = new TreeItem<Path>(Paths.get(x.getRoot().getCanonicalPath()));
         createTree(root);
-        treeView = new TreeView<>(root);
-        vbox.getChildren().add(treeView);
+        gob_treeView = new TreeView<>(root);
+        gob_vbox.getChildren().add(gob_treeView);
     }
 
     public void start(Stage lob_stage) {
@@ -76,7 +82,7 @@ public class MainController {
         try {
                 SplitPane lob_pane = lob_loader.load();
                 Scene lob_scene = new Scene(lob_pane);
-                lob_stage.setTitle(VFS);
+                lob_stage.setTitle(GC_VFS);
                 lob_stage.setScene(lob_scene);
                 lob_stage.show();
             }

@@ -14,7 +14,9 @@ public class DataCache {
     public static final String GC_EMAIL_KEY = "EMAIL";
     public static final String GC_PASSWORD_KEY = "PASSWORD";
     public static final String GC_NAME_KEY = "NAME";
-    public static final String GC_ADMIN = "ADMIN";
+    public static final String GC_ADMIN_ID_KEY = "ADMIN_ID";
+    public static final String GC_USER_ID_KEY = "USER_ID";
+    public static final String GC_IS_ADMIN_KEY = "IS_ADMIN";
 
     private static Map<String, String> gob_dataCacheMap;
     private static DataCache gob_dataCache;

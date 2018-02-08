@@ -43,7 +43,7 @@ public class ChangePWController {
     @FXML
     private AnchorPane gob_rootPane;
 
-    private controller.ListView listView = new controller.ListView();
+    private controller.ListView gob_listView = new controller.ListView();
     private DataCache gob_dataCache;
 
 
@@ -52,7 +52,7 @@ public class ChangePWController {
      * Initialisation of ListView
      */
     public void initialize() {
-        listView.loadList(gob_lvOptions);
+        gob_listView.loadList(gob_lvOptions);
         gob_dataCache = DataCache.getDataCache();
     }
 
@@ -63,19 +63,19 @@ public class ChangePWController {
      * @throws IOException
      */
     public void loadView(MouseEvent event) throws IOException {
-        if(gob_lvOptions.getSelectionModel().getSelectedItem().equals(CHANGE_PW)) {
+        if(gob_lvOptions.getSelectionModel().getSelectedItem().equals(GC_CHANGE_PW)) {
             FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("ChangePW.fxml"));
             AnchorPane lob_pane = lob_loader.load();
             gob_rootPane.getChildren().setAll(lob_pane);
         }
 
-        if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(ADMIN_ADD)) {
+        if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(GC_ADMIN_ADD)) {
             FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("addAdmin.fxml"));
             AnchorPane lob_pane = lob_loader.load();
             gob_rootPane.getChildren().setAll(lob_pane);
         }
 
-        if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(CHANGE_IP_PORT)) {
+        if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(GC_CHANGE_IP_PORT)) {
             FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("changeIpPort.fxml"));
             AnchorPane lob_pane = lob_loader.load();
             gob_rootPane.getChildren().setAll(lob_pane);

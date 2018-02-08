@@ -1,6 +1,7 @@
 package client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import models.classes.UserImpl;
 import models.interfaces.User;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
@@ -31,6 +32,7 @@ public class RestClient {
         ClientConfig config = new ClientConfig(authDetails);
         Client client = ClientBuilder.newClient(config);
         client.register(authDetails);
+        webTarget = client.target(baseUrl);
     }
 
     public HttpMessage registerNewUser(User user) throws IOException{
@@ -50,7 +52,7 @@ public class RestClient {
         ObjectMapper lob_mapper = new ObjectMapper();
         String lva_jsonInString;
         HttpMessage lob_httpMessage;
-        User lob_user = null;
+        UserImpl lob_user = new UserImpl();
 
         Response response = webTarget.path("/user/auth/login").request()
                 .put(Entity.entity(user, MediaType.APPLICATION_JSON));
@@ -61,7 +63,7 @@ public class RestClient {
 
         try {
             if (response.getStatus() == GC_HTTP_OK) {
-                lob_user = lob_mapper.readValue(lva_jsonInString, User.class);
+                lob_user = lob_mapper.readValue(lva_jsonInString, UserImpl.class);
             } else {
                 lob_httpMessage = lob_mapper.readValue(lva_jsonInString, HttpMessage.class);
                 lob_httpMessage.setHttpStatus(response.getStatus());
@@ -70,9 +72,6 @@ public class RestClient {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-
-        // TODO Löschen
-        System.out.println(response.readEntity(String.class));
 
         return lob_user;
     }

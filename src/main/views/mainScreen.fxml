@@ -10,17 +10,17 @@
     <items>
             <StackPane fx:id="sp_left">
          <children>
-            <VBox fx:id="vbox">
+            <VBox fx:id="gob_vbox">
                <children>
                </children></VBox>
          </children></StackPane>
             <StackPane fx:id="sp_right" alignment="TOP_RIGHT">
                    <children>
-                       <Button id="btnSettings" fx:id="btnSettings" mnemonicParsing="false" onAction="#onClick" text="Settings">
+                       <Button id="btnSettings" fx:id="gob_btnSettings" mnemonicParsing="false" onAction="#onClick" text="Settings">
                <StackPane.margin>
                   <Insets bottom="10.0" left="10.0" right="100.0" top="10.0" />
                </StackPane.margin></Button>
-            <Button fx:id="btnLogout" mnemonicParsing="false" onAction="#onClick" text="Logout">
+            <Button fx:id="gob_btnLogout" mnemonicParsing="false" onAction="#onClick" text="Logout">
                <StackPane.margin>
                   <Insets bottom="10.0" right="10.0" top="10.0" />
                </StackPane.margin>

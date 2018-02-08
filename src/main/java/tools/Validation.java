@@ -16,25 +16,25 @@ public class Validation {
     private static Matcher matcher;
 
     public static boolean ipValidation(String ip){
-        pattern = Pattern.compile(VALID_IP_ADDRESS_REGEX, Pattern.CASE_INSENSITIVE);
+        pattern = Pattern.compile(GC_VALID_IP_ADDRESS_REGEX, Pattern.CASE_INSENSITIVE);
         matcher = pattern.matcher(ip);
         return matcher.find();
     }
 
     public static boolean portValidation(String port){
-        pattern = Pattern.compile(VALID_PORT_REGEX, Pattern.CASE_INSENSITIVE);
+        pattern = Pattern.compile(GC_VALID_PORT_REGEX, Pattern.CASE_INSENSITIVE);
         matcher = pattern.matcher(port);
         return matcher.find();
     }
 
     public static boolean emailValidation(String email){
-        pattern = Pattern.compile(VALID_EMAIL_ADDRESS_REGEX, Pattern.CASE_INSENSITIVE);
+        pattern = Pattern.compile(GC_VALID_EMAIL_ADDRESS_REGEX, Pattern.CASE_INSENSITIVE);
         matcher = pattern.matcher(email);
         return matcher.find();
     }
 
     public static boolean passwordValidation(String password){
-        pattern = Pattern.compile(VALID_PASSWORD_REGEX);
+        pattern = Pattern.compile(GC_VALID_PASSWORD_REGEX);
         matcher = pattern.matcher(password);
         return matcher.find();
     }
