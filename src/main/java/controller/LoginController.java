@@ -18,6 +18,7 @@ import javafx.stage.Stage;
 import models.interfaces.User;
 import tools.Validation;
 
+import javax.xml.ws.Response;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -101,9 +102,12 @@ public class LoginController {
 
             if (Validation.passwordValidation(lva_password) && Validation.emailValidation(lva_email)) {
 
-                RestClient restClient = RestClientBuilder.buildRestClient(lva_ip, lva_port);
-
-                restClient.loginUser(lob_user);
+                RestClient restClient = RestClientBuilder.buildRestClientWithAuth(lva_ip, lva_port, lva_email, lva_password);
+                try {
+                    lob_user = restClient.loginUser(lob_user);
+                } catch (IllegalArgumentException ex) {
+                    System.out.println(ex.getMessage());
+                }
 
                 if (/*was wir von flo bekommen ==*/ true) {
 
