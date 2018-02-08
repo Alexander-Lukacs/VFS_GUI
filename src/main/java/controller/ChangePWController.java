@@ -18,9 +18,6 @@ import tools.Validation;
 import java.io.IOException;
 
 import static cache.DataCache.*;
-import static cache.DataCache.GC_IP_KEY;
-import static cache.DataCache.GC_PASSWORD_KEY;
-import static cache.DataCache.GC_PORT_KEY;
 import static controller.constants.SettingsConstants.*;
 
 public class ChangePWController {
@@ -82,7 +79,11 @@ public class ChangePWController {
         }
     }
 
-    public void onChangePasswordButtonClick(ActionEvent event){
+    public void onClickChangePassword(ActionEvent event){
+
+        System.out.println("klicked");
+
+
         User lob_user;
 
         String lva_ip   = gob_dataCache.get(GC_IP_KEY);

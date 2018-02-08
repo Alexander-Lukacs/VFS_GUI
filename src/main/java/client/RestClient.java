@@ -5,15 +5,15 @@ import models.classes.UserImpl;
 import models.interfaces.User;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
-import sun.security.provider.certpath.OCSPResponse;
+import tools.AlertWindows;
 
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.ws.WebServiceException;
 import java.io.IOException;
 
 import static client.constants.HttpStatusCodes.GC_HTTP_OK;
+import static controller.constants.AlertConstants.*;
 
 /**
  * Created by Mesut on 25.01.2018.
@@ -64,12 +64,16 @@ public class RestClient {
         try {
             if (response.getStatus() == GC_HTTP_OK) {
                 lob_user = lob_mapper.readValue(lva_jsonInString, UserImpl.class);
+            }else if (response.getStatus() == 401) {
+                throw new IllegalArgumentException("Unauthorized");
             } else {
                 lob_httpMessage = lob_mapper.readValue(lva_jsonInString, HttpMessage.class);
                 lob_httpMessage.setHttpStatus(response.getStatus());
                 throw new IllegalArgumentException(lob_httpMessage.getUserLoginStatus());
             }
         } catch (IOException ex) {
+            //TODO
+            AlertWindows.ExceptionAlert(GC_EXCEPTION_TITLE, GC_EXCEPTION_HEADER, ex.getMessage(), ex);
             ex.printStackTrace();
         }
 

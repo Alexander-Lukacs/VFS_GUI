@@ -13,6 +13,7 @@ import javafx.scene.control.TreeView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import tools.AlertWindows;
 import tools.Utils;
 
 import java.io.IOException;
@@ -21,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static controller.constants.AlertConstants.*;
 import static controller.constants.SettingsConstants.*;
 
 public class MainController {
@@ -87,6 +89,7 @@ public class MainController {
                 lob_stage.show();
             }
             catch (IOException e){
+                AlertWindows.ExceptionAlert(GC_EXCEPTION_TITLE, GC_EXCEPTION_HEADER, e.getMessage(), e);
                 throw new RuntimeException(e);
             }
     }

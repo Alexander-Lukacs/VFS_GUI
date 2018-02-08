@@ -14,12 +14,14 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import models.interfaces.User;
+import tools.AlertWindows;
 import tools.Validation;
 
 import java.io.IOException;
 import java.util.Objects;
 
 import static cache.DataCache.*;
+import static controller.constants.AlertConstants.*;
 import static controller.constants.SettingsConstants.GC_VFS;
 
 public class LoginController {
@@ -59,7 +61,7 @@ public class LoginController {
     private String encodedString;
     private Stage stage = new Stage();
     private MainController mainController = new MainController();
-    private DataCache gob_dataCache;
+    private static DataCache gob_dataCache;
     private RestClient gob_restClient;
     private HttpMessage gob_httpMessage;
 
@@ -93,29 +95,42 @@ public class LoginController {
         String lva_email = gob_tf_userName.getText();
 
         //TODO Vom Server uebergebenes Objekt auseinanderziehen und dann in den Cache setzen motherfucker
-        if (Validation.ipValidation(lva_ip) && Validation.portValidation(lva_port)) {
-            gob_dataCache.put(GC_IP_KEY, lva_ip);
-            gob_dataCache.put(GC_PORT_KEY, lva_port);
-            System.out.println("ip und Port Validation gehen klar");
+        if (Validation.ipValidation(lva_ip)){
+            if(Validation.portValidation(lva_port)) {
+                gob_dataCache.put(GC_IP_KEY, lva_ip);
+                gob_dataCache.put(GC_PORT_KEY, lva_port);
 
-            if (Validation.passwordValidation(lva_password) && Validation.emailValidation(lva_email)) {
+                if (Validation.passwordValidation(lva_password)) {
+                    if (Validation.emailValidation(lva_email)) {
 
-                RestClient restClient = RestClientBuilder.buildRestClientWithAuth(lva_ip, lva_port, lva_email, lva_password);
-                try {
-                    lob_user.setEmail(lva_email);
-                    lob_user.setPassword(lva_password);
-                    lob_user = restClient.loginUser(lob_user);
-                } catch (IllegalArgumentException ex) {
-                    System.out.println(ex.getMessage());
+                        RestClient restClient = RestClientBuilder.buildRestClientWithAuth(lva_ip, lva_port, lva_email, lva_password);
+                        try {
+                            lob_user.setEmail(lva_email);
+                            lob_user.setPassword(lva_password);
+                            lob_user = restClient.loginUser(lob_user);
+
+                            gob_dataCache.put(GC_PASSWORD_KEY, lva_password);
+                            cacheUser(lob_user);
+                            gob_tf_userName.setText("");
+                            gob_tf_loginPassword.setText("");
+                            mainController.start(stage);
+                            close();
+                        } catch (IllegalArgumentException ex) {
+                    /*TODO Alert Fenster*/
+                            AlertWindows.ExceptionAlert(GC_EXCEPTION_TITLE, GC_EXCEPTION_HEADER, ex.getMessage(), ex);
+                        }
+                    } else {
+                        AlertWindows.WarningAlert(GC_WARNING_TITLE, GC_WARNING_HEADER, GC_WARNING_EMAIL);
+                    }
+                } else {
+                    AlertWindows.WarningAlert(GC_WARNING_TITLE, GC_WARNING_HEADER, GC_WARNING_PASSWORD);
                 }
-                cacheUser(lob_user);
-                gob_tf_userName.setText("");
-                gob_tf_loginPassword.setText("");
-                mainController.start(stage);
-                close();
+            }
+            else{
+                AlertWindows.WarningAlert(GC_WARNING_TITLE,GC_WARNING_HEADER,GC_WARNING_PORT);
             }
         } else {
-            System.out.println("User setzt Login ein......... schlug fehl!");
+            AlertWindows.WarningAlert(GC_WARNING_TITLE,GC_WARNING_HEADER,GC_WARNING_IP);
         }
     }
 
@@ -132,39 +147,44 @@ public class LoginController {
         if (Validation.nameValidation(lva_name)) {
             if (Validation.emailValidation(lva_email)) {
 
-                if (Validation.passwordValidation(lva_password) &&
-                    Validation.passwordEqualsValidation(lva_password, lva_confirmPassword)) {
+                if (Validation.passwordValidation(lva_password)){
 
-                    lob_user = ModelObjectBuilder.getUserObject(lva_email, lva_password, lva_name);
+                    if(Validation.passwordEqualsValidation(lva_password, lva_confirmPassword)) {
 
-                    if (Validation.ipValidation(lva_ip) && Validation.portValidation(lva_port)) {
-                        gob_dataCache.put(GC_IP_KEY, lva_ip);
-                        gob_dataCache.put(GC_PORT_KEY, lva_port);
+                        lob_user = ModelObjectBuilder.getUserObject(lva_email, lva_password, lva_name);
 
-                        gob_restClient = RestClientBuilder.buildRestClient(lva_ip, lva_port);
-                        gob_httpMessage = gob_restClient.registerNewUser(lob_user);
-                        printMessage(gob_httpMessage);
-                       gob_tabPane.getSelectionModel().selectFirst();
+                        if (Validation.ipValidation(lva_ip) && Validation.portValidation(lva_port)) {
+                            gob_dataCache.put(GC_IP_KEY, lva_ip);
+                            gob_dataCache.put(GC_PORT_KEY, lva_port);
+
+                            gob_restClient = RestClientBuilder.buildRestClient(lva_ip, lva_port);
+                            gob_httpMessage = gob_restClient.registerNewUser(lob_user);
+                            printMessage(gob_httpMessage);
+                            gob_tabPane.getSelectionModel().selectFirst();
+                        }
                     }
-
+                    else{
+                        AlertWindows.WarningAlert(GC_WARNING_TITLE, GC_WARNING_HEADER, GC_WARNING_PASSWORD_NOT_EQUAL);
+                    }
                 } else {
-                    System.out.println("Kein korrektes Passwort oder Passwort stimmt nicht überein");
+                    AlertWindows.WarningAlert(GC_WARNING_TITLE, GC_WARNING_HEADER, GC_WARNING_PASSWORD);
                 }
             } else {
-                System.out.println("Kein korrekte E-Mail-Adresse");
+                AlertWindows.WarningAlert(GC_WARNING_TITLE, GC_WARNING_HEADER, GC_WARNING_EMAIL);
             }
         } else {
-            System.out.println("Username muss min. 3 Buchstaben lang sein");
+            AlertWindows.WarningAlert(GC_WARNING_TITLE, GC_WARNING_HEADER, GC_WARNING_USERNAME);
         }
     }
 
     private void cacheUser(User iob_user){
         gob_dataCache.put(GC_EMAIL_KEY, iob_user.getEmail());
-        gob_dataCache.put(GC_PASSWORD_KEY, iob_user.getPassword());
         gob_dataCache.put(GC_NAME_KEY, iob_user.getName());
         gob_dataCache.put(GC_ADMIN_ID_KEY, String.valueOf(iob_user.getAdminId()));
         gob_dataCache.put(GC_USER_ID_KEY, String.valueOf(iob_user.getUserId()));
         gob_dataCache.put(GC_IS_ADMIN_KEY, String.valueOf(iob_user.getIsAdmin()));
+
+       // System.out.println(gob_dataCache.get(GC_IS_ADMIN_KEY));
 
     }
 
@@ -175,6 +195,8 @@ public class LoginController {
                 System.out.println(status.getUserAddStatus());
                 break;
             case 400:
+                //TODO UserStatus oder unser String?
+                AlertWindows.ErrorAlert(GC_ERROR_TITLE, GC_ERROR_HEADER, GC_ERROR_PASSWORD);
                 System.out.println(status.getUserAddStatus());
                 break;
 

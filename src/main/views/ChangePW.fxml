@@ -38,7 +38,7 @@
                                   <Insets left="100.0" right="100.0" />
                               </VBox.margin>
                           </PasswordField>
-                          <Button fx:id="gob_btnSave" mnemonicParsing="false" onAction="#onChangePasswordButtonClick" text="Save" />
+                          <Button fx:id="gob_btnSave" mnemonicParsing="false" onAction="#onClickChangePassword" text="Save" />
                       </children>
                   </VBox>
               </children>

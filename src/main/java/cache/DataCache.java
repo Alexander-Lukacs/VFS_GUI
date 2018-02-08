@@ -1,5 +1,6 @@
 package cache;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -73,5 +74,9 @@ public class DataCache {
      */
     public void replaceData(String iva_key, String iva_value) {
         gob_dataCacheMap.remove(iva_key, iva_value);
+    }
+
+    public Collection<String> getAllValues() {
+        return gob_dataCacheMap.values();
     }
 }
