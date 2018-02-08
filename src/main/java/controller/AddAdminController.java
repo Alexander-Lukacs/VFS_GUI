@@ -21,7 +21,7 @@ public class AddAdminController{
     @FXML
     private AnchorPane gob_rootPane;
 
-    private controller.ListView listView = new controller.ListView();
+    private final controller.ListView listView = new controller.ListView();
 
     public void initialize()
     {

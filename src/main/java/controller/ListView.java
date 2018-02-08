@@ -8,26 +8,27 @@ import static controller.constants.SettingsConstants.GC_ADMIN_ADD;
 import static controller.constants.SettingsConstants.GC_CHANGE_IP_PORT;
 import static controller.constants.SettingsConstants.GC_CHANGE_PW;
 
+//TODO protected?
 public class ListView {
 
-    private LoginController loginController = new LoginController();
-
-    private ObservableList<String> gob_oblist;
+    private final LoginController loginController = new LoginController();
 
     public void loadList(javafx.scene.control.ListView<String> gob_lvOptions){
 
+        ObservableList<String> lob_oblist;
+
         if(loginController.getIsAdmin()){
-            gob_oblist = FXCollections.observableArrayList();
-            gob_oblist.add(GC_CHANGE_PW);
-            gob_oblist.add(GC_ADMIN_ADD);
-            gob_oblist.add(GC_CHANGE_IP_PORT);
-            gob_lvOptions.setItems(gob_oblist);
+            lob_oblist = FXCollections.observableArrayList();
+            lob_oblist.add(GC_CHANGE_PW);
+            lob_oblist.add(GC_ADMIN_ADD);
+            lob_oblist.add(GC_CHANGE_IP_PORT);
+            gob_lvOptions.setItems(lob_oblist);
             gob_lvOptions.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         }else {
-            gob_oblist = FXCollections.observableArrayList();
-            gob_oblist.add(GC_CHANGE_PW);
-            gob_oblist.add(GC_CHANGE_IP_PORT);
-            gob_lvOptions.setItems(gob_oblist);
+            lob_oblist = FXCollections.observableArrayList();
+            lob_oblist.add(GC_CHANGE_PW);
+            lob_oblist.add(GC_CHANGE_IP_PORT);
+            gob_lvOptions.setItems(lob_oblist);
             gob_lvOptions.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         }
     }

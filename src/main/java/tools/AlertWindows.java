@@ -10,6 +10,8 @@ import javafx.scene.layout.Priority;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import static controller.constants.AlertConstants.*;
+
 /**
  * Created by Mesut on 08.02.2018.
  */
@@ -17,18 +19,16 @@ import java.io.StringWriter;
 public class AlertWindows {
 
 
-    public static void ExceptionAlert (String title, String header, String content, Exception exception){
+    public static void ExceptionAlert (String content, Exception exception){
         Alert alert = new Alert(AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(header);
+        alert.setTitle(GC_EXCEPTION_TITLE);
+        alert.setHeaderText(GC_EXCEPTION_HEADER);
         alert.setContentText(content);
-
-        Exception ex = exception;
 
 // Create expandable Exception.
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        ex.printStackTrace(pw);
+        exception.printStackTrace(pw);
         String exceptionText = sw.toString();
 
         Label label = new Label("The exception stacktrace was:");
@@ -52,20 +52,21 @@ public class AlertWindows {
 
         alert.showAndWait();
     }
-    public static void WarningAlert (String title, String header, String content) {
+    public static void WarningAlert ( String content) {
 
         Alert alert = new Alert(AlertType.WARNING);
-        alert.setTitle(title);
-        alert.setHeaderText(header);
+        alert.setTitle(GC_WARNING_TITLE);
+        alert.setHeaderText(GC_WARNING_HEADER);
         alert.setContentText(content);
 
         alert.showAndWait();
     }
 
-    public static void ErrorAlert ( String title, String header, String content){
+    //TODO falls kein content dazu kommt, kann dies auch statisch gemacht werden
+    public static void ErrorAlert (String content){
         Alert alert = new Alert(AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(header);
+        alert.setTitle(GC_ERROR_TITLE);
+        alert.setHeaderText(GC_ERROR_HEADER);
         alert.setContentText(content);
 
         alert.showAndWait();

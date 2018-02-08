@@ -14,22 +14,6 @@ public class SettingsConstants {
      * @param GC_SETTINGS String for Title of Settings Views
      */
     public static final String GC_SETTINGS = "Settings";
-/*
-
-    */
-/**
-     * @param USER_NAME  String for Textfield "tfUserName" Test
-     *//*
-
-    public static final String NAME = "admin";
-
-    */
-/**
-     * @param PASSWORD  String for Passwordfield "pwPassword" Test
-     *//*
-
-    public static final String PASSWORD = "admin";
-*/
 
     /**
      * @param ADMIN_LOGOUT  String for Settings Item "Logout"

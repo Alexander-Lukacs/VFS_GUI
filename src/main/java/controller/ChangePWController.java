@@ -40,7 +40,7 @@ public class ChangePWController {
     @FXML
     private AnchorPane gob_rootPane;
 
-    private controller.ListView gob_listView = new controller.ListView();
+    private final controller.ListView gob_listView = new controller.ListView();
     private DataCache gob_dataCache;
 
 

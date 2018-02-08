@@ -5,7 +5,7 @@ import java.security.NoSuchAlgorithmException;
 
 import static controller.constants.AlertConstants.*;
 
-
+//TODO protected?
 public class PasswordService {
 
 
@@ -24,7 +24,7 @@ public class PasswordService {
             return lob_md.digest();
         } catch (NoSuchAlgorithmException ex) {
 
-            AlertWindows.ExceptionAlert(GC_EXCEPTION_TITLE, GC_EXCEPTION_HEADER, GC_ERR_NO_ALGORITHM_IMPLEMENTATION, ex);
+            AlertWindows.ExceptionAlert(GC_ERR_NO_ALGORITHM_IMPLEMENTATION, ex);
             ex.printStackTrace();
         }
 
@@ -32,12 +32,13 @@ public class PasswordService {
     }
 
     /**
+     * Must be static.
      * Encrypts a string
      *
      * @param iob_password password string
      * @return encrypted string
      */
-    public static String encryptPassword(String iob_password) {
+    private static String encryptPassword(String iob_password) {
         StringBuilder lob_sb = new StringBuilder();
 
         check(!iob_password.isEmpty(), GC_ERR_MSG_EMPTY_PASSWORD);

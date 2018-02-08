@@ -6,11 +6,9 @@ import tools.AlertWindows;
 
 import java.io.IOException;
 
-import static controller.constants.AlertConstants.*;
-
 public class MainApp extends Application {
 
-    private LoginController loginController = new LoginController();
+    private final LoginController loginController = new LoginController();
 
     @Override
     public void start(Stage primaryStage) {
@@ -18,10 +16,10 @@ public class MainApp extends Application {
             loginController.start(primaryStage);
         }
         catch (IOException e){
-            AlertWindows.ExceptionAlert(GC_EXCEPTION_TITLE, GC_EXCEPTION_HEADER, e.getMessage(), e);
+            AlertWindows.ExceptionAlert(e.getMessage(), e);
         }
         catch(Exception ex){
-            AlertWindows.ExceptionAlert(GC_EXCEPTION_TITLE, GC_EXCEPTION_HEADER, ex.getMessage(), ex);
+            AlertWindows.ExceptionAlert(ex.getMessage(), ex);
         }
     }
 

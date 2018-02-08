@@ -13,13 +13,13 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 
 import static client.constants.HttpStatusCodes.GC_HTTP_OK;
-import static controller.constants.AlertConstants.*;
 
 /**
  * Created by Mesut on 25.01.2018.
  */
 
 public class RestClient {
+    //TODO final?
     private WebTarget webTarget;
 
     public RestClient(String baseUrl) {
@@ -73,7 +73,7 @@ public class RestClient {
             }
         } catch (IOException ex) {
             //TODO
-            AlertWindows.ExceptionAlert(GC_EXCEPTION_TITLE, GC_EXCEPTION_HEADER, ex.getMessage(), ex);
+            AlertWindows.ExceptionAlert(ex.getMessage(), ex);
             ex.printStackTrace();
         }
 

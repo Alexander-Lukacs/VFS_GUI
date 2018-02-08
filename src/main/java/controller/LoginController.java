@@ -58,11 +58,11 @@ public class LoginController {
     @FXML
     private TabPane gob_tabPane = new TabPane();
 
-    private Stage stage = new Stage();
-    private MainController mainController = new MainController();
+    private final Stage stage = new Stage();
+    private final MainController mainController = new MainController();
     private static DataCache gob_dataCache;
-    private RestClient gob_restClient;
-    private HttpMessage gob_httpMessage;
+    private RestClient gob_restClient; //TODO Könnte lokal gemacht werden in OnClickRegister..
+    private HttpMessage gob_httpMessage; //TODO Könnte lokal gemacht werden in OnClickRegister..
     private boolean gva_isInputValid = false;
 
     public void initialize() {
@@ -86,7 +86,7 @@ public class LoginController {
      * sends inputs to Server, to Login.
      */
 
-    public void onClick(ActionEvent event) throws IOException {
+    public void onClick(ActionEvent event) {
         User lob_user = ModelObjectBuilder.getUserObject();
         String lva_ip = gob_tf_ipAddress.getText();
         String lva_port = gob_tf_port.getText();
@@ -116,14 +116,14 @@ public class LoginController {
                             mainController.start(stage);
                             close();
                         } catch (IllegalArgumentException ex) {
-                    /*TODO Alert Fenster*/
-                            AlertWindows.ExceptionAlert(GC_EXCEPTION_TITLE, GC_EXCEPTION_HEADER, ex.getMessage(), ex);
+                    /*TODO Alert Fenster Tests...*/
+                            AlertWindows.ExceptionAlert(ex.getMessage(), ex);
                         }
                     }
                     gva_isInputValid=false;
     }
 
-    public void onClickRegister(ActionEvent event) throws IOException {
+    public void onClickRegister(ActionEvent event) {
         String lva_ip = gob_tf_ipAddress.getText();
         String lva_port = gob_tf_port.getText();
         String lva_name = gob_tf_newUserName.getText();
@@ -144,7 +144,7 @@ public class LoginController {
                 printMessage(gob_httpMessage);
                 gob_tabPane.getSelectionModel().selectFirst();
             } catch (IOException e) {
-                AlertWindows.ExceptionAlert(GC_EXCEPTION_TITLE, GC_EXCEPTION_HEADER, e.getMessage(), e);
+                AlertWindows.ExceptionAlert(e.getMessage(), e);
             }
         }
         gva_isInputValid = false;
@@ -167,22 +167,22 @@ public class LoginController {
 
                             }
                             else {
-                                AlertWindows.WarningAlert(GC_WARNING_TITLE, GC_WARNING_HEADER, GC_WARNING_PORT);
+                                AlertWindows.WarningAlert(GC_WARNING_PORT);
                             }
                         } else {
-                            AlertWindows.WarningAlert(GC_WARNING_TITLE, GC_WARNING_HEADER, GC_WARNING_IP);
+                            AlertWindows.WarningAlert( GC_WARNING_IP);
                         }
                     } else {
-                        AlertWindows.WarningAlert(GC_WARNING_TITLE, GC_WARNING_HEADER, GC_WARNING_PASSWORD_NOT_EQUAL);
+                        AlertWindows.WarningAlert( GC_WARNING_PASSWORD_NOT_EQUAL);
                     }
                 } else {
-                    AlertWindows.WarningAlert(GC_WARNING_TITLE, GC_WARNING_HEADER, GC_WARNING_PASSWORD);
+                    AlertWindows.WarningAlert( GC_WARNING_PASSWORD);
                 }
             } else {
-                AlertWindows.WarningAlert(GC_WARNING_TITLE, GC_WARNING_HEADER, GC_WARNING_EMAIL);
+                AlertWindows.WarningAlert( GC_WARNING_EMAIL);
             }
         } else {
-            AlertWindows.WarningAlert(GC_WARNING_TITLE, GC_WARNING_HEADER, GC_WARNING_USERNAME);
+            AlertWindows.WarningAlert( GC_WARNING_USERNAME);
            }
            return null;
     }
@@ -205,7 +205,7 @@ public class LoginController {
                 break;
             case 400:
                 //TODO UserStatus oder unser String?
-                AlertWindows.ErrorAlert(GC_ERROR_TITLE, GC_ERROR_HEADER, GC_ERROR_PASSWORD);
+                AlertWindows.ErrorAlert( GC_ERROR_PASSWORD);
                 System.out.println(status.getUserAddStatus());
                 break;
 

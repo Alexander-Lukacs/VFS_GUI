@@ -22,7 +22,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static controller.constants.AlertConstants.*;
 import static controller.constants.SettingsConstants.*;
 
 public class MainController {
@@ -33,7 +32,7 @@ public class MainController {
     private Button gob_btnLogout;
 
     @FXML
-    private TreeView<Path> gob_treeView;
+    private TreeView<Path> gob_treeView; //TODO Köönte lokal gemacht werden, nur wie?
 
     @FXML
     private VBox gob_vbox = new VBox();
@@ -72,7 +71,7 @@ public class MainController {
     {
         userCache = DataCache.getDataCache();
         TreeImpl x = new TreeImpl(Utils.getUserBasePath());
-        TreeItem<Path> root = new TreeItem<Path>(Paths.get(x.getRoot().getCanonicalPath()));
+        TreeItem<Path> root = new TreeItem<>(Paths.get(x.getRoot().getCanonicalPath()));
         createTree(root);
         gob_treeView = new TreeView<>(root);
         gob_vbox.getChildren().add(gob_treeView);
@@ -89,18 +88,18 @@ public class MainController {
                 lob_stage.show();
             }
             catch (IOException e){
-                AlertWindows.ExceptionAlert(GC_EXCEPTION_TITLE, GC_EXCEPTION_HEADER, e.getMessage(), e);
+                AlertWindows.ExceptionAlert(e.getMessage(), e);
                 throw new RuntimeException(e);
             }
     }
 
-    public static void createTree(TreeItem<Path> rootItem) throws IOException {
+    private void createTree(TreeItem<Path> rootItem) throws IOException {
 
         try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(rootItem.getValue())) {
 
             for (Path path : directoryStream) {
 
-                TreeItem<Path> newItem = new TreeItem<Path>(path);
+                TreeItem<Path> newItem = new TreeItem<>(path);
                 newItem.setExpanded(true);
 
                 rootItem.getChildren().add(newItem);
