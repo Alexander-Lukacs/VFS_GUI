@@ -31,13 +31,13 @@ public class AddAdminController{
 public void loadView(MouseEvent e) throws IOException
 {
 
-    if(gob_lvOptions.getSelectionModel().getSelectedItem() == GC_CHANGE_PW)
+    if(gob_lvOptions.getSelectionModel().getSelectedItem().equals(GC_CHANGE_PW))
     {
         FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("ChangePW.fxml"));
         AnchorPane lob_pane = lob_loader.load();
         gob_rootPane.getChildren().setAll(lob_pane);
     }
-    if (gob_lvOptions.getSelectionModel().getSelectedItem() == GC_CHANGE_IP_PORT) {
+    if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(GC_CHANGE_IP_PORT)) {
         FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("changeIpPort.fxml"));
         AnchorPane lob_pane = lob_loader.load();
         gob_rootPane.getChildren().setAll(lob_pane);

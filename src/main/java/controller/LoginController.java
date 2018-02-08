@@ -35,7 +35,7 @@ public class LoginController {
     private PasswordField gob_tf_loginPassword;
 
     @FXML
-    private TextField gob_tf_userName;
+    private TextField gob_tf_userLoginEmail;
 
     @FXML
     private TextField gob_tf_newUserName;
@@ -58,12 +58,12 @@ public class LoginController {
     @FXML
     private TabPane gob_tabPane = new TabPane();
 
-    private String encodedString;
     private Stage stage = new Stage();
     private MainController mainController = new MainController();
     private static DataCache gob_dataCache;
     private RestClient gob_restClient;
     private HttpMessage gob_httpMessage;
+    private boolean gva_isInputValid = false;
 
     public void initialize() {
         gob_dataCache = DataCache.getDataCache();
@@ -80,11 +80,10 @@ public class LoginController {
 
     /**
      * reads the Textfields on Button Click
-     *
+     * <p>
      * Validate inputs
-     *
+     * <p>
      * sends inputs to Server, to Login.
-     *
      */
 
     public void onClick(ActionEvent event) throws IOException {
@@ -92,16 +91,17 @@ public class LoginController {
         String lva_ip = gob_tf_ipAddress.getText();
         String lva_port = gob_tf_port.getText();
         String lva_password = gob_tf_loginPassword.getText();
-        String lva_email = gob_tf_userName.getText();
+        String lva_email = gob_tf_userLoginEmail.getText();
+
+        //ein User Objekt "dummyUser" um die Valid Funktion zu ueberpruefen. da beim Login kein confirmpasswort oder username existiert
+        //wird anschließend direkt null gesetzt
+        User lob_dummyUser = checkIfInputsValid(lva_ip,lva_port,"test",lva_email,lva_password, lva_password);
+        lob_dummyUser = null;
 
         //TODO Vom Server uebergebenes Objekt auseinanderziehen und dann in den Cache setzen motherfucker
-        if (Validation.ipValidation(lva_ip)){
-            if(Validation.portValidation(lva_port)) {
+        if (gva_isInputValid) {
                 gob_dataCache.put(GC_IP_KEY, lva_ip);
                 gob_dataCache.put(GC_PORT_KEY, lva_port);
-
-                if (Validation.passwordValidation(lva_password)) {
-                    if (Validation.emailValidation(lva_email)) {
 
                         RestClient restClient = RestClientBuilder.buildRestClientWithAuth(lva_ip, lva_port, lva_email, lva_password);
                         try {
@@ -111,7 +111,7 @@ public class LoginController {
 
                             gob_dataCache.put(GC_PASSWORD_KEY, lva_password);
                             cacheUser(lob_user);
-                            gob_tf_userName.setText("");
+                            gob_tf_userLoginEmail.setText("");
                             gob_tf_loginPassword.setText("");
                             mainController.start(stage);
                             close();
@@ -119,19 +119,8 @@ public class LoginController {
                     /*TODO Alert Fenster*/
                             AlertWindows.ExceptionAlert(GC_EXCEPTION_TITLE, GC_EXCEPTION_HEADER, ex.getMessage(), ex);
                         }
-                    } else {
-                        AlertWindows.WarningAlert(GC_WARNING_TITLE, GC_WARNING_HEADER, GC_WARNING_EMAIL);
                     }
-                } else {
-                    AlertWindows.WarningAlert(GC_WARNING_TITLE, GC_WARNING_HEADER, GC_WARNING_PASSWORD);
-                }
-            }
-            else{
-                AlertWindows.WarningAlert(GC_WARNING_TITLE,GC_WARNING_HEADER,GC_WARNING_PORT);
-            }
-        } else {
-            AlertWindows.WarningAlert(GC_WARNING_TITLE,GC_WARNING_HEADER,GC_WARNING_IP);
-        }
+                    gva_isInputValid=false;
     }
 
     public void onClickRegister(ActionEvent event) throws IOException {
@@ -142,28 +131,48 @@ public class LoginController {
         String lva_password = gob_tf_registerPassword.getText();
         String lva_confirmPassword = gob_tf_confirmPassword1.getText();
 
+        User lob_user = checkIfInputsValid(lva_ip, lva_port, lva_name, lva_email, lva_password, lva_confirmPassword);
+
+
+        if (gva_isInputValid) {
+            gob_dataCache.put(GC_IP_KEY, lva_ip);
+            gob_dataCache.put(GC_PORT_KEY, lva_port);
+
+            try {
+                gob_restClient = RestClientBuilder.buildRestClient(lva_ip, lva_port);
+                gob_httpMessage = gob_restClient.registerNewUser(lob_user);
+                printMessage(gob_httpMessage);
+                gob_tabPane.getSelectionModel().selectFirst();
+            } catch (IOException e) {
+                AlertWindows.ExceptionAlert(GC_EXCEPTION_TITLE, GC_EXCEPTION_HEADER, e.getMessage(), e);
+            }
+        }
+        gva_isInputValid = false;
+    }
+
+    private User checkIfInputsValid(String lva_ip, String lva_port, String lva_name, String lva_email, String lva_password, String lva_confirmPassword) {
+
         User lob_user;
 
         if (Validation.nameValidation(lva_name)) {
             if (Validation.emailValidation(lva_email)) {
-
-                if (Validation.passwordValidation(lva_password)){
-
-                    if(Validation.passwordEqualsValidation(lva_password, lva_confirmPassword)) {
-
+                if (Validation.passwordValidation(lva_password)) {
+                    if (Validation.passwordEqualsValidation(lva_password, lva_confirmPassword)) {
                         lob_user = ModelObjectBuilder.getUserObject(lva_email, lva_password, lva_name);
+                        if (Validation.ipValidation(lva_ip)) {
+                            if (Validation.portValidation(lva_port)) {
 
-                        if (Validation.ipValidation(lva_ip) && Validation.portValidation(lva_port)) {
-                            gob_dataCache.put(GC_IP_KEY, lva_ip);
-                            gob_dataCache.put(GC_PORT_KEY, lva_port);
+                                gva_isInputValid = true;
+                                return lob_user;
 
-                            gob_restClient = RestClientBuilder.buildRestClient(lva_ip, lva_port);
-                            gob_httpMessage = gob_restClient.registerNewUser(lob_user);
-                            printMessage(gob_httpMessage);
-                            gob_tabPane.getSelectionModel().selectFirst();
+                            }
+                            else {
+                                AlertWindows.WarningAlert(GC_WARNING_TITLE, GC_WARNING_HEADER, GC_WARNING_PORT);
+                            }
+                        } else {
+                            AlertWindows.WarningAlert(GC_WARNING_TITLE, GC_WARNING_HEADER, GC_WARNING_IP);
                         }
-                    }
-                    else{
+                    } else {
                         AlertWindows.WarningAlert(GC_WARNING_TITLE, GC_WARNING_HEADER, GC_WARNING_PASSWORD_NOT_EQUAL);
                     }
                 } else {
@@ -174,7 +183,8 @@ public class LoginController {
             }
         } else {
             AlertWindows.WarningAlert(GC_WARNING_TITLE, GC_WARNING_HEADER, GC_WARNING_USERNAME);
-        }
+           }
+           return null;
     }
 
     private void cacheUser(User iob_user){
@@ -185,7 +195,6 @@ public class LoginController {
         gob_dataCache.put(GC_IS_ADMIN_KEY, String.valueOf(iob_user.getIsAdmin()));
 
        // System.out.println(gob_dataCache.get(GC_IS_ADMIN_KEY));
-
     }
 
     private void printMessage(HttpMessage status) {
@@ -206,18 +215,12 @@ public class LoginController {
         }
     }
 
-//    public String encode(String input){
-//        encodedString = Base64.getEncoder().encodeToString(input.getBytes());
-//        return encodedString;
-//    }
-
-
     public boolean getIsAdmin() {
         return Boolean.parseBoolean(gob_dataCache.get(GC_IS_ADMIN_KEY));
     }
 
     private void close() {
-        ((Stage) gob_tf_userName.getScene().getWindow()).close();
+        ((Stage) gob_tf_userLoginEmail.getScene().getWindow()).close();
     }
 
     public void start(Stage stage) throws IOException {
@@ -227,5 +230,4 @@ public class LoginController {
         stage.setTitle(GC_VFS);
         stage.show();
     }
-
 }
