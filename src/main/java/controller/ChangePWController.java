@@ -18,7 +18,7 @@ import java.io.IOException;
 import static cache.DataCache.GC_IP_KEY;
 import static cache.DataCache.GC_PASSWORD_KEY;
 import static cache.DataCache.GC_PORT_KEY;
-import static constants.SettingsConstants.*;
+import static controller.constants.SettingsConstants.*;
 
 public class ChangePWController {
 

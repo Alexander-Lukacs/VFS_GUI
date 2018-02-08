@@ -23,7 +23,7 @@ import java.util.Objects;
 
 import static cache.DataCache.GC_IP_KEY;
 import static cache.DataCache.GC_PORT_KEY;
-import static constants.SettingsConstants.VFS;
+import static controller.constants.SettingsConstants.VFS;
 
 public class LoginController {
     @FXML

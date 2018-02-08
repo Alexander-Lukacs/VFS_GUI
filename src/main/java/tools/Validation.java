@@ -7,6 +7,10 @@ import static tools.constants.ValidationConstants.*;
 /**
  * Created by Mesut on 07.02.2018.
  */
+
+/**
+ *
+ */
 public class Validation {
     private static Pattern pattern;
     private static Matcher matcher;

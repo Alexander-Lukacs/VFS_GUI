@@ -8,7 +8,7 @@ import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
 
-import static constants.SettingsConstants.*;
+import static controller.constants.SettingsConstants.*;
 
 
 public class SettingsController {

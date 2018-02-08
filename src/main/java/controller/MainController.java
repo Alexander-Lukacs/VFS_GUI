@@ -20,7 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static constants.SettingsConstants.*;
+import static controller.constants.SettingsConstants.*;
 
 public class MainController {
 

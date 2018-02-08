@@ -4,9 +4,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.SelectionMode;
 
-import static constants.SettingsConstants.ADMIN_ADD;
-import static constants.SettingsConstants.CHANGE_IP_PORT;
-import static constants.SettingsConstants.CHANGE_PW;
+import static controller.constants.SettingsConstants.ADMIN_ADD;
+import static controller.constants.SettingsConstants.CHANGE_IP_PORT;
+import static controller.constants.SettingsConstants.CHANGE_PW;
 
 public class ListView {
 

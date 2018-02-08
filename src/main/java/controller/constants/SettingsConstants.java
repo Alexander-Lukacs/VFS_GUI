@@ -1,4 +1,4 @@
-package constants;
+package controller.constants;
 
 /**
  * Created by Mesut on 24.01.2018.
