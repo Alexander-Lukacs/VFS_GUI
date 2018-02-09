@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane fx:id="gob_rootPane" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.112"
+<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.112"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LoginController">
     <VBox spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
           AnchorPane.topAnchor="0.0">
@@ -29,7 +29,7 @@
             </HBox>
         </AnchorPane>
         <TabPane fx:id="gob_tabPane" prefHeight="600.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE">
-            <Tab fx:id="Login" text="Login">
+            <Tab text="Login">
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                     <StackPane prefHeight="562.0" prefWidth="800.0" AnchorPane.bottomAnchor="-1.0"
                                AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
@@ -83,7 +83,7 @@
                                     <Insets left="250.0" right="250.0"/>
                                 </VBox.margin>
                             </PasswordField>
-                            <Button fx:id="btnRegister" mnemonicParsing="false" onAction="#onClickRegister"
+                            <Button mnemonicParsing="false" onAction="#onClickRegister"
                                     text="Register"/>
                         </VBox>
                     </StackPane>

@@ -9,18 +9,18 @@
 <SplitPane dividerPositions="0.33208020050125314" prefHeight="600.0" prefWidth="800.0"
            xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="controller.MainController">
-    <StackPane fx:id="sp_left">
+    <StackPane>
         <VBox fx:id="gob_vbox">
         </VBox>
     </StackPane>
-    <StackPane fx:id="sp_right" alignment="TOP_RIGHT">
+    <StackPane alignment="TOP_RIGHT">
         <Button id="btnSettings" fx:id="gob_btnSettings" mnemonicParsing="false" onAction="#onClick"
                 text="Settings">
             <StackPane.margin>
                 <Insets bottom="10.0" left="10.0" right="100.0" top="10.0"/>
             </StackPane.margin>
         </Button>
-        <Button fx:id="gob_btnLogout" mnemonicParsing="false" onAction="#onClick" text="Logout">
+        <Button mnemonicParsing="false" onAction="#onClick" text="Logout">
             <StackPane.margin>
                 <Insets bottom="10.0" right="10.0" top="10.0"/>
             </StackPane.margin>

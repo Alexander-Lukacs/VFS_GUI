@@ -6,7 +6,6 @@ package controller.constants;
 public class AlertConstants {
     public static final String GC_ALGORITHM = "SHA";
 
-    public static final String GC_ERR_MSG_EMPTY_PASSWORD = "Invalid password!";
     public static final String GC_ERR_MSG_PASSWORD_ENCRYPTION_FAILED = "Password encryption failed";
     public static final String GC_ERR_NO_ALGORITHM_IMPLEMENTATION = "SHA-1 is not implemented";
 

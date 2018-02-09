@@ -47,5 +47,9 @@ public class ChangeIpPortController {
             gob_rootPane.getChildren().setAll(lob_pane);
         }
     }
+
+    public void onClick(){
+
+    }
 }
 
