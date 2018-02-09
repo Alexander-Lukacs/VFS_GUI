@@ -81,6 +81,7 @@ public class RestClient {
     }
 
     public void changePassword(User iob_user) {
+
         String lva_jsonInString;
 
         Response response = webTarget.path("user/auth/changePassword").request()

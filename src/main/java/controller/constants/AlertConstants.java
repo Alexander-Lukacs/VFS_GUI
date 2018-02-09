@@ -4,10 +4,6 @@ package controller.constants;
  * Created by Mesut on 08.02.2018.
  */
 public class AlertConstants {
-    public static final String GC_ALGORITHM = "SHA";
-
-    public static final String GC_ERR_MSG_PASSWORD_ENCRYPTION_FAILED = "Password encryption failed";
-    public static final String GC_ERR_NO_ALGORITHM_IMPLEMENTATION = "SHA-1 is not implemented";
 
     public static final String GC_EXCEPTION_TITLE = "Exception Dialog";
     public static final String GC_EXCEPTION_HEADER = "Exception";

@@ -73,7 +73,7 @@ public class DataCache {
      * @param iva_value new value
      */
     public void replaceData(String iva_key, String iva_value) {
-        gob_dataCacheMap.remove(iva_key, iva_value);
+        gob_dataCacheMap.replace(iva_key, iva_value);
     }
 
     public Collection<String> getAllValues() {
