@@ -147,22 +147,22 @@ public class LoginController {
         StringBuilder lob_sb = new StringBuilder();
         boolean validationFailure = false;
 
-        if (Validation.isEmailNotValid(iva_email)) {
+        if (!Validation.isEmailValid(iva_email)) {
             lob_sb.append(GC_WARNING_EMAIL);
             validationFailure = true;
         }
 
-        if (Validation.isIpNotValid(iva_ip)) {
+        if (!Validation.isIpValid(iva_ip)) {
             lob_sb.append(GC_WARNING_IP);
             validationFailure = true;
         }
 
-        if (Validation.isPortNotValid(iva_port)) {
+        if (!Validation.isPortValid(iva_port)) {
             lob_sb.append(GC_WARNING_PORT);
             validationFailure = true;
         }
 
-        if (Validation.isPasswordNotValid(iva_password)) {
+        if (!Validation.isPasswordValid(iva_password)) {
             lob_sb.append(GC_WARNING_PASSWORD);
             validationFailure = true;
         }
@@ -180,16 +180,16 @@ public class LoginController {
         StringBuilder lob_sb = new StringBuilder();
         boolean validationFailure = false;
 
-        if (Validation.isEmailNotValid(iva_email)) {
+        if (!Validation.isEmailValid(iva_email)) {
             lob_sb.append(GC_WARNING_EMAIL);
             validationFailure = true;
         }
 
-        if (Validation.isIpNotValid(iva_ip)) {
+        if (!Validation.isIpValid(iva_ip)) {
             lob_sb.append(GC_WARNING_IP);
             validationFailure = true;
         }
-        if (Validation.isPortNotValid(iva_port)) {
+        if (!Validation.isPortValid(iva_port)) {
             lob_sb.append(GC_WARNING_PORT);
             validationFailure = true;
         }
@@ -199,7 +199,7 @@ public class LoginController {
             validationFailure = true;
         }
 
-        if (Validation.isPasswordNotValid(iva_password)) {
+        if (!Validation.isPasswordValid(iva_password)) {
             lob_sb.append(GC_WARNING_PASSWORD);
             validationFailure = true;
         }

@@ -13,28 +13,28 @@ public class Validation {
     private static Pattern pattern;
     private static Matcher matcher;
 
-    public static boolean isIpNotValid(String ip) {
+    public static boolean isIpValid(String ip) {
         pattern = Pattern.compile(GC_VALID_IP_ADDRESS_REGEX, Pattern.CASE_INSENSITIVE);
         matcher = pattern.matcher(ip);
-        return !matcher.find();
+        return matcher.find();
     }
 
-    public static boolean isPortNotValid(String port) {
+    public static boolean isPortValid(String port) {
         pattern = Pattern.compile(GC_VALID_PORT_REGEX, Pattern.CASE_INSENSITIVE);
         matcher = pattern.matcher(port);
-        return !matcher.find();
+        return matcher.find();
     }
 
-    public static boolean isEmailNotValid(String email) {
+    public static boolean isEmailValid(String email) {
         pattern = Pattern.compile(GC_VALID_EMAIL_ADDRESS_REGEX, Pattern.CASE_INSENSITIVE);
         matcher = pattern.matcher(email);
-        return !matcher.find();
+        return matcher.find();
     }
 
-    public static boolean isPasswordNotValid(String password) {
+    public static boolean isPasswordValid(String password) {
         pattern = Pattern.compile(GC_VALID_PASSWORD_REGEX);
         matcher = pattern.matcher(password);
-        return !matcher.find();
+        return matcher.find();
     }
 
     public static boolean nameValidation(String iva_name) {

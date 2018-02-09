@@ -65,10 +65,10 @@ public class ChangeIpPortController {
         String lva_ip = gob_tfServerIp.getText();
         String lva_port = gob_tfPort.getText();
 
-        if (!Validation.isIpNotValid(lva_ip)) {
+        if (Validation.isIpValid(lva_ip)) {
             lob_datacache.replaceData(GC_IP_KEY, lva_ip);
         }
-        if (!Validation.isPortNotValid(lva_port)) {
+        if (Validation.isPortValid(lva_port)) {
             lob_datacache.replaceData(GC_PORT_KEY, lva_port);
         }
         System.out.println(lob_datacache.get(GC_IP_KEY));
