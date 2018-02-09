@@ -1,4 +1,4 @@
-package controller.constants;
+package tools.constants;
 
 /**
  * Created by Mesut on 08.02.2018.
@@ -19,6 +19,7 @@ public class AlertConstants {
 
     public static final String GC_ERROR_TITLE = "Error Dialog";
     public static final String GC_ERROR_HEADER = "Error";
-    public static final String GC_ERROR_PASSWORD = "Incorrect Password";
 
+    public static final String GC_INFORMATION_TITLE = "Information Dialog";
+    public static final String GC_INFORMATION_HEADER = "Information";
 }

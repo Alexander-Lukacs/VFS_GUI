@@ -14,7 +14,7 @@ public class MainApp extends Application {
         try {
             loginController.start(primaryStage);
         } catch (Exception ex) {
-            AlertWindows.ExceptionAlert(ex.getMessage(), ex);
+            AlertWindows.createExceptionAlert(ex.getMessage(), ex);
         }
     }
 

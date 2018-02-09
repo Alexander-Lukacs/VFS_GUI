@@ -10,7 +10,7 @@ import javafx.scene.layout.Priority;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import static controller.constants.AlertConstants.*;
+import static tools.constants.AlertConstants.*;
 
 /**
  * Created by Mesut on 08.02.2018.
@@ -19,16 +19,16 @@ import static controller.constants.AlertConstants.*;
 public class AlertWindows {
 
 
-    public static void ExceptionAlert(String content, Exception exception) {
+    public static void createExceptionAlert(String iva_content, Exception iob_exception) {
         Alert alert = new Alert(AlertType.ERROR);
         alert.setTitle(GC_EXCEPTION_TITLE);
         alert.setHeaderText(GC_EXCEPTION_HEADER);
-        alert.setContentText(content);
+        alert.setContentText(iva_content);
 
 // Create expandable Exception.
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        exception.printStackTrace(pw);
+        iob_exception.printStackTrace(pw);
         String exceptionText = sw.toString();
 
         Label label = new Label("The exception stacktrace was:");
@@ -53,24 +53,34 @@ public class AlertWindows {
         alert.showAndWait();
     }
 
-    public static void WarningAlert(String content) {
+    public static void createWarningAlert(String iva_content) {
 
         Alert alert = new Alert(AlertType.WARNING);
         alert.setTitle(GC_WARNING_TITLE);
         alert.setHeaderText(GC_WARNING_HEADER);
-        alert.setContentText(content);
+        alert.setContentText(iva_content);
 
         alert.showAndWait();
     }
 
     //TODO falls kein content dazu kommt, kann dies auch statisch gemacht werden
-    public static void ErrorAlert(String content) {
+    public static void createErrorAlert(String iva_content) {
         Alert alert = new Alert(AlertType.ERROR);
         alert.setTitle(GC_ERROR_TITLE);
         alert.setHeaderText(GC_ERROR_HEADER);
-        alert.setContentText(content);
+        alert.setContentText(iva_content);
 
         alert.showAndWait();
+    }
+
+    public static void createInformationAlert(String iva_content) {
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle(GC_INFORMATION_TITLE);
+        alert.setHeaderText(GC_INFORMATION_HEADER);
+        alert.setContentText(iva_content);
+
+        alert.showAndWait();
+
     }
 
 }
