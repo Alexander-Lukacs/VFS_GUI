@@ -18,7 +18,9 @@ import models.interfaces.User;
 import tools.AlertWindows;
 import tools.Validation;
 
+import javax.ws.rs.ProcessingException;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.util.Objects;
 
 import static cache.DataCache.*;
@@ -136,8 +138,8 @@ public class LoginController {
                 gob_httpMessage = gob_restClient.registerNewUser(lob_user);
                 printMessage(gob_httpMessage);
                 gob_tabPane.getSelectionModel().selectFirst();
-            } catch (IOException e) {
-                AlertWindows.ExceptionAlert(e.getMessage(), e);
+            } catch (ProcessingException | IOException ex) {
+                AlertWindows.ExceptionAlert(ex.getMessage(), ex);
             }
         }
     }
