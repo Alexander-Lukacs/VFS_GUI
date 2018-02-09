@@ -106,8 +106,8 @@ public class LoginController {
 
                 gob_dataCache.put(GC_PASSWORD_KEY, lva_password);
                 cacheUser(lob_user);
-                gob_tf_userLoginEmail.setText("");
-                gob_tf_loginPassword.setText("");
+                //gob_tf_userLoginEmail.setText("");
+                //gob_tf_loginPassword.setText("");
                 mainController.start(stage);
                 close();
             } catch (IllegalArgumentException ex) {
@@ -138,6 +138,7 @@ public class LoginController {
                 gob_httpMessage = gob_restClient.registerNewUser(lob_user);
                 printMessage(gob_httpMessage);
                 gob_tabPane.getSelectionModel().selectFirst();
+
             } catch (ProcessingException | IOException ex) {
                 AlertWindows.ExceptionAlert(ex.getMessage(), ex);
             }
@@ -145,7 +146,6 @@ public class LoginController {
     }
 
     private boolean checkIfLoginDataValid(String iva_ip, String iva_port, String iva_email, String iva_password) {
-
         StringBuilder lob_sb = new StringBuilder();
         boolean validationFailure = false;
 
@@ -225,12 +225,9 @@ public class LoginController {
         gob_dataCache.put(GC_ADMIN_ID_KEY, String.valueOf(iob_user.getAdminId()));
         gob_dataCache.put(GC_USER_ID_KEY, String.valueOf(iob_user.getUserId()));
         gob_dataCache.put(GC_IS_ADMIN_KEY, String.valueOf(iob_user.getIsAdmin()));
-
-        // System.out.println(gob_dataCache.get(GC_IS_ADMIN_KEY));
     }
 
     private void printMessage(HttpMessage status) {
-        // TODO kein sout sondern Nachrichten im Client
         switch (status.getHttpStatus()) {
             case 200:
                 System.out.println(status.getUserAddStatus());
