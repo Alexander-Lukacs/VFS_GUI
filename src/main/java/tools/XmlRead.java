@@ -46,8 +46,8 @@ public class XmlRead {
 
                     Element eElement = (Element) nNode;
 
-                    iob_tf_iPAddress.setText(eElement.getElementsByTagName("IP").item(0).getTextContent());
-                    iob_tf_Port.setText(eElement.getElementsByTagName("Port").item(0).getTextContent());
+                    System.out.println(eElement.getElementsByTagName("IP").item(0).getTextContent());
+                    System.out.println(eElement.getElementsByTagName("Port").item(0).getTextContent());
                 }
             }
         } catch (Exception e) {

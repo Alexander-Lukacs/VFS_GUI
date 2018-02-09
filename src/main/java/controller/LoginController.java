@@ -242,7 +242,7 @@ public class LoginController {
         File lob_file = new File(Utils.getUserBasePath()+"\\properties.xml");
 
         if (lob_file.exists()) {
-            XmlRead.setTfFromXml(gob_tf_port, gob_tf_ipAddress);
+           // XmlRead.setTfFromXml();
         } else {
             System.out.println("File not found!");
         }
