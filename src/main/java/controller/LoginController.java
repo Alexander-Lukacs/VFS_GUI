@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 import models.interfaces.User;
 import tools.AlertWindows;
 import tools.Validation;
+import tools.WriteXml;
 
 import javax.ws.rs.ProcessingException;
 import java.io.IOException;
@@ -86,7 +87,7 @@ public class LoginController {
         if (checkIfLoginDataValid(lva_ip, lva_port, lva_email, lva_password)) {
             gob_dataCache.put(GC_IP_KEY, lva_ip);
             gob_dataCache.put(GC_PORT_KEY, lva_port);
-           // writeInXml(lva_ip, lva_port);
+            WriteXml.createXml(lva_ip, lva_port);
 
             RestClient restClient = RestClientBuilder.buildRestClientWithAuth(lva_ip, lva_port, lva_email, lva_password);
             try {
@@ -119,7 +120,7 @@ public class LoginController {
         if (checkIfRegisterDataValid(lva_ip, lva_port, lva_name, lva_email, lva_password, lva_confirmPassword)) {
             gob_dataCache.put(GC_IP_KEY, lva_ip);
             gob_dataCache.put(GC_PORT_KEY, lva_port);
-           // writeInXml(lva_ip, lva_port);
+           WriteXml.createXml(lva_ip, lva_port);
             User lob_user;
 
             lob_user = ModelObjectBuilder.getUserObject(lva_email, lva_password, lva_name);
