@@ -15,10 +15,11 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import models.interfaces.User;
-import tools.*;
+import tools.AlertWindows;
+import tools.Validation;
+import tools.XmlTool;
 
 import javax.ws.rs.ProcessingException;
-import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -52,13 +53,10 @@ public class LoginController {
     private TextField gob_tf_port;
     @FXML
     private TabPane gob_tabPane = new TabPane();
-    private DataCache gob_dataCache;
-    private RestClient gob_restClient; //TODO Könnte lokal gemacht werden in OnClickRegister..
-    private HttpMessage gob_httpMessage; //TODO Könnte lokal gemacht werden in OnClickRegister..
 
+    @FXML
     public void initialize() {
         gob_dataCache = DataCache.getDataCache();
-
         gob_btnLogin.setOnKeyPressed(
                 event -> {
                     switch (event.getCode()) {
@@ -67,6 +65,25 @@ public class LoginController {
                     }
                 }
         );
+        gob_ipPortEmailPasswordArray = XmlTool.readFromXml();
+        System.out.println(gob_ipPortEmailPasswordArray[0]);
+        System.out.println(gob_ipPortEmailPasswordArray[1]);
+        System.out.println(gob_ipPortEmailPasswordArray[2]);
+        System.out.println(gob_ipPortEmailPasswordArray[3]);
+        setTextFromXmlToTf();
+    }
+
+    private String[] gob_ipPortEmailPasswordArray = new String[4];
+    private DataCache gob_dataCache;
+    private RestClient gob_restClient; //TODO Könnte lokal gemacht werden in OnClickRegister..
+    private HttpMessage gob_httpMessage; //TODO Könnte lokal gemacht werden in OnClickRegister..
+
+
+    private void setTextFromXmlToTf() {
+        gob_tf_ipAddress.setText(gob_ipPortEmailPasswordArray[0]);
+        gob_tf_port.setText(gob_ipPortEmailPasswordArray[1]);
+        gob_tf_userLoginEmail.setText(gob_ipPortEmailPasswordArray[2]);
+        gob_tf_loginPassword.setText(gob_ipPortEmailPasswordArray[3]);
     }
 
     /**
@@ -87,6 +104,7 @@ public class LoginController {
         if (checkIfLoginDataValid(lva_ip, lva_port, lva_email, lva_password)) {
             gob_dataCache.put(GC_IP_KEY, lva_ip);
             gob_dataCache.put(GC_PORT_KEY, lva_port);
+            XmlTool.createXml(lva_ip, lva_port, lva_email, lva_password);
 
             RestClient restClient = RestClientBuilder.buildRestClientWithAuth(lva_ip, lva_port, lva_email, lva_password);
             try {
@@ -97,7 +115,6 @@ public class LoginController {
                 gob_dataCache.put(GC_PASSWORD_KEY, lva_password);
                 cacheUser(lob_user);
 
-                XmlWrite.createXml(lva_ip, lva_port);
                 //gob_tf_userLoginEmail.setText("");
                 //gob_tf_loginPassword.setText("");
                 mainController.start(gob_stage);
@@ -121,6 +138,7 @@ public class LoginController {
         if (checkIfRegisterDataValid(lva_ip, lva_port, lva_name, lva_email, lva_password, lva_confirmPassword)) {
             gob_dataCache.put(GC_IP_KEY, lva_ip);
             gob_dataCache.put(GC_PORT_KEY, lva_port);
+            XmlTool.createXml(lva_ip, lva_port, lva_email, lva_password);
             User lob_user;
 
             lob_user = ModelObjectBuilder.getUserObject(lva_email, lva_password, lva_name);
@@ -131,7 +149,7 @@ public class LoginController {
                 printMessage(gob_httpMessage);
                 gob_tabPane.getSelectionModel().selectFirst();
 
-                XmlWrite.createXml(lva_ip, lva_port);
+                XmlTool.createXml(lva_ip, lva_port, lva_email, lva_password);
 
             } catch (ProcessingException | IOException ex) {
                 AlertWindows.createExceptionAlert(ex.getMessage(), ex);
@@ -236,27 +254,12 @@ public class LoginController {
         }
     }
 
-    private void fileChecker() {
-
-        System.out.println(Utils.getUserBasePath()+"\\properties.xml");
-        File lob_file = new File(Utils.getUserBasePath()+"\\properties.xml");
-
-        if (lob_file.exists()) {
-           // XmlRead.setTfFromXml();
-        } else {
-            System.out.println("File not found!");
-        }
-
-
-    }
-
     private void close() {
         ((Stage) gob_tf_userLoginEmail.getScene().getWindow()).close();
     }
 
     public void start(Stage stage) throws IOException {
 
-        fileChecker();
         Parent root;
         root = FXMLLoader.load(Objects.requireNonNull(getClass().getClassLoader().
                 getResource("loginScreen.fxml")));

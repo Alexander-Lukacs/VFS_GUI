@@ -13,6 +13,7 @@ public class MainApp extends Application {
     public void start(Stage primaryStage) {
         try {
             loginController.start(primaryStage);
+
         } catch (Exception ex) {
             AlertWindows.createExceptionAlert(ex.getMessage(), ex);
         }

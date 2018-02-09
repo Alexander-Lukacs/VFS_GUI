@@ -8,11 +8,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import tools.AlertWindows;
 import tools.Validation;
+import tools.XmlTool;
 
 import java.io.IOException;
 
-import static cache.DataCache.GC_IP_KEY;
-import static cache.DataCache.GC_PORT_KEY;
+import static cache.DataCache.*;
 import static controller.constants.SettingsConstants.GC_ADMIN_ADD;
 import static controller.constants.SettingsConstants.GC_CHANGE_PW;
 import static tools.constants.AlertConstants.GC_WARNING_IP_PORT;
@@ -79,6 +79,7 @@ public class ChangeIpPortController {
             if (Validation.isPortValid(lva_port)) {
                 lob_datacache.replaceData(GC_IP_KEY, lva_ip);
                 lob_datacache.replaceData(GC_PORT_KEY, lva_port);
+                XmlTool.createXml(lva_ip, lva_port, lob_datacache.get(GC_EMAIL_KEY), lob_datacache.get(GC_PASSWORD_KEY));
             }
             else{
                 AlertWindows.createWarningAlert(GC_WARNING_PORT);
