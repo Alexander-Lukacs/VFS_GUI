@@ -15,10 +15,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import models.interfaces.User;
-import tools.AlertWindows;
-import tools.Validation;
-import tools.XmlRead;
-import tools.XmlWrite;
+import tools.*;
 
 import javax.ws.rs.ProcessingException;
 import java.io.File;
@@ -34,6 +31,7 @@ public class LoginController {
 
     private final Stage gob_stage = new Stage();
     private final MainController mainController = new MainController();
+
     @FXML
     private Button gob_btnLogin;
     @FXML
@@ -99,7 +97,7 @@ public class LoginController {
                 gob_dataCache.put(GC_PASSWORD_KEY, lva_password);
                 cacheUser(lob_user);
 
-                XmlWrite.createXml(lva_ip, lva_port, lob_user.getName());
+                XmlWrite.createXml(lva_ip, lva_port);
                 //gob_tf_userLoginEmail.setText("");
                 //gob_tf_loginPassword.setText("");
                 mainController.start(gob_stage);
@@ -133,7 +131,7 @@ public class LoginController {
                 printMessage(gob_httpMessage);
                 gob_tabPane.getSelectionModel().selectFirst();
 
-                XmlWrite.createXml(lva_ip, lva_port, lob_user.getName());
+                XmlWrite.createXml(lva_ip, lva_port);
 
             } catch (ProcessingException | IOException ex) {
                 AlertWindows.createExceptionAlert(ex.getMessage(), ex);
@@ -237,14 +235,15 @@ public class LoginController {
                 break;
         }
     }
-    private void fileChecker(){
 
-        File lob_file = new File("C:\\Users\\properties.xml");
+    private void fileChecker() {
 
-        if(lob_file.exists()){
-            //gob_tf_ipAddress.setText(XmlRead.getIp());
-            //gob_tf_port.setText(XmlRead.getPort());
-        }else{
+        System.out.println(Utils.getUserBasePath()+"\\properties.xml");
+        File lob_file = new File(Utils.getUserBasePath()+"\\properties.xml");
+
+        if (lob_file.exists()) {
+            XmlRead.setTfFromXml(gob_tf_port, gob_tf_ipAddress);
+        } else {
             System.out.println("File not found!");
         }
 

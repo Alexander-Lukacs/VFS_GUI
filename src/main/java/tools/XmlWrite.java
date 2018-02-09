@@ -12,14 +12,12 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import static tools.constants.XmlConstants.*;
 
 public class XmlWrite {
 
-    public static void createXml(String iva_ip, String iva_port, String iva_name) {
+    public static void createXml(String iva_ip, String iva_port) {
 
         try {
 
@@ -49,7 +47,7 @@ public class XmlWrite {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource source = new DOMSource(doc);
-            StreamResult result = new StreamResult(new File("C:\\Users\\properties.xml"));
+            StreamResult result = new StreamResult(new File(Utils.getUserBasePath()+"\\properties.xml"));
 
             // Output to console for testing
             // StreamResult result = new StreamResult(System.out);

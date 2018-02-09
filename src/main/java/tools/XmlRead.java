@@ -1,5 +1,7 @@
 package tools;
 
+
+import javafx.scene.control.TextField;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -14,11 +16,12 @@ import java.io.File;
  */
 public class XmlRead {
 
-    public static void main (String args[]) {
+
+    public static void setTfFromXml(TextField iob_tf_iPAddress, TextField iob_tf_Port) {
 
         try {
 
-            File fXmlFile = new File("C:\\Users\\properties.xml");
+            File fXmlFile = new File(Utils.getUserBasePath()+"\\properties.xml");
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(fXmlFile);
@@ -43,8 +46,8 @@ public class XmlRead {
 
                     Element eElement = (Element) nNode;
 
-                    System.out.println(eElement.getElementsByTagName("IP").item(0).getTextContent());
-                    System.out.println(eElement.getElementsByTagName("Port").item(0).getTextContent());
+                    iob_tf_iPAddress.setText(eElement.getElementsByTagName("IP").item(0).getTextContent());
+                    iob_tf_Port.setText(eElement.getElementsByTagName("Port").item(0).getTextContent());
                 }
             }
         } catch (Exception e) {
