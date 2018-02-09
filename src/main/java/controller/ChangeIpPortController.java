@@ -59,18 +59,20 @@ public class ChangeIpPortController {
         }
     }
 
-    public void onClick(){
+    public void onClick() {
         DataCache lob_datacache = DataCache.getDataCache();
 
         String lva_ip = gob_tfServerIp.getText();
         String lva_port = gob_tfPort.getText();
-        if(Validation.checkIfIpPortValid(lva_ip, lva_port)) {
-            lob_datacache.replaceData(GC_IP_KEY, lva_ip);
-            lob_datacache.replaceData(GC_PORT_KEY, lva_port);
 
-            System.out.println(lob_datacache.get(GC_IP_KEY));
-            System.out.println(lob_datacache.get(GC_PORT_KEY));
+        if (!Validation.isIpNotValid(lva_ip)) {
+            lob_datacache.replaceData(GC_IP_KEY, lva_ip);
         }
+        if (!Validation.isPortNotValid(lva_port)) {
+            lob_datacache.replaceData(GC_PORT_KEY, lva_port);
+        }
+        System.out.println(lob_datacache.get(GC_IP_KEY));
+        System.out.println(lob_datacache.get(GC_PORT_KEY));
     }
 }
 
