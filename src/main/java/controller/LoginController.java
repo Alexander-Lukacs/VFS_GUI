@@ -60,7 +60,7 @@ public class LoginController {
 
     private final Stage stage = new Stage();
     private final MainController mainController = new MainController();
-    private static DataCache gob_dataCache;
+    private DataCache gob_dataCache;
     private RestClient gob_restClient; //TODO Könnte lokal gemacht werden in OnClickRegister..
     private HttpMessage gob_httpMessage; //TODO Könnte lokal gemacht werden in OnClickRegister..
     private boolean gva_isInputValid = false;
