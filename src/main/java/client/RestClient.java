@@ -7,7 +7,10 @@ import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import tools.AlertWindows;
 
-import javax.ws.rs.client.*;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -53,14 +56,10 @@ public class RestClient {
         String lva_jsonInString;
         HttpMessage lob_httpMessage;
         UserImpl lob_user = new UserImpl();
-        Response response = null;
+        Response response;
 
-        try {
-            response = webTarget.path("/user/auth/login").request()
-                    .put(Entity.entity(user, MediaType.APPLICATION_JSON));
-        } catch (Exception ex ) {
-            System.out.println(ex.getMessage());
-        }
+        response = webTarget.path("/user/auth/login").request()
+                .put(Entity.entity(user, MediaType.APPLICATION_JSON));
 
         lva_jsonInString = response.readEntity(String.class);
 
