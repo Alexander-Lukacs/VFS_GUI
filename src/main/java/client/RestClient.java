@@ -48,6 +48,7 @@ public class RestClient {
 
         HttpMessage obj = mapper.readValue(jsonInString, HttpMessage.class);
         obj.setHttpStatus(response.getStatus());
+
         return obj;
     }
 
@@ -63,8 +64,6 @@ public class RestClient {
 
         lva_jsonInString = response.readEntity(String.class);
 
-        // TODO return value
-
         try {
             if (response.getStatus() == GC_HTTP_OK) {
                 lob_user = lob_mapper.readValue(lva_jsonInString, UserImpl.class);
@@ -76,7 +75,6 @@ public class RestClient {
                 throw new IllegalArgumentException(lob_httpMessage.getUserLoginStatus());
             }
         } catch (IOException ex) {
-            //TODO
             AlertWindows.createExceptionAlert(ex.getMessage(), ex);
             ex.printStackTrace();
         }
@@ -85,16 +83,9 @@ public class RestClient {
     }
 
     public void changePassword(User iob_user) {
-
-        String lva_jsonInString;
-
         Response response = webTarget.path("user/auth/changePassword").request()
                 .put(Entity.entity(iob_user, MediaType.APPLICATION_JSON));
 
-        lva_jsonInString = response.readEntity(String.class);
-
-        // TODO Löschen
-        System.out.println(response.readEntity(String.class));
+        String s = response.readEntity(String.class);
     }
-
 }
