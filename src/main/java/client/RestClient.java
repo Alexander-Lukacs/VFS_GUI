@@ -53,9 +53,14 @@ public class RestClient {
         String lva_jsonInString;
         HttpMessage lob_httpMessage;
         UserImpl lob_user = new UserImpl();
+        Response response = null;
 
-        Response response = webTarget.path("/user/auth/login").request()
-                .put(Entity.entity(user, MediaType.APPLICATION_JSON));
+        try {
+            response = webTarget.path("/user/auth/login").request()
+                    .put(Entity.entity(user, MediaType.APPLICATION_JSON));
+        } catch (Exception ex ) {
+            System.out.println(ex.getMessage());
+        }
 
         lva_jsonInString = response.readEntity(String.class);
 
