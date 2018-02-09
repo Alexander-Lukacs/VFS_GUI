@@ -17,9 +17,11 @@ import javafx.stage.Stage;
 import models.interfaces.User;
 import tools.AlertWindows;
 import tools.Validation;
-import tools.WriteXml;
+import tools.XmlRead;
+import tools.XmlWrite;
 
 import javax.ws.rs.ProcessingException;
+import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -87,7 +89,6 @@ public class LoginController {
         if (checkIfLoginDataValid(lva_ip, lva_port, lva_email, lva_password)) {
             gob_dataCache.put(GC_IP_KEY, lva_ip);
             gob_dataCache.put(GC_PORT_KEY, lva_port);
-            WriteXml.createXml(lva_ip, lva_port);
 
             RestClient restClient = RestClientBuilder.buildRestClientWithAuth(lva_ip, lva_port, lva_email, lva_password);
             try {
@@ -97,6 +98,8 @@ public class LoginController {
 
                 gob_dataCache.put(GC_PASSWORD_KEY, lva_password);
                 cacheUser(lob_user);
+
+                XmlWrite.createXml(lva_ip, lva_port, lob_user.getName());
                 //gob_tf_userLoginEmail.setText("");
                 //gob_tf_loginPassword.setText("");
                 mainController.start(gob_stage);
@@ -120,7 +123,6 @@ public class LoginController {
         if (checkIfRegisterDataValid(lva_ip, lva_port, lva_name, lva_email, lva_password, lva_confirmPassword)) {
             gob_dataCache.put(GC_IP_KEY, lva_ip);
             gob_dataCache.put(GC_PORT_KEY, lva_port);
-           WriteXml.createXml(lva_ip, lva_port);
             User lob_user;
 
             lob_user = ModelObjectBuilder.getUserObject(lva_email, lva_password, lva_name);
@@ -130,6 +132,8 @@ public class LoginController {
                 gob_httpMessage = gob_restClient.registerNewUser(lob_user);
                 printMessage(gob_httpMessage);
                 gob_tabPane.getSelectionModel().selectFirst();
+
+                XmlWrite.createXml(lva_ip, lva_port, lob_user.getName());
 
             } catch (ProcessingException | IOException ex) {
                 AlertWindows.createExceptionAlert(ex.getMessage(), ex);
@@ -233,12 +237,27 @@ public class LoginController {
                 break;
         }
     }
+    private void fileChecker(){
+
+        File lob_file = new File("C:\\Users\\properties.xml");
+
+        if(lob_file.exists()){
+            //gob_tf_ipAddress.setText(XmlRead.getIp());
+            //gob_tf_port.setText(XmlRead.getPort());
+        }else{
+            System.out.println("File not found!");
+        }
+
+
+    }
 
     private void close() {
         ((Stage) gob_tf_userLoginEmail.getScene().getWindow()).close();
     }
 
     public void start(Stage stage) throws IOException {
+
+        fileChecker();
         Parent root;
         root = FXMLLoader.load(Objects.requireNonNull(getClass().getClassLoader().
                 getResource("loginScreen.fxml")));
