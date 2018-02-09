@@ -11,13 +11,13 @@
               <VBox alignment="CENTER" prefHeight="400.0" prefWidth="454.0" spacing="20.0">
                  <children>
                      <Label text="New Server-IP" />
-                     <TextField fx:id="tfServerIp">
+                     <TextField fx:id="gob_tfServerIp">
                          <VBox.margin>
                              <Insets left="50.0" right="50.0" />
                          </VBox.margin>
                      </TextField>
                      <Label text="New Port" />
-                     <TextField fx:id="tfPort" prefHeight="31.0" prefWidth="307.0">
+                     <TextField fx:id="gob_tfPort" prefHeight="31.0" prefWidth="307.0">
                          <VBox.margin>
                              <Insets left="150.0" right="150.0" />
                          </VBox.margin>
