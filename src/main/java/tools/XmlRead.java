@@ -32,7 +32,7 @@ public class XmlRead {
 
             System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
 
-            NodeList nList = doc.getElementsByTagName("server");
+            NodeList nList = doc.getElementsByTagName("Server");
 
             System.out.println("----------------------------");
 
