@@ -4,7 +4,6 @@ package models.classes;
 import models.interfaces.User;
 
 import javax.xml.bind.annotation.XmlRootElement;
-import java.io.Serializable;
 import java.util.Objects;
 
 

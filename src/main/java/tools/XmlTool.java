@@ -64,12 +64,11 @@ public class XmlTool {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-        else{
-            lob_ipPortEmailPasswordArray[0]="";
-            lob_ipPortEmailPasswordArray[1]="";
-            lob_ipPortEmailPasswordArray[2]="";
-            lob_ipPortEmailPasswordArray[3]="";
+        } else {
+            lob_ipPortEmailPasswordArray[0] = "";
+            lob_ipPortEmailPasswordArray[1] = "";
+            lob_ipPortEmailPasswordArray[2] = "";
+            lob_ipPortEmailPasswordArray[3] = "";
         }
         return lob_ipPortEmailPasswordArray;
     }
@@ -133,7 +132,7 @@ public class XmlTool {
 
     private static boolean checkIfFileExist() {
 
-        System.out.println("checkIfFileExist(): "+Utils.getUserBasePath() + "\\properties.xml");
+        System.out.println("checkIfFileExist(): " + Utils.getUserBasePath() + "\\properties.xml");
         File lob_file = new File(Utils.getUserBasePath() + "\\properties.xml");
 
         if (lob_file.exists()) {

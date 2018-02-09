@@ -63,8 +63,7 @@ public class ChangeIpPortController {
                 AnchorPane lob_pane = lob_loader.load();
                 gob_rootPane.getChildren().setAll(lob_pane);
             }
-        }catch (Exception e)
-        {
+        } catch (Exception e) {
 
         }
     }
@@ -80,8 +79,7 @@ public class ChangeIpPortController {
                 lob_datacache.replaceData(GC_IP_KEY, lva_ip);
                 lob_datacache.replaceData(GC_PORT_KEY, lva_port);
                 XmlTool.createXml(lva_ip, lva_port, lob_datacache.get(GC_EMAIL_KEY), lob_datacache.get(GC_PASSWORD_KEY));
-            }
-            else{
+            } else {
                 AlertWindows.createWarningAlert(GC_WARNING_PORT);
             }
         } else {
