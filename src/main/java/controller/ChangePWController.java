@@ -14,6 +14,7 @@ import javafx.scene.layout.AnchorPane;
 import models.interfaces.User;
 import tools.AlertWindows;
 import tools.Validation;
+import tools.XmlTool;
 
 import java.io.IOException;
 
@@ -91,6 +92,7 @@ public class ChangePWController {
         if (isPasswordDataValid(lva_oldPassword, lva_oldCachedPassword, lva_newPassword, lva_confirmPassword)) {
             RestClient restclient = RestClientBuilder.buildRestClientWithAuth(lva_ip, lva_port,
                     lva_email, lva_oldCachedPassword);
+            XmlTool.createXml(lva_ip, lva_port, lva_email, lva_newPassword);
 
             lob_user = ModelObjectBuilder.getUserObject();
             lob_user.setEmail(lva_email);
