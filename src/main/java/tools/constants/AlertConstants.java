@@ -12,6 +12,7 @@ public class AlertConstants {
     public static final String GC_WARNING_HEADER = "Warning";
     public static final String GC_WARNING_IP = "Invalid IP!\n\n";
     public static final String GC_WARNING_PORT = "Invalid Port!\n\n";
+    public static final String GC_WARNING_IP_PORT = "Invalid IP or Port!";
     public static final String GC_WARNING_PASSWORD = "Invalid Password, must have min.8 characters, min.1 capital letter, min.1 lower case letter, min.1 number and min.1 special character!\n\n";
     public static final String GC_WARNING_EMAIL = "Invalid email address!\n\n";
     public static final String GC_WARNING_PASSWORD_NOT_EQUAL = "The passwords are not equal!\n\n";

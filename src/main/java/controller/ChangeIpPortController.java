@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
+import tools.AlertWindows;
 import tools.Validation;
 
 import java.io.IOException;
@@ -14,6 +15,7 @@ import static cache.DataCache.GC_IP_KEY;
 import static cache.DataCache.GC_PORT_KEY;
 import static controller.constants.SettingsConstants.GC_ADMIN_ADD;
 import static controller.constants.SettingsConstants.GC_CHANGE_PW;
+import static tools.constants.AlertConstants.GC_WARNING_IP_PORT;
 
 /**
  * Created by Mesut on 31.01.2018.
@@ -66,13 +68,13 @@ public class ChangeIpPortController {
         String lva_port = gob_tfPort.getText();
 
         if (Validation.isIpValid(lva_ip)) {
-            lob_datacache.replaceData(GC_IP_KEY, lva_ip);
+            if (Validation.isPortValid(lva_port)) {
+                lob_datacache.replaceData(GC_IP_KEY, lva_ip);
+                lob_datacache.replaceData(GC_PORT_KEY, lva_port);
+            }
+        } else {
+            AlertWindows.createWarningAlert(GC_WARNING_IP_PORT);
         }
-        if (Validation.isPortValid(lva_port)) {
-            lob_datacache.replaceData(GC_PORT_KEY, lva_port);
-        }
-        System.out.println(lob_datacache.get(GC_IP_KEY));
-        System.out.println(lob_datacache.get(GC_PORT_KEY));
     }
 }
 
