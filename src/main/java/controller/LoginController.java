@@ -23,46 +23,34 @@ import java.io.IOException;
 import java.util.Objects;
 
 import static cache.DataCache.*;
-import static client.constants.HttpStatusCodes.GC_HTTP_BAD_REQUEST;
-import static client.constants.HttpStatusCodes.GC_HTTP_CONFLICT;
-import static client.constants.HttpStatusCodes.GC_HTTP_OK;
-import static tools.constants.AlertConstants.*;
+import static client.constants.HttpStatusCodes.*;
 import static controller.constants.SettingsConstants.GC_VFS;
+import static tools.constants.AlertConstants.*;
 
 public class LoginController {
 
-    @FXML
-    private Button gob_btnLogin;
-
-    @FXML
-    private PasswordField gob_tf_loginPassword;
-
-    @FXML
-    private TextField gob_tf_userLoginEmail;
-
-    @FXML
-    private TextField gob_tf_newUserName;
-
-    @FXML
-    private TextField gob_tf_newUserEmail;
-
-    @FXML
-    private TextField gob_tf_registerPassword;
-
-    @FXML
-    private TextField gob_tf_confirmPassword1;
-
-    @FXML
-    private TextField gob_tf_ipAddress;
-
-    @FXML
-    private TextField gob_tf_port;
-
-    @FXML
-    private TabPane gob_tabPane = new TabPane();
-
     private final Stage stage = new Stage();
     private final MainController mainController = new MainController();
+    @FXML
+    private Button gob_btnLogin;
+    @FXML
+    private PasswordField gob_tf_loginPassword;
+    @FXML
+    private TextField gob_tf_userLoginEmail;
+    @FXML
+    private TextField gob_tf_newUserName;
+    @FXML
+    private TextField gob_tf_newUserEmail;
+    @FXML
+    private TextField gob_tf_registerPassword;
+    @FXML
+    private TextField gob_tf_confirmPassword1;
+    @FXML
+    private TextField gob_tf_ipAddress;
+    @FXML
+    private TextField gob_tf_port;
+    @FXML
+    private TabPane gob_tabPane = new TabPane();
     private DataCache gob_dataCache;
     private RestClient gob_restClient; //TODO Könnte lokal gemacht werden in OnClickRegister..
     private HttpMessage gob_httpMessage; //TODO Könnte lokal gemacht werden in OnClickRegister..
@@ -230,7 +218,7 @@ public class LoginController {
 
     private void printMessage(HttpMessage status) {
         switch (status.getHttpStatus()) {
-            case  GC_HTTP_OK:
+            case GC_HTTP_OK:
                 AlertWindows.createInformationAlert(status.getUserAddStatus());
                 break;
             case GC_HTTP_BAD_REQUEST:
@@ -249,7 +237,9 @@ public class LoginController {
 
     public void start(Stage stage) throws IOException {
         Parent root;
-        root = FXMLLoader.load(Objects.requireNonNull(getClass().getClassLoader().getResource("loginScreen.fxml")));
+        root = FXMLLoader.load(Objects.requireNonNull(getClass().getClassLoader().
+                getResource("loginScreen.fxml")));
+
         stage.setScene(new Scene(root));
         stage.setTitle(GC_VFS);
         stage.show();
