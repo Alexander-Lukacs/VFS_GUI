@@ -16,7 +16,7 @@ public class Validation {
     public static boolean isIpValid(String ip) {
         pattern = Pattern.compile(GC_VALID_IP_ADDRESS_REGEX, Pattern.CASE_INSENSITIVE);
         matcher = pattern.matcher(ip);
-        return matcher.find();
+        return matcher.find() || ip.equals("localhost");
     }
 
     public static boolean isPortValid(String port) {

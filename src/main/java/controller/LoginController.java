@@ -20,11 +20,13 @@ import tools.Validation;
 
 import javax.ws.rs.ProcessingException;
 import java.io.IOException;
-import java.net.ConnectException;
 import java.util.Objects;
 
 import static cache.DataCache.*;
-import static controller.constants.AlertConstants.*;
+import static client.constants.HttpStatusCodes.GC_HTTP_BAD_REQUEST;
+import static client.constants.HttpStatusCodes.GC_HTTP_CONFLICT;
+import static client.constants.HttpStatusCodes.GC_HTTP_OK;
+import static tools.constants.AlertConstants.*;
 import static controller.constants.SettingsConstants.GC_VFS;
 
 public class LoginController {
@@ -93,7 +95,6 @@ public class LoginController {
         String lva_password = gob_tf_loginPassword.getText();
         String lva_email = gob_tf_userLoginEmail.getText();
 
-        //TODO Vom Server uebergebenes Objekt auseinanderziehen und dann in den Cache setzen motherfucker
         if (checkIfLoginDataValid(lva_ip, lva_port, lva_email, lva_password)) {
             gob_dataCache.put(GC_IP_KEY, lva_ip);
             gob_dataCache.put(GC_PORT_KEY, lva_port);
@@ -110,9 +111,9 @@ public class LoginController {
                 //gob_tf_loginPassword.setText("");
                 mainController.start(stage);
                 close();
-            } catch (IllegalArgumentException ex) {
-                    /*TODO Alert Fenster Tests...*/
-                AlertWindows.ExceptionAlert(ex.getMessage(), ex);
+            } catch (ProcessingException | IllegalArgumentException ex) {
+
+                AlertWindows.createExceptionAlert(ex.getMessage(), ex);
             }
         }
     }
@@ -140,7 +141,7 @@ public class LoginController {
                 gob_tabPane.getSelectionModel().selectFirst();
 
             } catch (ProcessingException | IOException ex) {
-                AlertWindows.ExceptionAlert(ex.getMessage(), ex);
+                AlertWindows.createExceptionAlert(ex.getMessage(), ex);
             }
         }
     }
@@ -170,7 +171,7 @@ public class LoginController {
         }
 
         if (validationFailure) {
-            AlertWindows.WarningAlert(lob_sb.toString());
+            AlertWindows.createWarningAlert(lob_sb.toString());
             return false;
         }
 
@@ -212,7 +213,7 @@ public class LoginController {
         }
 
         if (validationFailure) {
-            AlertWindows.WarningAlert(lob_sb.toString());
+            AlertWindows.createWarningAlert(lob_sb.toString());
             return false;
         }
 
@@ -229,17 +230,15 @@ public class LoginController {
 
     private void printMessage(HttpMessage status) {
         switch (status.getHttpStatus()) {
-            case 200:
-                System.out.println(status.getUserAddStatus());
+            case  GC_HTTP_OK:
+                AlertWindows.createInformationAlert(status.getUserAddStatus());
                 break;
-            case 400:
-                //TODO UserStatus oder unser String?
-                AlertWindows.ErrorAlert(GC_ERROR_PASSWORD);
-                System.out.println(status.getUserAddStatus());
+            case GC_HTTP_BAD_REQUEST:
+                AlertWindows.createErrorAlert(status.getUserAddStatus());
                 break;
 
-            case 409:
-                System.out.println(status.getUserAddStatus());
+            case GC_HTTP_CONFLICT:
+                AlertWindows.createErrorAlert(status.getUserAddStatus());
                 break;
         }
     }

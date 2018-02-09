@@ -82,7 +82,7 @@ public class MainController {
             lob_stage.setScene(lob_scene);
             lob_stage.show();
         } catch (IOException e) {
-            AlertWindows.ExceptionAlert(e.getMessage(), e);
+            AlertWindows.createExceptionAlert(e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }

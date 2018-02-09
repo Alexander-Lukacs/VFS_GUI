@@ -77,7 +77,7 @@ public class RestClient {
             }
         } catch (IOException ex) {
             //TODO
-            AlertWindows.ExceptionAlert(ex.getMessage(), ex);
+            AlertWindows.createExceptionAlert(ex.getMessage(), ex);
             ex.printStackTrace();
         }
 
