@@ -1,7 +1,7 @@
 package tools;
 
 import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.*;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
@@ -19,7 +19,7 @@ import static controller.constants.AlertConstants.*;
 public class AlertWindows {
 
 
-    public static void ExceptionAlert (String content, Exception exception){
+    public static void ExceptionAlert(String content, Exception exception) {
         Alert alert = new Alert(AlertType.ERROR);
         alert.setTitle(GC_EXCEPTION_TITLE);
         alert.setHeaderText(GC_EXCEPTION_HEADER);
@@ -52,7 +52,8 @@ public class AlertWindows {
 
         alert.showAndWait();
     }
-    public static void WarningAlert ( String content) {
+
+    public static void WarningAlert(String content) {
 
         Alert alert = new Alert(AlertType.WARNING);
         alert.setTitle(GC_WARNING_TITLE);
@@ -63,7 +64,7 @@ public class AlertWindows {
     }
 
     //TODO falls kein content dazu kommt, kann dies auch statisch gemacht werden
-    public static void ErrorAlert (String content){
+    public static void ErrorAlert(String content) {
         Alert alert = new Alert(AlertType.ERROR);
         alert.setTitle(GC_ERROR_TITLE);
         alert.setHeaderText(GC_ERROR_HEADER);

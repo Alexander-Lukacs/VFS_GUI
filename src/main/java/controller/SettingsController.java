@@ -3,7 +3,6 @@ package controller;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ListView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
@@ -24,8 +23,7 @@ public class SettingsController {
     /**
      * Initialize of ListView
      */
-    public void initialize()
-    {
+    public void initialize() {
         gob_listView.loadList(gob_lvOptions);
     }
 
@@ -33,15 +31,14 @@ public class SettingsController {
     /**
      * shows the choosen Settings View
      *
-     * @param event
      * @throws IOException
      */
-    public void loadView(MouseEvent event) throws IOException {
+    public void loadView() throws IOException {
 
         if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(GC_CHANGE_PW)) {
-           FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("ChangePW.fxml"));
-           AnchorPane lob_pane = lob_loader.load();
-           gob_rootPane.getChildren().setAll(lob_pane);
+            FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("ChangePW.fxml"));
+            AnchorPane lob_pane = lob_loader.load();
+            gob_rootPane.getChildren().setAll(lob_pane);
         }
         if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(GC_ADMIN_ADD)) {
             FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("addAdmin.fxml"));

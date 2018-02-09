@@ -28,11 +28,9 @@ public class MainController {
 
     @FXML
     private Button gob_btnSettings;
-    @FXML
-    private Button gob_btnLogout;
 
     @FXML
-    private TreeView<Path> gob_treeView; //TODO Köönte lokal gemacht werden, nur wie?
+    private TreeView<Path> gob_treeView; //TODO Könte lokal gemacht werden, nur wie?
 
     @FXML
     private VBox gob_vbox = new VBox();
@@ -40,35 +38,32 @@ public class MainController {
     private DataCache userCache;
 
 
-
     /**
      * Beim Klicken des Buttons wird die View settings.fxml geöffnet
      */
 
-   public void onClick(ActionEvent e) throws RuntimeException, IOException{
+    public void onClick(ActionEvent e) throws RuntimeException, IOException {
 
-           if( ((Button)e.getSource()).getText().equals(GC_SETTINGS) ) {
+        if (((Button) e.getSource()).getText().equals(GC_SETTINGS)) {
 
-               FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("settings.fxml"));
-               AnchorPane lob_pane = lob_loader.load();
-               Scene lob_scene = new Scene(lob_pane);
-               Stage lob_stage = new Stage();
-               lob_stage.setTitle(GC_SETTINGS);
-               lob_stage.setResizable(false);
-               lob_stage.setScene(lob_scene);
-               lob_stage.show();
-           }
-           else if( ((Button)e.getSource()).getText().equals(GC_LOGOUT) ){
-               userCache.clearDataCache();
-               Stage stage = ((Stage) gob_btnSettings.getScene().getWindow());
-               stage.close();
-               LoginController ob_x = new LoginController();
-               ob_x.start(stage);
-           }
+            FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("settings.fxml"));
+            AnchorPane lob_pane = lob_loader.load();
+            Scene lob_scene = new Scene(lob_pane);
+            Stage lob_stage = new Stage();
+            lob_stage.setTitle(GC_SETTINGS);
+            lob_stage.setResizable(false);
+            lob_stage.setScene(lob_scene);
+            lob_stage.show();
+        } else if (((Button) e.getSource()).getText().equals(GC_LOGOUT)) {
+            userCache.clearDataCache();
+            Stage stage = ((Stage) gob_btnSettings.getScene().getWindow());
+            stage.close();
+            LoginController ob_x = new LoginController();
+            ob_x.start(stage);
+        }
     }
 
-    public void initialize()throws  IOException
-    {
+    public void initialize() throws IOException {
         userCache = DataCache.getDataCache();
         TreeImpl x = new TreeImpl(Utils.getUserBasePath());
         TreeItem<Path> root = new TreeItem<>(Paths.get(x.getRoot().getCanonicalPath()));
@@ -81,16 +76,15 @@ public class MainController {
 
         FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("mainScreen.fxml"));
         try {
-                SplitPane lob_pane = lob_loader.load();
-                Scene lob_scene = new Scene(lob_pane);
-                lob_stage.setTitle(GC_VFS);
-                lob_stage.setScene(lob_scene);
-                lob_stage.show();
-            }
-            catch (IOException e){
-                AlertWindows.ExceptionAlert(e.getMessage(), e);
-                throw new RuntimeException(e);
-            }
+            SplitPane lob_pane = lob_loader.load();
+            Scene lob_scene = new Scene(lob_pane);
+            lob_stage.setTitle(GC_VFS);
+            lob_stage.setScene(lob_scene);
+            lob_stage.show();
+        } catch (IOException e) {
+            AlertWindows.ExceptionAlert(e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
     }
 
     private void createTree(TreeItem<Path> rootItem) throws IOException {

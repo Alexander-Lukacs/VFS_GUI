@@ -19,7 +19,7 @@ import static client.constants.HttpStatusCodes.GC_HTTP_OK;
  */
 
 public class RestClient {
-    //TODO final?
+
     private WebTarget webTarget;
 
     public RestClient(String baseUrl) {
@@ -35,7 +35,7 @@ public class RestClient {
         webTarget = client.target(baseUrl);
     }
 
-    public HttpMessage registerNewUser(User user) throws IOException{
+    public HttpMessage registerNewUser(User user) throws IOException {
         Response response = webTarget.path("/user/addNewUser").request()
                 .put(Entity.entity(user, MediaType.APPLICATION_JSON));
 
@@ -48,7 +48,7 @@ public class RestClient {
         return obj;
     }
 
-    public User loginUser (User user) {
+    public User loginUser(User user) {
         ObjectMapper lob_mapper = new ObjectMapper();
         String lva_jsonInString;
         HttpMessage lob_httpMessage;
@@ -64,7 +64,7 @@ public class RestClient {
         try {
             if (response.getStatus() == GC_HTTP_OK) {
                 lob_user = lob_mapper.readValue(lva_jsonInString, UserImpl.class);
-            }else if (response.getStatus() == 401) {
+            } else if (response.getStatus() == 401) {
                 throw new IllegalArgumentException("Unauthorized");
             } else {
                 lob_httpMessage = lob_mapper.readValue(lva_jsonInString, HttpMessage.class);
