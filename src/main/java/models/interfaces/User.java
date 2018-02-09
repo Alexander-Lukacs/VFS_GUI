@@ -1,5 +1,6 @@
 package models.interfaces;
 
+
 public interface User {
     void setEmail(String iva_email);
     void setPassword(String iva_password);

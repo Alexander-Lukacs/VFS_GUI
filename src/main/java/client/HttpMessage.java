@@ -1,5 +1,10 @@
 package client;
 
+import tools.AlertWindows;
+
+import static client.constants.HttpStatusCodes.GC_HTTP_BAD_REQUEST;
+import static client.constants.HttpStatusCodes.GC_HTTP_CONFLICT;
+
 /**
  * Created by Mesut on 07.02.2018.
  */
@@ -7,8 +12,9 @@ public class HttpMessage {
     private int httpStatus;
 
     private String userLoginStatus;
-    private String userChangePassword;
+    private String passwordChangeStatus;
     private String userAddStatus;
+    private String addAdminStatus;
 
     public int getHttpStatus() {
         return httpStatus;
@@ -34,12 +40,20 @@ public class HttpMessage {
         this.userLoginStatus = userLoginStatus;
     }
 
-    public String getUserChangePassword() {
-        return userChangePassword;
+    public String getPasswordChangeStatus() {
+        return passwordChangeStatus;
     }
 
-    public void setUserChangePassword(String userChangePassword) {
-        this.userChangePassword = userChangePassword;
+    public void setPasswordChangeStatus(String passwordChangeStatus) {
+        this.passwordChangeStatus = passwordChangeStatus;
+    }
+
+    public String getAddAdminStatus() {
+        return addAdminStatus;
+    }
+
+    public void setAddAdminStatus(String addAdminStatus) {
+        this.addAdminStatus = addAdminStatus;
     }
 
     @Override

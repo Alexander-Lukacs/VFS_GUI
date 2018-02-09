@@ -4,6 +4,7 @@ package models.classes;
 import models.interfaces.User;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 import java.util.Objects;
 
 
@@ -19,11 +20,12 @@ public class UserImpl implements User {
     public UserImpl() {
     }
 
-    public UserImpl (String email, String password, String name) {
+    public UserImpl(String email, String password, String name) {
         this.email = email;
         this.password = password;
         this.name = name;
     }
+
     public UserImpl(String iva_email, String iva_password, String iva_name, boolean iva_isAdmin, int iva_userId, int iva_adminId) {
         setEmail(iva_email);
         setPassword(iva_password);

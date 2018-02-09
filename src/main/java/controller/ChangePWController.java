@@ -46,7 +46,7 @@ public class ChangePWController {
      * Initialisation of ListView
      */
     public void initialize() {
-        gob_listView.loadList(gob_lvOptions);
+        gob_listView.loadSettingsList(gob_lvOptions);
         gob_dataCache = DataCache.getDataCache();
     }
 
@@ -56,23 +56,23 @@ public class ChangePWController {
      * @throws IOException
      */
     public void loadView() throws IOException {
-        if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(GC_CHANGE_PW)) {
-            FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("ChangePW.fxml"));
-            AnchorPane lob_pane = lob_loader.load();
-            gob_rootPane.getChildren().setAll(lob_pane);
+        try {
+
+            if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(GC_ADMIN_ADD)) {
+                FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("addAdmin.fxml"));
+                AnchorPane lob_pane = lob_loader.load();
+                gob_rootPane.getChildren().setAll(lob_pane);
+            }
+
+            if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(GC_CHANGE_IP_PORT)) {
+                FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("changeIpPort.fxml"));
+                AnchorPane lob_pane = lob_loader.load();
+                gob_rootPane.getChildren().setAll(lob_pane);
+            }
+        }catch (Exception e){
+
         }
 
-        if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(GC_ADMIN_ADD)) {
-            FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("addAdmin.fxml"));
-            AnchorPane lob_pane = lob_loader.load();
-            gob_rootPane.getChildren().setAll(lob_pane);
-        }
-
-        if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(GC_CHANGE_IP_PORT)) {
-            FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("changeIpPort.fxml"));
-            AnchorPane lob_pane = lob_loader.load();
-            gob_rootPane.getChildren().setAll(lob_pane);
-        }
     }
 
     public void onClickChangePassword() {
@@ -97,7 +97,11 @@ public class ChangePWController {
             lob_user.setPassword(lva_newPassword);
 
             httpMessage = restclient.changePassword(lob_user);
+
             printHttpMessage(httpMessage);
+            gob_tf_oldPassword.setText("");
+            gob_tf_newPassword.setText("");
+            gob_tf_confirmPassword.setText("");
         }
     }
 
@@ -133,15 +137,15 @@ public class ChangePWController {
     private void printHttpMessage(HttpMessage httpMessage) {
         switch (httpMessage.getHttpStatus()) {
             case GC_HTTP_OK:
-                AlertWindows.createInformationAlert(httpMessage.getUserChangePassword());
+                AlertWindows.createInformationAlert(httpMessage.getPasswordChangeStatus());
                 break;
 
             case GC_HTTP_BAD_REQUEST:
-                AlertWindows.createErrorAlert(httpMessage.getUserChangePassword());
+                AlertWindows.createErrorAlert(httpMessage.getPasswordChangeStatus());
                 break;
 
             case GC_HTTP_CONFLICT:
-                AlertWindows.createErrorAlert(httpMessage.getUserChangePassword());
+                AlertWindows.createErrorAlert(httpMessage.getPasswordChangeStatus());
                 break;
         }
     }

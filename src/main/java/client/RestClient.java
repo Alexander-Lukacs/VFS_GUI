@@ -11,9 +11,11 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.List;
 
 import static client.constants.HttpStatusCodes.GC_HTTP_OK;
 
@@ -88,6 +90,29 @@ public class RestClient {
         Response response = webTarget.path("user/auth/changePassword").request()
                 .put(Entity.entity(iob_user, MediaType.APPLICATION_JSON));
 
-        return httpMessage = response.readEntity(HttpMessage.class);
+        httpMessage = response.readEntity(HttpMessage.class);
+        httpMessage.setHttpStatus(response.getStatus());
+
+        return httpMessage;
+    }
+
+    public List<UserImpl> getAllUser() {
+        List<UserImpl> userList;
+        userList = webTarget.path("user/adminAuth/getAllUser").request()
+                .get(new GenericType<List<UserImpl>>(){});
+
+        return userList;
+    }
+
+    public HttpMessage addNewAdmin(User iob_user) {
+        HttpMessage lob_httpMessage;
+
+        Response response = webTarget.path("admin/adminAuth/addNewAdmin").request()
+                .put(Entity.entity(iob_user, MediaType.APPLICATION_JSON));
+
+        lob_httpMessage = response.readEntity(HttpMessage.class);
+        lob_httpMessage.setHttpStatus(response.getStatus());
+
+        return lob_httpMessage;
     }
 }

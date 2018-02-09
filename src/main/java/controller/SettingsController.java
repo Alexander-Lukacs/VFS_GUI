@@ -24,7 +24,7 @@ public class SettingsController {
      * Initialize of ListView
      */
     public void initialize() {
-        gob_listView.loadList(gob_lvOptions);
+        gob_listView.loadSettingsList(gob_lvOptions);
     }
 
 
@@ -34,21 +34,25 @@ public class SettingsController {
      * @throws IOException
      */
     public void loadView() throws IOException {
+        try {
 
-        if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(GC_CHANGE_PW)) {
-            FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("ChangePW.fxml"));
-            AnchorPane lob_pane = lob_loader.load();
-            gob_rootPane.getChildren().setAll(lob_pane);
-        }
-        if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(GC_ADMIN_ADD)) {
-            FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("addAdmin.fxml"));
-            AnchorPane lob_pane = lob_loader.load();
-            gob_rootPane.getChildren().setAll(lob_pane);
-        }
-        if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(GC_CHANGE_IP_PORT)) {
-            FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("changeIpPort.fxml"));
-            AnchorPane lob_pane = lob_loader.load();
-            gob_rootPane.getChildren().setAll(lob_pane);
+            if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(GC_CHANGE_PW)) {
+                FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("changePW.fxml"));
+                AnchorPane lob_pane = lob_loader.load();
+                gob_rootPane.getChildren().setAll(lob_pane);
+            }
+            if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(GC_ADMIN_ADD)) {
+                FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("addAdmin.fxml"));
+                AnchorPane lob_pane = lob_loader.load();
+                gob_rootPane.getChildren().setAll(lob_pane);
+            }
+            if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(GC_CHANGE_IP_PORT)) {
+                FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("changeIpPort.fxml"));
+                AnchorPane lob_pane = lob_loader.load();
+                gob_rootPane.getChildren().setAll(lob_pane);
+            }
+        }catch (Exception e){
+
         }
     }
 }

@@ -16,6 +16,7 @@ import static cache.DataCache.GC_PORT_KEY;
 import static controller.constants.SettingsConstants.GC_ADMIN_ADD;
 import static controller.constants.SettingsConstants.GC_CHANGE_PW;
 import static tools.constants.AlertConstants.GC_WARNING_IP_PORT;
+import static tools.constants.AlertConstants.GC_WARNING_PORT;
 
 /**
  * Created by Mesut on 31.01.2018.
@@ -39,7 +40,7 @@ public class ChangeIpPortController {
 
     public void initialize() {
 
-        listView.loadList(gob_lvOptions);
+        listView.loadSettingsList(gob_lvOptions);
     }
 
     /**
@@ -49,15 +50,22 @@ public class ChangeIpPortController {
      */
     public void loadView() throws IOException {
 
-        if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(GC_CHANGE_PW)) {
-            FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("ChangePW.fxml"));
-            AnchorPane lob_pane = lob_loader.load();
-            gob_rootPane.getChildren().setAll(lob_pane);
-        }
-        if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(GC_ADMIN_ADD)) {
-            FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("addAdmin.fxml"));
-            AnchorPane lob_pane = lob_loader.load();
-            gob_rootPane.getChildren().setAll(lob_pane);
+        try {
+
+
+            if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(GC_CHANGE_PW)) {
+                FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("changePW.fxml"));
+                AnchorPane lob_pane = lob_loader.load();
+                gob_rootPane.getChildren().setAll(lob_pane);
+            }
+            if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(GC_ADMIN_ADD)) {
+                FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("addAdmin.fxml"));
+                AnchorPane lob_pane = lob_loader.load();
+                gob_rootPane.getChildren().setAll(lob_pane);
+            }
+        }catch (Exception e)
+        {
+
         }
     }
 
@@ -71,6 +79,9 @@ public class ChangeIpPortController {
             if (Validation.isPortValid(lva_port)) {
                 lob_datacache.replaceData(GC_IP_KEY, lva_ip);
                 lob_datacache.replaceData(GC_PORT_KEY, lva_port);
+            }
+            else{
+                AlertWindows.createWarningAlert(GC_WARNING_PORT);
             }
         } else {
             AlertWindows.createWarningAlert(GC_WARNING_IP_PORT);
