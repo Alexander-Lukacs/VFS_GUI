@@ -123,7 +123,7 @@ public class LoginController {
                     gva_isInputValid=false;
     }
 
-    public void onClickRegister(ActionEvent event) {
+    public void onClickRegister() {
         String lva_ip = gob_tf_ipAddress.getText();
         String lva_port = gob_tf_port.getText();
         String lva_name = gob_tf_newUserName.getText();
