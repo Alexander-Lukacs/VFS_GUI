@@ -5,10 +5,10 @@ package client;
  */
 public class HttpMessage {
     private int httpStatus;
+
     private String userLoginStatus;
-
+    private String userChangePassword;
     private String userAddStatus;
-
 
     public int getHttpStatus() {
         return httpStatus;
@@ -32,6 +32,14 @@ public class HttpMessage {
 
     public void setUserLoginStatus(String userLoginStatus) {
         this.userLoginStatus = userLoginStatus;
+    }
+
+    public String getUserChangePassword() {
+        return userChangePassword;
+    }
+
+    public void setUserChangePassword(String userChangePassword) {
+        this.userChangePassword = userChangePassword;
     }
 
     @Override

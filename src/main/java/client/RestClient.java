@@ -82,10 +82,12 @@ public class RestClient {
         return lob_user;
     }
 
-    public void changePassword(User iob_user) {
+    public HttpMessage changePassword(User iob_user) {
+        HttpMessage httpMessage;
+
         Response response = webTarget.path("user/auth/changePassword").request()
                 .put(Entity.entity(iob_user, MediaType.APPLICATION_JSON));
 
-        String s = response.readEntity(String.class);
+        return httpMessage = response.readEntity(HttpMessage.class);
     }
 }

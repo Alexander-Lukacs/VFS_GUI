@@ -3,6 +3,7 @@ package controller;
 import builder.ModelObjectBuilder;
 import builder.RestClientBuilder;
 import cache.DataCache;
+import client.HttpMessage;
 import client.RestClient;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,6 +18,9 @@ import tools.Validation;
 import java.io.IOException;
 
 import static cache.DataCache.*;
+import static client.constants.HttpStatusCodes.GC_HTTP_BAD_REQUEST;
+import static client.constants.HttpStatusCodes.GC_HTTP_CONFLICT;
+import static client.constants.HttpStatusCodes.GC_HTTP_OK;
 import static controller.constants.SettingsConstants.*;
 import static tools.constants.AlertConstants.*;
 
@@ -72,7 +76,7 @@ public class ChangePWController {
     }
 
     public void onClickChangePassword() {
-
+        HttpMessage httpMessage;
         User lob_user;
 
         String lva_ip = gob_dataCache.get(GC_IP_KEY);
@@ -92,7 +96,8 @@ public class ChangePWController {
             lob_user.setEmail(lva_email);
             lob_user.setPassword(lva_newPassword);
 
-            restclient.changePassword(lob_user);
+            httpMessage = restclient.changePassword(lob_user);
+            printHttpMessage(httpMessage);
         }
     }
 
@@ -123,5 +128,21 @@ public class ChangePWController {
         }
 
         return true;
+    }
+
+    private void printHttpMessage(HttpMessage httpMessage) {
+        switch (httpMessage.getHttpStatus()) {
+            case GC_HTTP_OK:
+                AlertWindows.createInformationAlert(httpMessage.getUserChangePassword());
+                break;
+
+            case GC_HTTP_BAD_REQUEST:
+                AlertWindows.createErrorAlert(httpMessage.getUserChangePassword());
+                break;
+
+            case GC_HTTP_CONFLICT:
+                AlertWindows.createErrorAlert(httpMessage.getUserChangePassword());
+                break;
+        }
     }
 }
