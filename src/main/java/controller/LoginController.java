@@ -16,14 +16,14 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import models.interfaces.User;
 import tools.AlertWindows;
+import tools.Validation;
 
 import java.io.IOException;
 import java.util.Objects;
 
 import static cache.DataCache.*;
-import static controller.constants.AlertConstants.GC_ERROR_PASSWORD;
+import static controller.constants.AlertConstants.*;
 import static controller.constants.SettingsConstants.GC_VFS;
-import static tools.Validation.*;
 
 public class LoginController {
 
@@ -124,7 +124,7 @@ public class LoginController {
         String lva_confirmPassword = gob_tf_confirmPassword1.getText();
 
 
-        if (checkIfRegisteDataValid(lva_ip, lva_port, lva_name, lva_email, lva_password, lva_confirmPassword)) {
+        if (checkIfRegisterDataValid(lva_ip, lva_port, lva_name, lva_email, lva_password, lva_confirmPassword)) {
             gob_dataCache.put(GC_IP_KEY, lva_ip);
             gob_dataCache.put(GC_PORT_KEY, lva_port);
             User lob_user;
@@ -144,20 +144,77 @@ public class LoginController {
 
     private boolean checkIfLoginDataValid(String iva_ip, String iva_port, String iva_email, String iva_password) {
 
-        return checkIfEmailValid(iva_email) &&
-                checkIfIpPortValid(iva_ip, iva_port) &&
-                checkIfPasswordValid(iva_password);
+        StringBuilder lob_sb = new StringBuilder();
+        boolean validationFailure = false;
 
+        if (Validation.isEmailNotValid(iva_email)) {
+            lob_sb.append(GC_WARNING_EMAIL);
+            validationFailure = true;
+        }
+
+        if (Validation.isIpNotValid(iva_ip)) {
+            lob_sb.append(GC_WARNING_IP);
+            validationFailure = true;
+        }
+
+        if (Validation.isPortNotValid(iva_port)) {
+            lob_sb.append(GC_WARNING_PORT);
+            validationFailure = true;
+        }
+
+        if (Validation.isPasswordNotValid(iva_password)) {
+            lob_sb.append(GC_WARNING_PASSWORD);
+            validationFailure = true;
+        }
+
+        if (validationFailure) {
+            AlertWindows.WarningAlert(lob_sb.toString());
+            return false;
+        }
+
+        return true;
     }
 
-    private boolean checkIfRegisteDataValid(String iva_ip, String iva_port, String iva_name, String iva_email,
-                                            String iva_password, String iva_confirmPassword) {
+    private boolean checkIfRegisterDataValid(String iva_ip, String iva_port, String iva_name, String iva_email,
+                                             String iva_password, String iva_confirmPassword) {
+        StringBuilder lob_sb = new StringBuilder();
+        boolean validationFailure = false;
 
-        return checkIfEmailValid(iva_email) &&
-                checkIfIpPortValid(iva_ip, iva_port) &&
-                checkIfNameValid(iva_name) &&
-                checkIfPasswordValid(iva_password) &&
-                checkIfPasswordEqual(iva_password, iva_confirmPassword);
+        if (Validation.isEmailNotValid(iva_email)) {
+            lob_sb.append(GC_WARNING_EMAIL);
+            validationFailure = true;
+        }
+
+        if (Validation.isIpNotValid(iva_ip)) {
+            lob_sb.append(GC_WARNING_IP);
+            validationFailure = true;
+        }
+        if (Validation.isPortNotValid(iva_port)) {
+            lob_sb.append(GC_WARNING_PORT);
+            validationFailure = true;
+        }
+
+        if (!Validation.nameValidation(iva_name)) {
+            lob_sb.append(GC_WARNING_USERNAME);
+            validationFailure = true;
+        }
+
+        if (Validation.isPasswordNotValid(iva_password)) {
+            lob_sb.append(GC_WARNING_PASSWORD);
+            validationFailure = true;
+        }
+
+        if (!Validation.passwordEqualsValidation(iva_password, iva_confirmPassword)) {
+            lob_sb.append(GC_WARNING_PASSWORD_NOT_EQUAL);
+            validationFailure = true;
+        }
+
+        if (validationFailure) {
+            AlertWindows.WarningAlert(lob_sb.toString());
+            return false;
+        }
+
+        return true;
     }
 
     private void cacheUser(User iob_user) {
