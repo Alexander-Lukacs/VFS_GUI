@@ -1,6 +1,5 @@
 package controller;
 
-import builder.ModelObjectBuilder;
 import builder.RestClientBuilder;
 import cache.DataCache;
 import client.RestClient;
@@ -15,7 +14,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import models.interfaces.User;
+import models.classes.User;
 import tools.AlertWindows;
 import tools.Utils;
 import tools.Validation;
@@ -25,7 +24,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 import static cache.DataCache.*;
-import static client.constants.HttpStatusCodes.*;
+import static client.constants.HttpStatusCodes.GC_HTTP_OK;
 import static controller.constants.ApplicationConstants.GC_APPLICATION_ICON_PATH;
 import static controller.constants.SettingsConstants.GC_VFS;
 import static tools.constants.AlertConstants.*;
@@ -87,7 +86,7 @@ public class LoginController {
 
     public void onClick() {
         RestClient lob_restClient;
-        User lob_user = ModelObjectBuilder.getUserObject();
+        User lob_user = new User();
 
         String lva_ip = gob_tf_ipAddress.getText();
         String lva_port = gob_tf_port.getText();
@@ -135,7 +134,7 @@ public class LoginController {
             gob_dataCache.put(GC_IP_KEY, lva_ip);
             gob_dataCache.put(GC_PORT_KEY, lva_port);
 
-            lob_user = ModelObjectBuilder.getUserObject(lva_email, lva_password, lva_name);
+            lob_user = new User(lva_email, lva_password, lva_name);
 
             lob_restClient = RestClientBuilder.buildRestClient(lva_ip, lva_port);
             lob_restResponse = lob_restClient.registerNewUser(lob_user);

@@ -2,9 +2,7 @@ package tools;
 
 import client.RestResponse;
 
-import static client.constants.HttpStatusCodes.GC_HTTP_BAD_REQUEST;
-import static client.constants.HttpStatusCodes.GC_HTTP_CONFLICT;
-import static client.constants.HttpStatusCodes.GC_HTTP_OK;
+import static client.constants.HttpStatusCodes.*;
 
 public class Utils {
     private static final String GC_FILE_BASE_PATH = "C:\\Users\\$\\Documents\\FileSystem";
@@ -24,6 +22,10 @@ public class Utils {
                 break;
 
             case GC_HTTP_CONFLICT:
+                new AlertWindows().createErrorAlert(restResponse.getResponseMessage());
+                break;
+
+            case GC_HTTP_NO_PERMISSION:
                 new AlertWindows().createErrorAlert(restResponse.getResponseMessage());
                 break;
         }

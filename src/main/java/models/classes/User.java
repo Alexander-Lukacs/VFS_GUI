@@ -1,14 +1,12 @@
 package models.classes;
 
 
-import models.interfaces.User;
-
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Objects;
 
 
 @XmlRootElement
-public class UserImpl implements User {
+public class User {
     private String email;
     private String password;
     private String name;
@@ -16,16 +14,16 @@ public class UserImpl implements User {
     private int userId;
     private int adminId;
 
-    public UserImpl() {
+    public User() {
     }
 
-    public UserImpl(String email, String password, String name) {
+    public User(String email, String password, String name) {
         this.email = email;
         this.password = password;
         this.name = name;
     }
 
-    public UserImpl(String iva_email, String iva_password, String iva_name, boolean iva_isAdmin, int iva_userId, int iva_adminId) {
+    public User(String iva_email, String iva_password, String iva_name, boolean iva_isAdmin, int iva_userId, int iva_adminId) {
         setEmail(iva_email);
         setPassword(iva_password);
         setName(iva_name);
@@ -37,9 +35,17 @@ public class UserImpl implements User {
         }
     }
 
+    public String getEmail() {
+        return this.email;
+    }
+
     public void setEmail(String iva_email) {
 
         this.email = iva_email;
+    }
+
+    public String getPassword() {
+        return this.password;
     }
 
     public void setPassword(String iva_password) {
@@ -47,8 +53,16 @@ public class UserImpl implements User {
         this.password = iva_password;
     }
 
+    public boolean getIsAdmin() {
+        return this.isAdmin;
+    }
+
     public void setIsAdmin(boolean iva_isAdmin) {
         this.isAdmin = iva_isAdmin;
+    }
+
+    public int getUserId() {
+        return this.userId;
     }
 
     public void setUserId(int iva_userId) {
@@ -56,37 +70,21 @@ public class UserImpl implements User {
         this.userId = iva_userId;
     }
 
+    public int getAdminId() {
+        return this.adminId;
+    }
+
     public void setAdminId(int iva_adminId) {
         this.adminId = iva_adminId;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public void setName(String iva_name) {
 
         this.name = iva_name;
-    }
-
-    public String getEmail() {
-        return this.email;
-    }
-
-    public String getPassword() {
-        return this.password;
-    }
-
-    public boolean getIsAdmin() {
-        return this.isAdmin;
-    }
-
-    public int getUserId() {
-        return this.userId;
-    }
-
-    public int getAdminId() {
-        return this.adminId;
-    }
-
-    public String getName() {
-        return name;
     }
 
     @Override
@@ -105,7 +103,7 @@ public class UserImpl implements User {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        UserImpl user = (UserImpl) o;
+        User user = (User) o;
         return Objects.equals(email, user.email) &&
                 Objects.equals(password, user.password);
     }

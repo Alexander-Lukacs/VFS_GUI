@@ -1,14 +1,12 @@
 package client;
 
-import builder.RestClientBuilder;
 import cache.DataCache;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.MultiPart;
 import com.sun.jersey.multipart.file.FileDataBodyPart;
 import com.sun.jersey.multipart.impl.MultiPartWriter;
-import models.classes.UserImpl;
-import models.interfaces.User;
+import models.classes.User;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import tools.AlertWindows;
@@ -68,7 +66,7 @@ public class RestClient {
         ObjectMapper lob_mapper = new ObjectMapper();
         String lva_responseString;
         RestResponse lob_restResponse = new RestResponse();
-        UserImpl lob_user = new UserImpl();
+        User lob_user = new User();
         Response lob_response;
 
         lob_response = gob_webTarget.path(GC_REST_LOGIN_USER_PATH).request()
@@ -78,7 +76,7 @@ public class RestClient {
 
         try {
             if (lob_response.getStatus() == GC_HTTP_OK) {
-                lob_user = lob_mapper.readValue(lva_responseString, UserImpl.class);
+                lob_user = lob_mapper.readValue(lva_responseString, User.class);
 
             } else {
                 lob_restResponse.setResponseMessage(lva_responseString);
@@ -108,12 +106,13 @@ public class RestClient {
 // Get all users
 // ---------------------------------------------------------------------------------------------------------------------
 
-    public List<UserImpl> getAllUser() {
-        List<UserImpl> lli_userList = null;
+    public List<User> getAllUser() {
+        List<User> lli_userList = null;
 
         try {
             lli_userList = gob_webTarget.path(GC_REST_GET_ALL_USERS_PATH).request()
-                    .get(new GenericType<List<UserImpl>>() {});
+                    .get(new GenericType<List<User>>() {
+                    });
         } catch (Exception ex) {
             new AlertWindows().createExceptionAlert(ex.getMessage(), ex);
         }
