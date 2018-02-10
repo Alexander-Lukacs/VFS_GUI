@@ -38,7 +38,7 @@ public class MainController {
 
     public void onClick(ActionEvent e) throws RuntimeException, IOException {
         if (((Button) e.getSource()).getText().equals(GC_SETTINGS)) {
-            FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("settings.fxml"));
+            FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("views/settings.fxml"));
             AnchorPane lob_pane = lob_loader.load();
             Scene lob_scene = new Scene(lob_pane);
             Stage lob_stage = new Stage();
@@ -64,7 +64,7 @@ public class MainController {
     }
 
     public void start(Stage lob_stage) {
-        FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("mainScreen.fxml"));
+        FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("views/mainScreen.fxml"));
 
         try {
             SplitPane lob_pane = lob_loader.load();

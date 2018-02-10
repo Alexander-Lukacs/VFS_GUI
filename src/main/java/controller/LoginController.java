@@ -13,6 +13,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import models.interfaces.User;
 import tools.AlertWindows;
@@ -251,10 +252,12 @@ public class LoginController {
     public void start(Stage iob_stage) throws IOException {
         Parent lob_root;
         lob_root = FXMLLoader.load(Objects.requireNonNull(getClass().getClassLoader().
-                getResource("loginScreen.fxml")));
+                getResource("views/loginScreen.fxml")));
 
         iob_stage.setScene(new Scene(lob_root));
         iob_stage.setTitle(GC_VFS);
+
+        iob_stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("images/APPLICATION_ICON.png")));
         iob_stage.show();
     }
 }

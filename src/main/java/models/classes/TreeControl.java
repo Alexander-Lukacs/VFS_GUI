@@ -119,25 +119,25 @@ public class TreeControl {
         ImageView rob_imageView;
         switch (iva_iconName) {
             case GC_DIRECTORY_ICON:
-                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("ICON_DIR.png")));
+                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("images/fileIcons/ICON_DIR.png")));
                 break;
             case GC_TEXT_FILE:
-                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("ICON_TXT.png")));
+                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("images/fileIcons/ICON_TXT.png")));
                 break;
             case GC_EXCEL_FILE:
-                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("ICON_EXCEL.png")));
+                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("images/fileIcons/ICON_EXCEL.png")));
                 break;
             case GC_PDF_FILE:
-                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("ICON_PDF.png")));
+                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("images/fileIcons/ICON_PDF.png")));
                 break;
             case GC_WORD_FILE:
-                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("ICON_WORD.png")));
+                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("images/fileIcons/ICON_WORD.png")));
                 break;
             case GC_XML_FILE:
-                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("ICON_XML.png")));
+                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("images/fileIcons/ICON_XML.png")));
                 break;
             default:
-                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("ICON_FILE.png")));
+                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("images/fileIcons/ICON_FILE.png")));
         }
 
         return rob_imageView;

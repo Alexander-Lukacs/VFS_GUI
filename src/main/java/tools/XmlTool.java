@@ -35,21 +35,13 @@ public class XmlTool {
                 DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
                 Document doc = dBuilder.parse(fXmlFile);
 
-                //optional, but recommended
-                //read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
                 doc.getDocumentElement().normalize();
 
-                System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
-
                 NodeList nList = doc.getElementsByTagName("Server");
-
-                System.out.println("----------------------------");
 
                 for (int temp = 0; temp < nList.getLength(); temp++) {
 
                     Node nNode = nList.item(temp);
-
-                    System.out.println("\nCurrent Element :" + nNode.getNodeName());
 
                     if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
@@ -75,7 +67,6 @@ public class XmlTool {
 
 
     public static void createXml(String iva_ip, String iva_port, String iva_email, String iva_password) {
-
         try {
 
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -114,25 +105,14 @@ public class XmlTool {
             DOMSource source = new DOMSource(doc);
             StreamResult result = new StreamResult(new File(Utils.getUserBasePath() + "\\properties.xml"));
 
-            // Output to console for testing
-            // StreamResult result = new StreamResult(System.out);
-
-            System.out.println(result);
-
             transformer.transform(source, result);
-
-            System.out.println("File saved!");
-
         } catch (ParserConfigurationException | TransformerException ex) {
             ex.printStackTrace();
         }
     }
 
     private static boolean checkIfFileExist() {
-
-        System.out.println("checkIfFileExist(): " + Utils.getUserBasePath() + "\\properties.xml");
         File lob_file = new File(Utils.getUserBasePath() + "\\properties.xml");
-
         return lob_file.exists();
     }
 }
