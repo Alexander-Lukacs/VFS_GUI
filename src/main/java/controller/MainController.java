@@ -1,10 +1,10 @@
 package controller;
 
+import cache.DataCache;
 import fileTree.models.TreeImpl;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
@@ -13,96 +13,97 @@ import javafx.scene.control.TreeView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import models.classes.TreeControl;
+import tools.AlertWindows;
+import tools.Utils;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
-import static constants.SettingsConstants.*;
-import static fileTree.models.TreeImpl.*;
+import static controller.constants.SettingsConstants.*;
 
 public class MainController {
 
     @FXML
-    private Button btnSettings;
-    @FXML
-    private Button btnLogout;
+    private Button gob_btnSettings;
 
     @FXML
-    private TreeView<Path> treeView;
+    private TreeView<String> gob_treeView; //TODO Könte lokal gemacht werden, nur wie?
 
     @FXML
-    private VBox vbox = new VBox();
+    private VBox gob_vbox = new VBox();
+
+    private DataCache userCache;
 
 
     /**
-     Beim Klicken des Buttons wird die View settings.fxml geöffnet
+     * Beim Klicken des Buttons wird die View settings.fxml geöffnet
      */
 
-   public void onClick(ActionEvent e) throws RuntimeException, IOException{
+    public void onClick(ActionEvent e) throws RuntimeException, IOException {
 
-           if( ((Button)e.getSource()).getText().equals(SETTINGS) ) {
+        if (((Button) e.getSource()).getText().equals(GC_SETTINGS)) {
 
-               FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("settings.fxml"));
-               AnchorPane lob_pane = lob_loader.load();
-               Scene lob_scene = new Scene(lob_pane);
-               Stage lob_stage = new Stage();
-               lob_stage.setTitle(SETTINGS);
-               lob_stage.setResizable(false);
-               lob_stage.setScene(lob_scene);
-               lob_stage.show();
-           }
-           else if( ((Button)e.getSource()).getText().equals(LOGOUT) ){
-               Stage stage = ((Stage)btnSettings.getScene().getWindow());
-               stage.close();
-               LoginController ob_x = new LoginController();
-               ob_x.start(stage);
-           }
+            FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("settings.fxml"));
+            AnchorPane lob_pane = lob_loader.load();
+            Scene lob_scene = new Scene(lob_pane);
+            Stage lob_stage = new Stage();
+            lob_stage.setTitle(GC_SETTINGS);
+            lob_stage.setResizable(false);
+            lob_stage.setScene(lob_scene);
+            lob_stage.show();
+        } else if (((Button) e.getSource()).getText().equals(GC_LOGOUT)) {
+            userCache.clearDataCache();
+            Stage stage = ((Stage) gob_btnSettings.getScene().getWindow());
+            stage.close();
+            LoginController ob_x = new LoginController();
+            ob_x.start(stage);
+        }
     }
 
-    public void initialize()throws  IOException
-    {
-        TreeImpl x = new TreeImpl("c:/Users/Robin/Documents/FileSystem");
-        TreeItem<Path> root = new TreeItem<Path>(Paths.get(x.getRoot().getCanonicalPath()));
-        createTree(root);
-        treeView = new TreeView<>(root);
-        vbox.getChildren().add(treeView);
+    public void initialize() throws IOException {
+        userCache = DataCache.getDataCache();
+        gob_treeView = new TreeView<>();
+        TreeControl lob_treeControl = new TreeControl(gob_treeView, userCache.get(DataCache.GC_IP_KEY), userCache.get(DataCache.GC_PORT_KEY));
+//        TreeImpl x = new TreeImpl(Utils.getUserBasePath());
+//        TreeItem<String> root = new TreeItem<>(x.getRoot().getCanonicalPath());
+//        createTree(root);
+        gob_vbox.getChildren().add(gob_treeView);
     }
 
     public void start(Stage lob_stage) {
 
         FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("mainScreen.fxml"));
         try {
-                SplitPane lob_pane = lob_loader.load();
-                Scene lob_scene = new Scene(lob_pane);
-                lob_stage.setTitle(VFS);
-                lob_stage.setScene(lob_scene);
-                lob_stage.show();
-            }
-            catch (IOException e){
-                throw new RuntimeException(e);
-            }
-    }
-
-    public static void createTree(TreeItem<Path> rootItem) throws IOException {
-
-        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(rootItem.getValue())) {
-
-            for (Path path : directoryStream) {
-
-                TreeItem<Path> newItem = new TreeItem<Path>(path);
-                newItem.setExpanded(true);
-
-                rootItem.getChildren().add(newItem);
-
-                if (Files.isDirectory(path)) {
-                    createTree(newItem);
-                }
-            }
+            SplitPane lob_pane = lob_loader.load();
+            Scene lob_scene = new Scene(lob_pane);
+            lob_stage.setTitle(GC_VFS);
+            lob_stage.setScene(lob_scene);
+            lob_stage.show();
+        } catch (IOException e) {
+            AlertWindows.createExceptionAlert(e.getMessage(), e);
+            throw new RuntimeException(e);
         }
     }
 
+//    private void createTree(TreeItem<String> rootItem) throws IOException {
+//
+//        try (DirectoryStream<String> directoryStream = Files.newDirectoryStream(rootItem.getValue())) {
+//
+//            for (String path : directoryStream) {
+//
+//                TreeItem<String> newItem = new TreeItem<>(path);
+//                newItem.setExpanded(true);
+//
+//                rootItem.getChildren().add(newItem);
+//
+//                if (Files.isDirectory(path)) {
+//                    createTree(newItem);
+//                }
+//            }
+//        }
+//    }
 }

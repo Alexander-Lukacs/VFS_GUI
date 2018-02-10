@@ -1,160 +1,271 @@
 package controller;
 
-import javafx.event.ActionEvent;
+import builder.ModelObjectBuilder;
+import builder.RestClientBuilder;
+import cache.DataCache;
+import client.HttpMessage;
+import client.RestClient;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import models.classes.UserImpl;
+import models.interfaces.User;
+import tools.AlertWindows;
+import tools.Validation;
+import tools.XmlTool;
 
-
-import java.awt.*;
-import java.awt.event.KeyListener;
+import javax.ws.rs.ProcessingException;
 import java.io.IOException;
-import java.util.Base64;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Objects;
 
-import static constants.SettingsConstants.*;
-import static models.constants.UserConstants.*;
+import static cache.DataCache.*;
+import static client.constants.HttpStatusCodes.*;
+import static controller.constants.SettingsConstants.GC_VFS;
+import static tools.constants.AlertConstants.*;
 
-public class LoginController{
+public class LoginController {
 
-    @FXML
-    private AnchorPane gob_rootPane;
-
-    @FXML
-    private Button btnLogin;
+    private final Stage gob_stage = new Stage();
+    private final MainController mainController = new MainController();
 
     @FXML
-    private PasswordField pwPasswort;
+    private Button gob_btnLogin;
+    @FXML
+    private PasswordField gob_tf_loginPassword;
+    @FXML
+    private TextField gob_tf_userLoginEmail;
+    @FXML
+    private TextField gob_tf_newUserName;
+    @FXML
+    private TextField gob_tf_newUserEmail;
+    @FXML
+    private TextField gob_tf_registerPassword;
+    @FXML
+    private TextField gob_tf_confirmPassword1;
+    @FXML
+    private TextField gob_tf_ipAddress;
+    @FXML
+    private TextField gob_tf_port;
+    @FXML
+    private TabPane gob_tabPane = new TabPane();
 
     @FXML
-    private TextField tfUserName;
-
-    @FXML
-    private TextField tfNewUserName;
-
-    @FXML
-    private TextField tfNewUserEmail;
-
-    @FXML
-    private TextField pwNewPassword;
-
-    @FXML
-    private TextField pwNewPassword1;
-
-
-    private boolean isAdmin = false;
-
-    private Pattern pattern;
-    private Matcher matcher;
-
-    private String encodedString;
-
-    private Stage stage = new Stage();
-    private UserImpl user = new UserImpl();
-
-    private MainController mainController = new MainController();
-
-    public void initialize()
-    {
-        btnLogin.setOnKeyPressed(
+    public void initialize() {
+        gob_dataCache = DataCache.getDataCache();
+        gob_btnLogin.setOnKeyPressed(
                 event -> {
-                    switch(event.getCode()) {
-                        case ENTER: btnLogin.fire();
+                    switch (event.getCode()) {
+                        case ENTER:
+                            gob_btnLogin.fire();
                     }
                 }
         );
+        gob_ipPortEmailPasswordArray = XmlTool.readFromXml();
+        System.out.println(gob_ipPortEmailPasswordArray[0]);
+        System.out.println(gob_ipPortEmailPasswordArray[1]);
+        System.out.println(gob_ipPortEmailPasswordArray[2]);
+        System.out.println(gob_ipPortEmailPasswordArray[3]);
+        setTextFromXmlToTf();
+    }
+
+    private String[] gob_ipPortEmailPasswordArray = new String[4];
+    private DataCache gob_dataCache;
+    private RestClient gob_restClient; //TODO Könnte lokal gemacht werden in OnClickRegister..
+    private HttpMessage gob_httpMessage; //TODO Könnte lokal gemacht werden in OnClickRegister..
+
+
+    private void setTextFromXmlToTf() {
+        gob_tf_ipAddress.setText(gob_ipPortEmailPasswordArray[0]);
+        gob_tf_port.setText(gob_ipPortEmailPasswordArray[1]);
+        gob_tf_userLoginEmail.setText(gob_ipPortEmailPasswordArray[2]);
+        gob_tf_loginPassword.setText(gob_ipPortEmailPasswordArray[3]);
     }
 
     /**
-        Beim Klicken des Buttons wird geprüft ob der User ein Admin ist,
-        falls ja, dann öffne die View settingAdmin.fxml
-        falls nein, dann kommt eine Fehlermeldung
+     * reads the Textfields on Button Click
+     * <p>
+     * Validate inputs
+     * <p>
+     * sends inputs to Server, to Login.
      */
 
-    public void onClick(ActionEvent event) throws IOException
-    {
+    public void onClick() {
+        User lob_user = ModelObjectBuilder.getUserObject();
+        String lva_ip = gob_tf_ipAddress.getText();
+        String lva_port = gob_tf_port.getText();
+        String lva_password = gob_tf_loginPassword.getText();
+        String lva_email = gob_tf_userLoginEmail.getText();
 
-        if(!NAME.equals(tfUserName.getText()) || !PASSWORD.equals(pwPasswort.getText()))
-        {
-            System.out.println("Benutzername oder Passwort falsch!");
-        }
-        else {
-            tfUserName.setText("");
-            pwPasswort.setText("");
-            mainController.start(stage);
-            close();
-        }
-    }
+        if (checkIfLoginDataValid(lva_ip, lva_port, lva_email, lva_password)) {
+            gob_dataCache.put(GC_IP_KEY, lva_ip);
+            gob_dataCache.put(GC_PORT_KEY, lva_port);
+            XmlTool.createXml(lva_ip, lva_port, lva_email, lva_password);
 
-    public void onClickRegister(ActionEvent event) throws IOException {
+            RestClient restClient = RestClientBuilder.buildRestClientWithAuth(lva_ip, lva_port, lva_email, lva_password);
+            try {
+                lob_user.setEmail(lva_email);
+                lob_user.setPassword(lva_password);
+                lob_user = restClient.loginUser(lob_user);
 
-        if (tfNewUserName.getText().length() >= 3) {
-            if (validateEmail(tfNewUserEmail.getText())) {
-                if (validatePasswort(pwNewPassword.getText()) && pwNewPassword.getText().equals(pwNewPassword1.getText())) {
-                    user = new UserImpl(tfNewUserEmail.getText(), pwNewPassword.getText(), tfNewUserName.getText());
-                    System.out.println("User registriert");
-                } else {
-                    System.out.println("Kein korrektes Passwort oder Passwort stimmt nicht überein");
-                }
-            } else {
-                System.out.println("Kein korrekte E-Mail-Adresse");
+                gob_dataCache.put(GC_PASSWORD_KEY, lva_password);
+                cacheUser(lob_user);
+
+                //gob_tf_userLoginEmail.setText("");
+                //gob_tf_loginPassword.setText("");
+                mainController.start(gob_stage);
+                close();
+            } catch (ProcessingException | IllegalArgumentException ex) {
+
+                AlertWindows.createExceptionAlert(ex.getMessage(), ex);
             }
-        } else {
-            System.out.println("Username muss min. 3 Buchstaben lang sein");
         }
     }
 
-    public String encode(String input){
-        encodedString = Base64.getEncoder().encodeToString(input.getBytes());
-        return encodedString;
+    public void onClickRegister() {
+        String lva_ip = gob_tf_ipAddress.getText();
+        String lva_port = gob_tf_port.getText();
+        String lva_name = gob_tf_newUserName.getText();
+        String lva_email = gob_tf_newUserEmail.getText();
+        String lva_password = gob_tf_registerPassword.getText();
+        String lva_confirmPassword = gob_tf_confirmPassword1.getText();
+
+
+        if (checkIfRegisterDataValid(lva_ip, lva_port, lva_name, lva_email, lva_password, lva_confirmPassword)) {
+            gob_dataCache.put(GC_IP_KEY, lva_ip);
+            gob_dataCache.put(GC_PORT_KEY, lva_port);
+            XmlTool.createXml(lva_ip, lva_port, lva_email, lva_password);
+            User lob_user;
+
+            lob_user = ModelObjectBuilder.getUserObject(lva_email, lva_password, lva_name);
+
+            try {
+                gob_restClient = RestClientBuilder.buildRestClient(lva_ip, lva_port);
+                gob_httpMessage = gob_restClient.registerNewUser(lob_user);
+                printMessage(gob_httpMessage);
+                gob_tabPane.getSelectionModel().selectFirst();
+
+                XmlTool.createXml(lva_ip, lva_port, lva_email, lva_password);
+
+            } catch (ProcessingException | IOException ex) {
+                AlertWindows.createExceptionAlert(ex.getMessage(), ex);
+            }
+        }
     }
 
-    private boolean validateEmail(String email) {
-        System.out.println("Case1: " + pwNewPassword.getText());
-        System.out.println("Case2: " + pwNewPassword.getText());
-        System.out.println("equal: " + pwNewPassword.getText().equals(pwNewPassword1.getText()));
-        System.out.println("validation: " + validatePasswort(pwNewPassword.getText()));
+    private boolean checkIfLoginDataValid(String iva_ip, String iva_port, String iva_email, String iva_password) {
+        StringBuilder lob_sb = new StringBuilder();
+        boolean validationFailure = false;
 
-        pattern = Pattern.compile(VALID_EMAIL_ADDRESS_REGEX, Pattern.CASE_INSENSITIVE);
-        matcher = pattern.matcher(email);
-        return matcher.find();
+        if (!Validation.isEmailValid(iva_email)) {
+            lob_sb.append(GC_WARNING_EMAIL);
+            validationFailure = true;
+        }
+
+        if (!Validation.isIpValid(iva_ip)) {
+            lob_sb.append(GC_WARNING_IP);
+            validationFailure = true;
+        }
+
+        if (!Validation.isPortValid(iva_port)) {
+            lob_sb.append(GC_WARNING_PORT);
+            validationFailure = true;
+        }
+
+        if (!Validation.isPasswordValid(iva_password)) {
+            lob_sb.append(GC_WARNING_PASSWORD);
+            validationFailure = true;
+        }
+
+        if (validationFailure) {
+            AlertWindows.createWarningAlert(lob_sb.toString());
+            return false;
+        }
+
+        return true;
     }
 
-    private boolean validatePasswort(String password){
-        pattern = Pattern.compile(VALID_PASSWORD_REGEX);
-        matcher = pattern.matcher(password);
-        return matcher.find();
+    private boolean checkIfRegisterDataValid(String iva_ip, String iva_port, String iva_name, String iva_email,
+                                             String iva_password, String iva_confirmPassword) {
+        StringBuilder lob_sb = new StringBuilder();
+        boolean validationFailure = false;
+
+        if (!Validation.isEmailValid(iva_email)) {
+            lob_sb.append(GC_WARNING_EMAIL);
+            validationFailure = true;
+        }
+
+        if (!Validation.isIpValid(iva_ip)) {
+            lob_sb.append(GC_WARNING_IP);
+            validationFailure = true;
+        }
+        if (!Validation.isPortValid(iva_port)) {
+            lob_sb.append(GC_WARNING_PORT);
+            validationFailure = true;
+        }
+
+        if (!Validation.nameValidation(iva_name)) {
+            lob_sb.append(GC_WARNING_USERNAME);
+            validationFailure = true;
+        }
+
+        if (!Validation.isPasswordValid(iva_password)) {
+            lob_sb.append(GC_WARNING_PASSWORD);
+            validationFailure = true;
+        }
+
+        if (!Validation.passwordEqualsValidation(iva_password, iva_confirmPassword)) {
+            lob_sb.append(GC_WARNING_PASSWORD_NOT_EQUAL);
+            validationFailure = true;
+        }
+
+        if (validationFailure) {
+            AlertWindows.createWarningAlert(lob_sb.toString());
+            return false;
+        }
+
+        return true;
     }
 
-
-
-
-    public boolean getIsAdmin()
-    {
-        return isAdmin;
+    private void cacheUser(User iob_user) {
+        gob_dataCache.put(GC_EMAIL_KEY, iob_user.getEmail());
+        gob_dataCache.put(GC_NAME_KEY, iob_user.getName());
+        gob_dataCache.put(GC_ADMIN_ID_KEY, String.valueOf(iob_user.getAdminId()));
+        gob_dataCache.put(GC_USER_ID_KEY, String.valueOf(iob_user.getUserId()));
+        gob_dataCache.put(GC_IS_ADMIN_KEY, String.valueOf(iob_user.getIsAdmin()));
     }
 
-    public void close() {
-        ((Stage)tfUserName.getScene().getWindow()).close();
+    private void printMessage(HttpMessage status) {
+        switch (status.getHttpStatus()) {
+            case GC_HTTP_OK:
+                AlertWindows.createInformationAlert(status.getUserAddStatus());
+                break;
+            case GC_HTTP_BAD_REQUEST:
+                AlertWindows.createErrorAlert(status.getUserAddStatus());
+                break;
+
+            case GC_HTTP_CONFLICT:
+                AlertWindows.createErrorAlert(status.getUserAddStatus());
+                break;
+        }
     }
 
-    public void start(Stage stage) throws IOException{
+    private void close() {
+        ((Stage) gob_tf_userLoginEmail.getScene().getWindow()).close();
+    }
+
+    public void start(Stage stage) throws IOException {
+
         Parent root;
-        root = FXMLLoader.load(getClass().getClassLoader().getResource("loginScreen.fxml"));
+        root = FXMLLoader.load(Objects.requireNonNull(getClass().getClassLoader().
+                getResource("loginScreen.fxml")));
+
         stage.setScene(new Scene(root));
-        stage.setTitle(VFS);
+        stage.setTitle(GC_VFS);
         stage.show();
     }
-
 }

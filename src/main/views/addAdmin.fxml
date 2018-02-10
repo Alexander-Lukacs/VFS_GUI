@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import java.lang.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-
-<AnchorPane fx:id="gob_rootPane" prefWidth="550.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AddAdminController">
+<?import javafx.scene.layout.*?>
+<AnchorPane fx:id="gob_rootPane" prefWidth="550.0" xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AddAdminController">
     <children>
-        <HBox alignment="CENTER_LEFT" prefHeight="400.0" prefWidth="550.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <HBox alignment="CENTER_LEFT" prefHeight="400.0" prefWidth="550.0" AnchorPane.bottomAnchor="0.0"
+              AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
-                  <ListView fx:id="gob_lvOptions" onMouseClicked="#loadView" prefHeight="400.0" prefWidth="209.0" />
-            <VBox alignment="CENTER" prefHeight="400.0" prefWidth="454.0" spacing="20.0">
-               <children>
-                  <Label text="Enter Username" />
-                  <TextField fx:id="tfAddAdmin">
-                     <VBox.margin>
-                        <Insets left="50.0" right="50.0" />
-                     </VBox.margin></TextField>
-                  <Button fx:id="btnAdd" mnemonicParsing="false" text="Add" />
-               </children>
-            </VBox>
+                <ListView fx:id="gob_lvOptions" onMouseClicked="#loadView" prefHeight="400.0" prefWidth="209.0"/>
+                <VBox alignment="CENTER" prefHeight="400.0" prefWidth="454.0" spacing="20.0">
+                    <children>
+                        <Label text="Choose Username"/>
+                        <ListView fx:id="gob_lvUser" prefHeight="182.0" prefWidth="398.0">
+                            <VBox.margin>
+                                <Insets left="50.0" right="50.0"/>
+                            </VBox.margin>
+                        </ListView>
+                        <Button mnemonicParsing="false" onAction="#onClick" text="Add"/>
+                    </children>
+                </VBox>
             </children>
         </HBox>
     </children>

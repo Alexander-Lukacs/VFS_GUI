@@ -12,92 +12,83 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane fx:id="gob_rootPane" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LoginController">
-   <children>
-      <TabPane prefHeight="600.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-        <tabs>
-          <Tab text="Login">
-            <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                        <StackPane prefHeight="562.0" prefWidth="800.0" AnchorPane.bottomAnchor="-1.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                           <children>
-                              <HBox prefHeight="100.0" prefWidth="200.0" spacing="20.0">
-                                 <children>
-                                    <Label text="Server" />
-                                    <TextField fx:id="tfIPAdress" />
-                                    <Label text="Port" />
-                                    <TextField fx:id="tfPort" prefHeight="31.0" prefWidth="66.0" />
-                                 </children>
-                                 <StackPane.margin>
-                                    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-                                 </StackPane.margin>
-                              </HBox>
-                              <VBox alignment="CENTER" spacing="20.0">
-                                 <children>
-                                    <Label text="E-Mail" />
-                                    <TextField fx:id="tfUserName">
-                                       <VBox.margin>
-                                          <Insets left="250.0" right="250.0" />
-                                       </VBox.margin>
-                                    </TextField>
-                                    <Label text="Password" />
-                                    <PasswordField fx:id="pwPasswort">
-                                       <VBox.margin>
-                                          <Insets left="250.0" right="250.0" />
-                                       </VBox.margin>
-                                    </PasswordField>
-                                    <Button fx:id="btnLogin" mnemonicParsing="false" onAction="#onClick" text="Login" />
-                                 </children>
-                              </VBox>
-                           </children>
-                        </StackPane>
-                     </children>
-                  </AnchorPane>
-            </content>
-          </Tab>
-          <Tab text="Register">
-            <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                        <StackPane prefHeight="562.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                           <children>
-                              <VBox alignment="CENTER" spacing="20.0">
-                                 <children>
-                                    <Label text="Username" />
-                                    <TextField fx:id="tfNewUserName">
-                                       <VBox.margin>
-                                          <Insets left="250.0" right="250.0" />
-                                       </VBox.margin>
-                                    </TextField>
-                                    <Label layoutX="377.0" layoutY="138.0" text="E-Mail" />
-                                    <TextField fx:id="tfNewUserEmail" layoutX="260.0" layoutY="158.0">
-                                       <VBox.margin>
-                                          <Insets left="250.0" right="250.0" />
-                                       </VBox.margin>
-                                    </TextField>
-                                    <Label text="Password" />
-                                    <PasswordField fx:id="pwNewPassword">
-                                       <VBox.margin>
-                                          <Insets left="250.0" right="250.0" />
-                                       </VBox.margin>
-                                    </PasswordField>
-                                    <Label layoutX="377.0" layoutY="184.0" text="Repeat Password" />
-                                    <PasswordField fx:id="pwNewPassword1">
-                                       <VBox.margin>
-                                          <Insets left="250.0" right="250.0" />
-                                       </VBox.margin>
-                                    </PasswordField>
-                                    <Button fx:id="btnRegister" mnemonicParsing="false" onAction="#onClickRegister" text="Register" />
-                                 </children>
-                              </VBox>
-                           </children>
-                        </StackPane>
-                     </children>
-                  </AnchorPane>
-            </content>
-          </Tab>
-        </tabs>
-      </TabPane>
-   </children>
+<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.112"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LoginController">
+    <VBox spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+          AnchorPane.topAnchor="0.0">
+        <AnchorPane prefHeight="56.0" prefWidth="400.0">
+            <HBox prefHeight="37.0" prefWidth="400.0" spacing="20.0" AnchorPane.bottomAnchor="0.0"
+                  AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                <padding>
+                    <Insets left="5.0" top="10.0"/>
+                </padding>
+                <Label text="Server"/>
+                <TextField fx:id="gob_tf_ipAddress" text="192.168.178.25"/>
+                <Label text="Port"/>
+                <TextField fx:id="gob_tf_port" prefHeight="31.0" prefWidth="66.0" text="8080"/>
+            </HBox>
+        </AnchorPane>
+        <TabPane fx:id="gob_tabPane" prefHeight="600.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE">
+            <Tab text="Login">
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                    <StackPane prefHeight="562.0" prefWidth="800.0" AnchorPane.bottomAnchor="-1.0"
+                               AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                               AnchorPane.topAnchor="0.0">
+                        <VBox alignment="CENTER" spacing="20.0">
+                            <Label text="E-Mail"/>
+                            <TextField fx:id="gob_tf_userLoginEmail" text="test@test.de">
+                                <VBox.margin>
+                                    <Insets left="250.0" right="250.0"/>
+                                </VBox.margin>
+                            </TextField>
+                            <Label text="Password"/>
+                            <PasswordField fx:id="gob_tf_loginPassword" text="Passwort1!">
+                                <VBox.margin>
+                                    <Insets left="250.0" right="250.0"/>
+                                </VBox.margin>
+                            </PasswordField>
+                            <Button fx:id="gob_btnLogin" mnemonicParsing="false" onAction="#onClick"
+                                    text="Login"/>
+                        </VBox>
+                    </StackPane>
+                </AnchorPane>
+            </Tab>
+            <Tab text="Register">
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                    <StackPane prefHeight="562.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0"
+                               AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                               AnchorPane.topAnchor="0.0">
+                        <VBox alignment="CENTER" spacing="20.0">
+                            <Label text="Username"/>
+                            <TextField fx:id="gob_tf_newUserName">
+                                <VBox.margin>
+                                    <Insets left="250.0" right="250.0"/>
+                                </VBox.margin>
+                            </TextField>
+                            <Label layoutX="377.0" layoutY="138.0" text="E-Mail"/>
+                            <TextField fx:id="gob_tf_newUserEmail" layoutX="260.0" layoutY="158.0">
+                                <VBox.margin>
+                                    <Insets left="250.0" right="250.0"/>
+                                </VBox.margin>
+                            </TextField>
+                            <Label text="Password"/>
+                            <PasswordField fx:id="gob_tf_registerPassword">
+                                <VBox.margin>
+                                    <Insets left="250.0" right="250.0"/>
+                                </VBox.margin>
+                            </PasswordField>
+                            <Label layoutX="377.0" layoutY="184.0" text="Repeat Password"/>
+                            <PasswordField fx:id="gob_tf_confirmPassword1">
+                                <VBox.margin>
+                                    <Insets left="250.0" right="250.0"/>
+                                </VBox.margin>
+                            </PasswordField>
+                            <Button mnemonicParsing="false" onAction="#onClickRegister"
+                                    text="Register"/>
+                        </VBox>
+                    </StackPane>
+                </AnchorPane>
+            </Tab>
+        </TabPane>
+    </VBox>
 </AnchorPane>

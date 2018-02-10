@@ -1,20 +1,22 @@
 
 import controller.LoginController;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
+import tools.AlertWindows;
 
-import static constants.SettingsConstants.*;
 
 public class MainApp extends Application {
 
-    private LoginController loginController = new LoginController();
+    private final LoginController loginController = new LoginController();
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
-        loginController.start(primaryStage);
+    public void start(Stage primaryStage) {
+        try {
+            loginController.start(primaryStage);
+
+        } catch (Exception ex) {
+            AlertWindows.createExceptionAlert(ex.getMessage(), ex);
+        }
     }
 
 
