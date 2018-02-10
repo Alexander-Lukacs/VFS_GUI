@@ -3,7 +3,7 @@ package tools.constants;
 /**
  * Created by Mesut on 08.02.2018.
  */
-public class AlertConstants {
+public abstract class AlertConstants {
 
     public static final String GC_EXCEPTION_TITLE = "Exception Dialog";
     public static final String GC_EXCEPTION_HEADER = "Exception";

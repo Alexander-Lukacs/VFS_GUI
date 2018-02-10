@@ -7,6 +7,7 @@ import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import tools.AlertWindows;
 
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -47,7 +48,7 @@ public class RestClient {
 // Register new user
 // ---------------------------------------------------------------------------------------------------------------------
 
-    public HttpMessage registerNewUser(User iob_user) {
+    public RestResponse registerNewUser(User iob_user) {
         return createRestRequest(GC_REST_ADD_USER_PATH, iob_user);
     }
 
@@ -57,29 +58,31 @@ public class RestClient {
 
     public User loginUser(User user) {
         ObjectMapper lob_mapper = new ObjectMapper();
-        String lva_jsonInString;
-        HttpMessage lob_httpMessage;
+        String lva_responseString;
+        RestResponse lob_restResponse = new RestResponse();
         UserImpl lob_user = new UserImpl();
         Response lob_response;
 
         lob_response = gob_webTarget.path(GC_REST_LOGIN_USER_PATH).request()
                 .put(Entity.entity(user, MediaType.APPLICATION_JSON));
 
-        lva_jsonInString = lob_response.readEntity(String.class);
+        lva_responseString = lob_response.readEntity(String.class);
 
         try {
             if (lob_response.getStatus() == GC_HTTP_OK) {
-                lob_user = lob_mapper.readValue(lva_jsonInString, UserImpl.class);
-            } else if (lob_response.getStatus() == 401) {
-                throw new IllegalArgumentException("Unauthorized");
+                lob_user = lob_mapper.readValue(lva_responseString, UserImpl.class);
+
             } else {
-                lob_httpMessage = lob_mapper.readValue(lva_jsonInString, HttpMessage.class);
-                lob_httpMessage.setHttpStatus(lob_response.getStatus());
-                throw new IllegalArgumentException(lob_httpMessage.getUserLoginStatus());
+                lob_restResponse.setResponseMessage(lva_responseString);
+                lob_restResponse.setHttpStatus(lob_response.getStatus());
+
+                // TODO eigene Exception schreiben
+                throw new IllegalArgumentException(lob_restResponse.getResponseMessage());
             }
         } catch (IOException ex) {
-            AlertWindows.createExceptionAlert(ex.getMessage(), ex);
             ex.printStackTrace();
+        } catch (ProcessingException ex) {
+            AlertWindows.createExceptionAlert(ex.getMessage(), ex);
         }
 
         return lob_user;
@@ -89,7 +92,7 @@ public class RestClient {
 // Change password
 // ---------------------------------------------------------------------------------------------------------------------
 
-    public HttpMessage changePassword(User iob_user) {
+    public RestResponse changePassword(User iob_user) {
         return createRestRequest(GC_REST_CHANGE_PASSWORD_PATH, iob_user);
     }
 
@@ -98,11 +101,14 @@ public class RestClient {
 // ---------------------------------------------------------------------------------------------------------------------
 
     public List<UserImpl> getAllUser() {
-        List<UserImpl> lli_userList;
+        List<UserImpl> lli_userList = null;
 
-        lli_userList = gob_webTarget.path(GC_REST_GET_ALL_USERS_PATH).request()
-                .get(new GenericType<List<UserImpl>>() {
-                });
+        try {
+            lli_userList = gob_webTarget.path(GC_REST_GET_ALL_USERS_PATH).request()
+                    .get(new GenericType<List<UserImpl>>() {});
+        } catch (Exception ex) {
+            AlertWindows.createExceptionAlert(ex.getMessage(), ex);
+        }
 
         return lli_userList;
     }
@@ -111,25 +117,25 @@ public class RestClient {
 // Add new Admin
 // ---------------------------------------------------------------------------------------------------------------------
 
-    public HttpMessage addNewAdmin(User iob_user) {
+    public RestResponse addNewAdmin(User iob_user) {
         return createRestRequest(GC_REST_ADD_ADMIN_PATH, iob_user);
     }
 
 //----------------------------------------------------------------------------------------------------------------------
 
-    private HttpMessage createRestRequest(String iva_requestPath, User iob_user) {
-        HttpMessage lob_httpMessage = null;
+    private RestResponse createRestRequest(String iva_requestPath, User iob_user) {
+        RestResponse lob_restResponse = new RestResponse();
 
         try {
             Response response = gob_webTarget.path(iva_requestPath).request()
                     .put(Entity.entity(iob_user, MediaType.APPLICATION_JSON));
 
-            lob_httpMessage = response.readEntity(HttpMessage.class);
-            lob_httpMessage.setHttpStatus(response.getStatus());
+            lob_restResponse.setResponseMessage(response.readEntity(String.class));
+            lob_restResponse.setHttpStatus(response.getStatus());
         } catch (Exception ex) {
             AlertWindows.createExceptionAlert(ex.getMessage(), ex);
         }
 
-        return lob_httpMessage;
+        return lob_restResponse;
     }
 }

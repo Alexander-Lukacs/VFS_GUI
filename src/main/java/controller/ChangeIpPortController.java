@@ -22,8 +22,6 @@ import static tools.constants.AlertConstants.GC_WARNING_PORT;
  * Created by Mesut on 31.01.2018.
  */
 public class ChangeIpPortController {
-
-
     @FXML
     private ListView<String> gob_lvOptions;
 
@@ -39,20 +37,14 @@ public class ChangeIpPortController {
     private final controller.ListView listView = new controller.ListView();
 
     public void initialize() {
-
         listView.loadSettingsList(gob_lvOptions);
     }
 
     /**
      * Öffnet die View die ausgewählt wurde
-     *
-     * @throws IOException
      */
-    public void loadView() throws IOException {
-
+    public void loadView() {
         try {
-
-
             if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(GC_CHANGE_PW)) {
                 FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("changePW.fxml"));
                 AnchorPane lob_pane = lob_loader.load();
@@ -69,16 +61,16 @@ public class ChangeIpPortController {
     }
 
     public void onClick() {
-        DataCache lob_datacache = DataCache.getDataCache();
+        DataCache lob_dataCache = DataCache.getDataCache();
 
         String lva_ip = gob_tfServerIp.getText();
         String lva_port = gob_tfPort.getText();
 
         if (Validation.isIpValid(lva_ip)) {
             if (Validation.isPortValid(lva_port)) {
-                lob_datacache.replaceData(GC_IP_KEY, lva_ip);
-                lob_datacache.replaceData(GC_PORT_KEY, lva_port);
-                XmlTool.createXml(lva_ip, lva_port, lob_datacache.get(GC_EMAIL_KEY), lob_datacache.get(GC_PASSWORD_KEY));
+                lob_dataCache.replaceData(GC_IP_KEY, lva_ip);
+                lob_dataCache.replaceData(GC_PORT_KEY, lva_port);
+                XmlTool.createXml(lva_ip, lva_port, lob_dataCache.get(GC_EMAIL_KEY), lob_dataCache.get(GC_PASSWORD_KEY));
             } else {
                 AlertWindows.createWarningAlert(GC_WARNING_PORT);
             }

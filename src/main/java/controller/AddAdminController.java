@@ -2,8 +2,8 @@ package controller;
 
 import builder.RestClientBuilder;
 import cache.DataCache;
-import client.HttpMessage;
 import client.RestClient;
+import client.RestResponse;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ListView;
@@ -11,13 +11,12 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import models.classes.UserImpl;
 import models.interfaces.User;
-import tools.AlertWindows;
+import tools.Utils;
 
-import javax.ws.rs.ProcessingException;
 import java.util.List;
 
 import static cache.DataCache.*;
-import static client.constants.HttpStatusCodes.*;
+import static client.constants.HttpStatusCodes.GC_HTTP_OK;
 import static controller.constants.SettingsConstants.GC_CHANGE_IP_PORT;
 import static controller.constants.SettingsConstants.GC_CHANGE_PW;
 
@@ -37,25 +36,24 @@ public class AddAdminController {
     private DataCache gob_dataCache;
 
     public void initialize() {
+        RestClient lob_restClient;
         gob_dataCache = DataCache.getDataCache();
+
         String lva_email = gob_dataCache.get(GC_EMAIL_KEY);
         String lva_password = gob_dataCache.get(GC_PASSWORD_KEY);
         String lva_ip = gob_dataCache.get(GC_IP_KEY);
         String lva_port = gob_dataCache.get(GC_PORT_KEY);
 
+        lob_restClient = RestClientBuilder.buildRestClientWithAuth(lva_ip, lva_port, lva_email, lva_password);
 
-        RestClient restClient = RestClientBuilder.buildRestClientWithAuth(lva_ip, lva_port, lva_email, lva_password);
+        gob_userList = lob_restClient.getAllUser();
 
-        try {
-            gob_userList = restClient.getAllUser();
-        } catch (ProcessingException ex) {
-            AlertWindows.createExceptionAlert(ex.getMessage(), ex);
+        if (gob_userList == null) {
+            // TODO stage schließen
+        } else {
+            listView.loadSettingsList(gob_lvOptions);
+            listView.loadUserList(gob_lvUser, gob_userList);
         }
-
-
-        listView.loadSettingsList(gob_lvOptions);
-        listView.loadUserList(gob_lvUser, gob_userList);
-
     }
 
     public void loadView() {
@@ -81,7 +79,7 @@ public class AddAdminController {
         String lva_password = gob_dataCache.get(GC_PASSWORD_KEY);
         String lva_email = gob_dataCache.get(GC_EMAIL_KEY);
 
-        HttpMessage lob_httpMessage;
+        RestResponse lob_restResponse;
         RestClient lob_restClient;
 
         lob_restClient = RestClientBuilder.buildRestClientWithAuth(lva_ip, lva_port, lva_email, lva_password);
@@ -89,29 +87,16 @@ public class AddAdminController {
         for (User lob_user : gob_userList) {
             if (lob_user.getEmail().equals(gob_lvUser.getSelectionModel().getSelectedItem())) {
 
-                lob_httpMessage = lob_restClient.addNewAdmin(lob_user);
+                lob_restResponse = lob_restClient.addNewAdmin(lob_user);
 
-                if (lob_httpMessage != null) {
-                    printHttpMessage(lob_httpMessage);
-                    ((Stage) gob_rootPane.getScene().getWindow()).close();
+                if (lob_restResponse != null) {
+                    Utils.printResponseMessage(lob_restResponse);
+
+                    if (lob_restResponse.getHttpStatus() == GC_HTTP_OK) {
+                        ((Stage) gob_rootPane.getScene().getWindow()).close();
+                    }
                 }
             }
-        }
-    }
-
-    private void printHttpMessage(HttpMessage iob_httpMessage) {
-        switch (iob_httpMessage.getHttpStatus()) {
-            case GC_HTTP_OK:
-                AlertWindows.createInformationAlert(iob_httpMessage.getAddAdminStatus());
-                break;
-
-            case GC_HTTP_BAD_REQUEST:
-                AlertWindows.createErrorAlert(iob_httpMessage.getAddAdminStatus());
-                break;
-
-            case GC_HTTP_CONFLICT:
-                AlertWindows.createErrorAlert(iob_httpMessage.getAddAdminStatus());
-                break;
         }
     }
 }

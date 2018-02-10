@@ -5,20 +5,15 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.AnchorPane;
 
-import java.io.IOException;
-
 import static controller.constants.SettingsConstants.*;
 
 
 public class SettingsController {
-
+    private final controller.ListView gob_listView = new controller.ListView();
     @FXML
     private ListView<String> gob_lvOptions;
-
     @FXML
     private AnchorPane gob_rootPane;
-
-    private final controller.ListView gob_listView = new controller.ListView();
 
     /**
      * Initialize of ListView
@@ -30,10 +25,8 @@ public class SettingsController {
 
     /**
      * shows the choosen Settings View
-     *
-     * @throws IOException
      */
-    public void loadView() throws IOException {
+    public void loadView() {
         try {
 
             if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(GC_CHANGE_PW)) {
@@ -51,7 +44,7 @@ public class SettingsController {
                 AnchorPane lob_pane = lob_loader.load();
                 gob_rootPane.getChildren().setAll(lob_pane);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
 
         }
     }

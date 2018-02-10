@@ -54,7 +54,6 @@ public class AlertWindows {
     }
 
     public static void createWarningAlert(String iva_content) {
-
         Alert alert = new Alert(AlertType.WARNING);
         alert.setTitle(GC_WARNING_TITLE);
         alert.setHeaderText(GC_WARNING_HEADER);
@@ -63,7 +62,6 @@ public class AlertWindows {
         alert.showAndWait();
     }
 
-    //TODO falls kein content dazu kommt, kann dies auch statisch gemacht werden
     public static void createErrorAlert(String iva_content) {
         Alert alert = new Alert(AlertType.ERROR);
         alert.setTitle(GC_ERROR_TITLE);
