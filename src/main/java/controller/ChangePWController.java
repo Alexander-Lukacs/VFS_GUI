@@ -77,7 +77,7 @@ public class ChangePWController {
     }
 
     public void onClickChangePassword() {
-        HttpMessage httpMessage;
+        HttpMessage lob_httpMessage;
         User lob_user;
 
         String lva_ip = gob_dataCache.get(GC_IP_KEY);
@@ -90,6 +90,7 @@ public class ChangePWController {
         String lva_confirmPassword = gob_tf_confirmPassword.getText();
 
         if (isPasswordDataValid(lva_oldPassword, lva_oldCachedPassword, lva_newPassword, lva_confirmPassword)) {
+
             RestClient restclient = RestClientBuilder.buildRestClientWithAuth(lva_ip, lva_port,
                     lva_email, lva_oldCachedPassword);
             XmlTool.createXml(lva_ip, lva_port, lva_email, lva_newPassword);
@@ -98,12 +99,15 @@ public class ChangePWController {
             lob_user.setEmail(lva_email);
             lob_user.setPassword(lva_newPassword);
 
-            httpMessage = restclient.changePassword(lob_user);
+            lob_httpMessage = restclient.changePassword(lob_user);
 
-            printHttpMessage(httpMessage);
-            gob_tf_oldPassword.setText("");
-            gob_tf_newPassword.setText("");
-            gob_tf_confirmPassword.setText("");
+            if (lob_httpMessage != null) {
+                printHttpMessage(lob_httpMessage);
+                gob_tf_oldPassword.setText("");
+                gob_tf_newPassword.setText("");
+                gob_tf_confirmPassword.setText("");
+            }
+
         }
     }
 

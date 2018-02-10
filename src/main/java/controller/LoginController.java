@@ -53,6 +53,9 @@ public class LoginController {
     private TextField gob_tf_port;
     @FXML
     private TabPane gob_tabPane = new TabPane();
+    private String[] gob_ipPortEmailPasswordArray = new String[4];
+    private DataCache gob_dataCache;
+    private RestClient gob_restClient; //TODO Könnte lokal gemacht werden in OnClickRegister..
 
     @FXML
     public void initialize() {
@@ -72,12 +75,6 @@ public class LoginController {
         System.out.println(gob_ipPortEmailPasswordArray[3]);
         setTextFromXmlToTf();
     }
-
-    private String[] gob_ipPortEmailPasswordArray = new String[4];
-    private DataCache gob_dataCache;
-    private RestClient gob_restClient; //TODO Könnte lokal gemacht werden in OnClickRegister..
-    private HttpMessage gob_httpMessage; //TODO Könnte lokal gemacht werden in OnClickRegister..
-
 
     private void setTextFromXmlToTf() {
         gob_tf_ipAddress.setText(gob_ipPortEmailPasswordArray[0]);
@@ -115,8 +112,6 @@ public class LoginController {
                 gob_dataCache.put(GC_PASSWORD_KEY, lva_password);
                 cacheUser(lob_user);
 
-                //gob_tf_userLoginEmail.setText("");
-                //gob_tf_loginPassword.setText("");
                 mainController.start(gob_stage);
                 close();
             } catch (ProcessingException | IllegalArgumentException ex) {
@@ -133,26 +128,26 @@ public class LoginController {
         String lva_email = gob_tf_newUserEmail.getText();
         String lva_password = gob_tf_registerPassword.getText();
         String lva_confirmPassword = gob_tf_confirmPassword1.getText();
-
+        HttpMessage lob_httpMessage;
 
         if (checkIfRegisterDataValid(lva_ip, lva_port, lva_name, lva_email, lva_password, lva_confirmPassword)) {
+            // TODO wenn man nach dem registrieren nicht direkt eingeloggt wird, ist das hier falsch
             gob_dataCache.put(GC_IP_KEY, lva_ip);
             gob_dataCache.put(GC_PORT_KEY, lva_port);
+
             XmlTool.createXml(lva_ip, lva_port, lva_email, lva_password);
             User lob_user;
 
             lob_user = ModelObjectBuilder.getUserObject(lva_email, lva_password, lva_name);
 
-            try {
-                gob_restClient = RestClientBuilder.buildRestClient(lva_ip, lva_port);
-                gob_httpMessage = gob_restClient.registerNewUser(lob_user);
-                printMessage(gob_httpMessage);
+            gob_restClient = RestClientBuilder.buildRestClient(lva_ip, lva_port);
+            lob_httpMessage = gob_restClient.registerNewUser(lob_user);
+
+            if (lob_httpMessage != null) {
+                printMessage(lob_httpMessage);
                 gob_tabPane.getSelectionModel().selectFirst();
 
                 XmlTool.createXml(lva_ip, lva_port, lva_email, lva_password);
-
-            } catch (ProcessingException | IOException ex) {
-                AlertWindows.createExceptionAlert(ex.getMessage(), ex);
             }
         }
     }
