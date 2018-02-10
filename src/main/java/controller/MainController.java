@@ -13,14 +13,15 @@ import javafx.scene.control.TreeView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import models.classes.TreeControl;
 import tools.AlertWindows;
 import tools.Utils;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static controller.constants.SettingsConstants.*;
 
@@ -30,7 +31,7 @@ public class MainController {
     private Button gob_btnSettings;
 
     @FXML
-    private TreeView<Path> gob_treeView; //TODO Könte lokal gemacht werden, nur wie?
+    private TreeView<String> gob_treeView; //TODO Könte lokal gemacht werden, nur wie?
 
     @FXML
     private VBox gob_vbox = new VBox();
@@ -65,10 +66,11 @@ public class MainController {
 
     public void initialize() throws IOException {
         userCache = DataCache.getDataCache();
-        TreeImpl x = new TreeImpl(Utils.getUserBasePath());
-        TreeItem<Path> root = new TreeItem<>(Paths.get(x.getRoot().getCanonicalPath()));
-        createTree(root);
-        gob_treeView = new TreeView<>(root);
+        gob_treeView = new TreeView<>();
+        TreeControl lob_treeControl = new TreeControl(gob_treeView, userCache.get(DataCache.GC_IP_KEY), userCache.get(DataCache.GC_PORT_KEY));
+//        TreeImpl x = new TreeImpl(Utils.getUserBasePath());
+//        TreeItem<String> root = new TreeItem<>(x.getRoot().getCanonicalPath());
+//        createTree(root);
         gob_vbox.getChildren().add(gob_treeView);
     }
 
@@ -87,22 +89,21 @@ public class MainController {
         }
     }
 
-    private void createTree(TreeItem<Path> rootItem) throws IOException {
-
-        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(rootItem.getValue())) {
-
-            for (Path path : directoryStream) {
-
-                TreeItem<Path> newItem = new TreeItem<>(path);
-                newItem.setExpanded(true);
-
-                rootItem.getChildren().add(newItem);
-
-                if (Files.isDirectory(path)) {
-                    createTree(newItem);
-                }
-            }
-        }
-    }
-
+//    private void createTree(TreeItem<String> rootItem) throws IOException {
+//
+//        try (DirectoryStream<String> directoryStream = Files.newDirectoryStream(rootItem.getValue())) {
+//
+//            for (String path : directoryStream) {
+//
+//                TreeItem<String> newItem = new TreeItem<>(path);
+//                newItem.setExpanded(true);
+//
+//                rootItem.getChildren().add(newItem);
+//
+//                if (Files.isDirectory(path)) {
+//                    createTree(newItem);
+//                }
+//            }
+//        }
+//    }
 }
