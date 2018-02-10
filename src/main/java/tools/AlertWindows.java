@@ -13,7 +13,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import static controller.constants.ApplicationConstants.GC_APPLICATION_ICON_PATH;
-import static tools.constants.AlertConstants.*;
 
 /**
  * Created by Mesut on 08.02.2018.
@@ -22,7 +21,7 @@ import static tools.constants.AlertConstants.*;
 public class AlertWindows {
     public void createExceptionAlert(String iva_content, Exception iob_exception) {
         Alert alert = new Alert(AlertType.ERROR);
-        alert.setTitle(GC_EXCEPTION_TITLE);
+        alert.setTitle(null);
         alert.setHeaderText(null);
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
         stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream(GC_APPLICATION_ICON_PATH)));
@@ -59,8 +58,10 @@ public class AlertWindows {
 
     public void createWarningAlert(String iva_content) {
         Alert alert = new Alert(AlertType.WARNING);
-        alert.setTitle(GC_WARNING_TITLE);
-        alert.setHeaderText(GC_WARNING_HEADER);
+        alert.setTitle(null);
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream(GC_APPLICATION_ICON_PATH)));
+        alert.setHeaderText(null);
         alert.setContentText(iva_content);
 
         alert.showAndWait();
@@ -68,7 +69,7 @@ public class AlertWindows {
 
     public void createErrorAlert(String iva_content) {
         Alert alert = new Alert(AlertType.ERROR);
-        alert.setTitle(GC_ERROR_TITLE);
+        alert.setTitle(null);
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
         stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream(GC_APPLICATION_ICON_PATH)));
         //alert.setHeaderText(GC_ERROR_HEADER);
@@ -80,7 +81,7 @@ public class AlertWindows {
 
     public void createInformationAlert(String iva_content) {
         Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle(GC_INFORMATION_TITLE);
+        alert.setTitle(null);
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
         stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream(GC_APPLICATION_ICON_PATH)));
         //alert.setHeaderText(GC_INFORMATION_HEADER);
