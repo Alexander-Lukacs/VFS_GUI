@@ -15,8 +15,8 @@ import static controller.constants.SettingsConstants.*;
 
 public class ListView {
     public void loadSettingsList(javafx.scene.control.ListView<String> gob_lvOptions) {
-        DataCache dataCache = DataCache.getDataCache();
-        boolean lva_isAdmin = Boolean.parseBoolean(dataCache.get(GC_IS_ADMIN_KEY));
+        DataCache lob_dataCache = DataCache.getDataCache();
+        boolean lva_isAdmin = Boolean.parseBoolean(lob_dataCache.get(GC_IS_ADMIN_KEY));
         ObservableList<String> lob_observableList;
 
         if (lva_isAdmin) {

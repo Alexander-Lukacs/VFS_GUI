@@ -123,10 +123,8 @@ public class XmlTool {
 
             System.out.println("File saved!");
 
-        } catch (ParserConfigurationException pce) {
-            pce.printStackTrace();
-        } catch (TransformerException tfe) {
-            tfe.printStackTrace();
+        } catch (ParserConfigurationException | TransformerException ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -135,10 +133,6 @@ public class XmlTool {
         System.out.println("checkIfFileExist(): " + Utils.getUserBasePath() + "\\properties.xml");
         File lob_file = new File(Utils.getUserBasePath() + "\\properties.xml");
 
-        if (lob_file.exists()) {
-            return true;
-        } else {
-            return false;
-        }
+        return lob_file.exists();
     }
 }

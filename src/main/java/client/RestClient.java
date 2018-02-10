@@ -13,6 +13,7 @@ import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import tools.AlertWindows;
 
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -25,103 +26,125 @@ import java.io.IOException;
 import java.util.List;
 
 import static client.constants.HttpStatusCodes.GC_HTTP_OK;
+import static client.constants.RestResourcesPaths.*;
 
 /**
  * Created by Mesut on 25.01.2018.
  */
 
 public class RestClient {
-
-    private WebTarget webTarget;
+    private WebTarget gob_webTarget;
     private Client gob_client;
 
     public RestClient(String baseUrl) {
-        Client client = ClientBuilder.newClient();
-        webTarget = client.target(baseUrl);
+        Client lob_client = ClientBuilder.newClient();
+        gob_webTarget = lob_client.target(baseUrl);
     }
 
     public RestClient(String baseUrl, String iva_email, String iva_password) {
-        HttpAuthenticationFeature authDetails = HttpAuthenticationFeature.basic(iva_email, iva_password);
-        ClientConfig config = new ClientConfig(authDetails);
-        gob_client = ClientBuilder.newClient(config);
-        gob_client.register(authDetails);
-        webTarget = gob_client.target(baseUrl);
+        HttpAuthenticationFeature lob_authDetails = HttpAuthenticationFeature.basic(iva_email, iva_password);
+
+        ClientConfig lob_config = new ClientConfig(lob_authDetails);
+
+        Client lob_client = ClientBuilder.newClient(lob_config);
+        lob_client.register(lob_authDetails);
+
+        gob_webTarget = lob_client.target(baseUrl);
     }
 
-    public HttpMessage registerNewUser(User user) throws IOException {
-        Response response = webTarget.path("/user/addNewUser").request()
-                .put(Entity.entity(user, MediaType.APPLICATION_JSON));
+// ---------------------------------------------------------------------------------------------------------------------
+// Register new user
+// ---------------------------------------------------------------------------------------------------------------------
 
-
-        ObjectMapper mapper = new ObjectMapper();
-        String jsonInString = response.readEntity(String.class);
-
-        HttpMessage obj = mapper.readValue(jsonInString, HttpMessage.class);
-        obj.setHttpStatus(response.getStatus());
-
-        return obj;
+    public RestResponse registerNewUser(User iob_user) {
+        return createRestRequest(GC_REST_ADD_USER_PATH, iob_user);
     }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Login user
+// ---------------------------------------------------------------------------------------------------------------------
 
     public User loginUser(User user) {
         ObjectMapper lob_mapper = new ObjectMapper();
-        String lva_jsonInString;
-        HttpMessage lob_httpMessage;
+        String lva_responseString;
+        RestResponse lob_restResponse = new RestResponse();
         UserImpl lob_user = new UserImpl();
-        Response response;
+        Response lob_response;
 
-        response = webTarget.path("/user/auth/login").request()
+        lob_response = gob_webTarget.path(GC_REST_LOGIN_USER_PATH).request()
                 .put(Entity.entity(user, MediaType.APPLICATION_JSON));
 
-        lva_jsonInString = response.readEntity(String.class);
+        lva_responseString = lob_response.readEntity(String.class);
 
         try {
-            if (response.getStatus() == GC_HTTP_OK) {
-                lob_user = lob_mapper.readValue(lva_jsonInString, UserImpl.class);
-            } else if (response.getStatus() == 401) {
-                throw new IllegalArgumentException("Unauthorized");
+            if (lob_response.getStatus() == GC_HTTP_OK) {
+                lob_user = lob_mapper.readValue(lva_responseString, UserImpl.class);
+
             } else {
-                lob_httpMessage = lob_mapper.readValue(lva_jsonInString, HttpMessage.class);
-                lob_httpMessage.setHttpStatus(response.getStatus());
-                throw new IllegalArgumentException(lob_httpMessage.getUserLoginStatus());
+                lob_restResponse.setResponseMessage(lva_responseString);
+                lob_restResponse.setHttpStatus(lob_response.getStatus());
+
+                // TODO eigene Exception schreiben
+                throw new IllegalArgumentException(lob_restResponse.getResponseMessage());
             }
         } catch (IOException ex) {
-            AlertWindows.createExceptionAlert(ex.getMessage(), ex);
             ex.printStackTrace();
+        } catch (ProcessingException ex) {
+            AlertWindows.createExceptionAlert(ex.getMessage(), ex);
         }
 
         return lob_user;
     }
 
-    public HttpMessage changePassword(User iob_user) {
-        HttpMessage httpMessage;
+// ---------------------------------------------------------------------------------------------------------------------
+// Change password
+// ---------------------------------------------------------------------------------------------------------------------
 
-        Response response = webTarget.path("user/auth/changePassword").request()
-                .put(Entity.entity(iob_user, MediaType.APPLICATION_JSON));
-
-        httpMessage = response.readEntity(HttpMessage.class);
-        httpMessage.setHttpStatus(response.getStatus());
-
-        return httpMessage;
+    public RestResponse changePassword(User iob_user) {
+        return createRestRequest(GC_REST_CHANGE_PASSWORD_PATH, iob_user);
     }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Get all users
+// ---------------------------------------------------------------------------------------------------------------------
 
     public List<UserImpl> getAllUser() {
-        List<UserImpl> userList;
-        userList = webTarget.path("user/adminAuth/getAllUser").request()
-                .get(new GenericType<List<UserImpl>>(){});
+        List<UserImpl> lli_userList = null;
 
-        return userList;
+        try {
+            lli_userList = gob_webTarget.path(GC_REST_GET_ALL_USERS_PATH).request()
+                    .get(new GenericType<List<UserImpl>>() {});
+        } catch (Exception ex) {
+            AlertWindows.createExceptionAlert(ex.getMessage(), ex);
+        }
+
+        return lli_userList;
     }
 
-    public HttpMessage addNewAdmin(User iob_user) {
-        HttpMessage lob_httpMessage;
+// ---------------------------------------------------------------------------------------------------------------------
+// Add new Admin
+// ---------------------------------------------------------------------------------------------------------------------
 
-        Response response = webTarget.path("admin/adminAuth/addNewAdmin").request()
-                .put(Entity.entity(iob_user, MediaType.APPLICATION_JSON));
+    public RestResponse addNewAdmin(User iob_user) {
+        return createRestRequest(GC_REST_ADD_ADMIN_PATH, iob_user);
+    }
 
-        lob_httpMessage = response.readEntity(HttpMessage.class);
-        lob_httpMessage.setHttpStatus(response.getStatus());
+//----------------------------------------------------------------------------------------------------------------------
 
-        return lob_httpMessage;
+    private RestResponse createRestRequest(String iva_requestPath, User iob_user) {
+        RestResponse lob_restResponse = new RestResponse();
+
+        try {
+            Response response = gob_webTarget.path(iva_requestPath).request()
+                    .put(Entity.entity(iob_user, MediaType.APPLICATION_JSON));
+
+            lob_restResponse.setResponseMessage(response.readEntity(String.class));
+            lob_restResponse.setHttpStatus(response.getStatus());
+        } catch (Exception ex) {
+            AlertWindows.createExceptionAlert(ex.getMessage(), ex);
+        }
+
+        return lob_restResponse;
     }
 
     public void uploadFilesToServer(File iob_filesToUpload, String iva_relativeFilePath) {

@@ -534,7 +534,6 @@ public class TreeImpl implements Tree {
      * @param iva_path path of the file to find
      * @param depth of the tree
      * @return the found file node or null
-     * @throws IOException
      */
     private FileNode searchNode(FileNode iob_parent, String iva_path, int depth) throws IOException{
         //-------------------------------Variables------------------------------------------
