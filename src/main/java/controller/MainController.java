@@ -59,7 +59,7 @@ public class MainController {
     public void initialize() throws IOException {
         gob_userCache = DataCache.getDataCache();
         gob_treeView = new TreeView<>();
-        TreeControl lob_treeControl = new TreeControl(gob_treeView, userCache.get(DataCache.GC_IP_KEY), userCache.get(DataCache.GC_PORT_KEY));
+        TreeControl lob_treeControl = new TreeControl(gob_treeView, gob_userCache.get(DataCache.GC_IP_KEY), gob_userCache.get(DataCache.GC_PORT_KEY));
         gob_vBox.getChildren().add(gob_treeView);
     }
 

@@ -149,26 +149,26 @@ public class RestClient {
 
     public void uploadFilesToServer(File iob_filesToUpload, String iva_relativeFilePath) {
         DataCache lob_dataCache = DataCache.getDataCache();
-        webTarget = gob_client.target("http://" + lob_dataCache.get(DataCache.GC_IP_KEY) + ":" + lob_dataCache.get(DataCache.GC_PORT_KEY) + "/api/auth/files/upload").queryParam("path", iva_relativeFilePath);
+        gob_webTarget = gob_client.target("http://" + lob_dataCache.get(DataCache.GC_IP_KEY) + ":" + lob_dataCache.get(DataCache.GC_PORT_KEY) + "/api/auth/files/upload").queryParam("path", iva_relativeFilePath);
 
 
         final FileDataBodyPart lob_filePart = new FileDataBodyPart("attachment", iob_filesToUpload);
         MultiPart lob_multiPart = new FormDataMultiPart().bodyPart(lob_filePart);
 
         //webTarget.path("/auth/files/upload").queryParam("path", iva_relativeFilePath);
-        webTarget.register(MultiPartWriter.class);
-        Response lob_response = webTarget.request().post(Entity.entity(lob_multiPart, lob_multiPart.getMediaType()));
+        gob_webTarget.register(MultiPartWriter.class);
+        Response lob_response = gob_webTarget.request().post(Entity.entity(lob_multiPart, lob_multiPart.getMediaType()));
 
         System.out.println(iob_filesToUpload.getName() + ": " + lob_response.getStatus());
     }
 
     public void createDirectoryOnServer(String iva_relativeDirectoryPath) {
-        Response lob_response = webTarget.path("/auth/files/createDirectory").request().post(Entity.entity(iva_relativeDirectoryPath, MediaType.TEXT_PLAIN));
+        Response lob_response = gob_webTarget.path("/auth/files/createDirectory").request().post(Entity.entity(iva_relativeDirectoryPath, MediaType.TEXT_PLAIN));
         System.out.println(lob_response.getStatus());
     }
 
     public void deleteOnServer(String iva_relativePath) {
-        Response lob_response = webTarget.path("/auth/files/delete").request().post(Entity.entity(iva_relativePath, MediaType.TEXT_PLAIN));
+        Response lob_response = gob_webTarget.path("/auth/files/delete").request().post(Entity.entity(iva_relativePath, MediaType.TEXT_PLAIN));
         System.out.println(lob_response.getStatus());
     }
 }
