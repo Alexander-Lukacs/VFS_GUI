@@ -23,7 +23,7 @@
                     <Insets left="5.0" top="10.0"/>
                 </padding>
                 <Label text="Server"/>
-                <TextField fx:id="gob_tf_ipAddress" text="10.9.40.235"/>
+                <TextField fx:id="gob_tf_ipAddress" text="192.168.178.25"/>
                 <Label text="Port"/>
                 <TextField fx:id="gob_tf_port" prefHeight="31.0" prefWidth="66.0" text="8080"/>
             </HBox>
@@ -36,13 +36,13 @@
                                AnchorPane.topAnchor="0.0">
                         <VBox alignment="CENTER" spacing="20.0">
                             <Label text="E-Mail"/>
-                            <TextField fx:id="gob_tf_userLoginEmail" text="Onur_93@yahoo.de">
+                            <TextField fx:id="gob_tf_userLoginEmail" text="test@test.de">
                                 <VBox.margin>
                                     <Insets left="250.0" right="250.0"/>
                                 </VBox.margin>
                             </TextField>
                             <Label text="Password"/>
-                            <PasswordField fx:id="gob_tf_loginPassword" text="Pimmel123!">
+                            <PasswordField fx:id="gob_tf_loginPassword" text="Passwort1!">
                                 <VBox.margin>
                                     <Insets left="250.0" right="250.0"/>
                                 </VBox.margin>
