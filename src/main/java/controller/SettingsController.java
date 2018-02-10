@@ -24,7 +24,7 @@ public class SettingsController {
 
 
     /**
-     * shows the choosen Settings View
+     * shows the selected Settings View
      */
     public void loadView() {
         try {

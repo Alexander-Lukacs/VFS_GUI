@@ -47,7 +47,7 @@ public class ChangePWController {
     }
 
     /**
-     * open choosen View
+     * open selected View
      */
     public void loadView() {
         try {

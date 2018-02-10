@@ -10,8 +10,6 @@ import tools.AlertWindows;
 import tools.Validation;
 import tools.XmlTool;
 
-import java.io.IOException;
-
 import static cache.DataCache.*;
 import static controller.constants.SettingsConstants.GC_ADMIN_ADD;
 import static controller.constants.SettingsConstants.GC_CHANGE_PW;
