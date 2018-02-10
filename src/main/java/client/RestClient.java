@@ -90,7 +90,7 @@ public class RestClient {
         } catch (IOException ex) {
             ex.printStackTrace();
         } catch (ProcessingException ex) {
-            AlertWindows.createExceptionAlert(ex.getMessage(), ex);
+            new AlertWindows().createExceptionAlert(ex.getMessage(), ex);
         }
 
         return lob_user;
@@ -115,7 +115,7 @@ public class RestClient {
             lli_userList = gob_webTarget.path(GC_REST_GET_ALL_USERS_PATH).request()
                     .get(new GenericType<List<UserImpl>>() {});
         } catch (Exception ex) {
-            AlertWindows.createExceptionAlert(ex.getMessage(), ex);
+            new AlertWindows().createExceptionAlert(ex.getMessage(), ex);
         }
 
         return lli_userList;
@@ -141,7 +141,7 @@ public class RestClient {
             lob_restResponse.setResponseMessage(response.readEntity(String.class));
             lob_restResponse.setHttpStatus(response.getStatus());
         } catch (Exception ex) {
-            AlertWindows.createExceptionAlert(ex.getMessage(), ex);
+            new AlertWindows().createExceptionAlert(ex.getMessage(), ex);
         }
 
         return lob_restResponse;

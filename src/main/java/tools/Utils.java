@@ -16,15 +16,15 @@ public class Utils {
     public static void printResponseMessage(RestResponse restResponse) {
         switch (restResponse.getHttpStatus()) {
             case GC_HTTP_OK:
-                AlertWindows.createInformationAlert(restResponse.getResponseMessage());
+                new AlertWindows().createInformationAlert(restResponse.getResponseMessage());
                 break;
 
             case GC_HTTP_BAD_REQUEST:
-                AlertWindows.createErrorAlert(restResponse.getResponseMessage());
+                new AlertWindows().createErrorAlert(restResponse.getResponseMessage());
                 break;
 
             case GC_HTTP_CONFLICT:
-                AlertWindows.createErrorAlert(restResponse.getResponseMessage());
+                new AlertWindows().createErrorAlert(restResponse.getResponseMessage());
                 break;
         }
     }

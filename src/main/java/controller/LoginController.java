@@ -26,6 +26,7 @@ import java.util.Objects;
 
 import static cache.DataCache.*;
 import static client.constants.HttpStatusCodes.*;
+import static controller.constants.ApplicationConstants.GC_APPLICATION_ICON_PATH;
 import static controller.constants.SettingsConstants.GC_VFS;
 import static tools.constants.AlertConstants.*;
 
@@ -112,7 +113,7 @@ public class LoginController {
                     close();
                 }
             } catch (IllegalArgumentException ex) {
-                AlertWindows.createExceptionAlert(ex.getMessage(), ex);
+                new AlertWindows().createExceptionAlert(ex.getMessage(), ex);
             }
         }
     }
@@ -180,7 +181,7 @@ public class LoginController {
         }
 
         if (lva_validationFailure) {
-            AlertWindows.createWarningAlert(lob_sb.toString());
+            new AlertWindows().createWarningAlert(lob_sb.toString());
             return false;
         }
 
@@ -230,7 +231,7 @@ public class LoginController {
         }
 
         if (lva_validationFailure) {
-            AlertWindows.createWarningAlert(lob_sb.toString());
+            new AlertWindows().createWarningAlert(lob_sb.toString());
             return false;
         }
 
@@ -256,8 +257,7 @@ public class LoginController {
 
         iob_stage.setScene(new Scene(lob_root));
         iob_stage.setTitle(GC_VFS);
-
-        iob_stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("images/APPLICATION_ICON.png")));
+        iob_stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream(GC_APPLICATION_ICON_PATH)));
         iob_stage.show();
     }
 }

@@ -132,7 +132,7 @@ public class ChangePWController {
         }
 
         if (lva_validationFailure) {
-            AlertWindows.createWarningAlert(lob_sb.toString());
+            new AlertWindows().createWarningAlert(lob_sb.toString());
             return false;
         }
 

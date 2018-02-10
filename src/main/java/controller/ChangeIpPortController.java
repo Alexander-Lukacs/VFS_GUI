@@ -70,10 +70,10 @@ public class ChangeIpPortController {
                 lob_dataCache.replaceData(GC_PORT_KEY, lva_port);
                 XmlTool.createXml(lva_ip, lva_port, lob_dataCache.get(GC_EMAIL_KEY), lob_dataCache.get(GC_PASSWORD_KEY));
             } else {
-                AlertWindows.createWarningAlert(GC_WARNING_PORT);
+                new AlertWindows().createWarningAlert(GC_WARNING_PORT);
             }
         } else {
-            AlertWindows.createWarningAlert(GC_WARNING_IP_PORT);
+            new AlertWindows().createWarningAlert(GC_WARNING_IP_PORT);
         }
     }
 }

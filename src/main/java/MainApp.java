@@ -15,7 +15,7 @@ public class MainApp extends Application {
             loginController.start(primaryStage);
 
         } catch (Exception ex) {
-            AlertWindows.createExceptionAlert(ex.getMessage(), ex);
+            new AlertWindows().createExceptionAlert(ex.getMessage(), ex);
         }
     }
 

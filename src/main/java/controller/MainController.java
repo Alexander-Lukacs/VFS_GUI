@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TreeView;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -16,6 +17,7 @@ import tools.AlertWindows;
 
 import java.io.IOException;
 
+import static controller.constants.ApplicationConstants.GC_APPLICATION_ICON_PATH;
 import static controller.constants.SettingsConstants.*;
 
 public class MainController {
@@ -43,6 +45,7 @@ public class MainController {
             Scene lob_scene = new Scene(lob_pane);
             Stage lob_stage = new Stage();
             lob_stage.setTitle(GC_SETTINGS);
+            lob_stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream(GC_APPLICATION_ICON_PATH)));
             lob_stage.setResizable(false);
             lob_stage.setScene(lob_scene);
             lob_stage.show();
@@ -70,10 +73,11 @@ public class MainController {
             SplitPane lob_pane = lob_loader.load();
             Scene lob_scene = new Scene(lob_pane);
             lob_stage.setTitle(GC_VFS);
+            lob_stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream(GC_APPLICATION_ICON_PATH)));
             lob_stage.setScene(lob_scene);
             lob_stage.show();
         } catch (IOException e) {
-            AlertWindows.createExceptionAlert(e.getMessage(), e);
+            new AlertWindows().createExceptionAlert(e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
