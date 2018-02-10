@@ -68,9 +68,6 @@ public class MainController {
         userCache = DataCache.getDataCache();
         gob_treeView = new TreeView<>();
         TreeControl lob_treeControl = new TreeControl(gob_treeView, userCache.get(DataCache.GC_IP_KEY), userCache.get(DataCache.GC_PORT_KEY));
-//        TreeImpl x = new TreeImpl(Utils.getUserBasePath());
-//        TreeItem<String> root = new TreeItem<>(x.getRoot().getCanonicalPath());
-//        createTree(root);
         gob_vbox.getChildren().add(gob_treeView);
     }
 
@@ -88,22 +85,4 @@ public class MainController {
             throw new RuntimeException(e);
         }
     }
-
-//    private void createTree(TreeItem<String> rootItem) throws IOException {
-//
-//        try (DirectoryStream<String> directoryStream = Files.newDirectoryStream(rootItem.getValue())) {
-//
-//            for (String path : directoryStream) {
-//
-//                TreeItem<String> newItem = new TreeItem<>(path);
-//                newItem.setExpanded(true);
-//
-//                rootItem.getChildren().add(newItem);
-//
-//                if (Files.isDirectory(path)) {
-//                    createTree(newItem);
-//                }
-//            }
-//        }
-//    }
 }

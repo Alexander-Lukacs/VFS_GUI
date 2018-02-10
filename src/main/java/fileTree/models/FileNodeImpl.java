@@ -53,7 +53,7 @@ public class FileNodeImpl implements FileNode {
      */
     @Override
     public void removeChild(File iob_child) {
-        this.gco_children.removeIf(lob_child -> (iob_child.equals(lob_child)));
+        this.gco_children.removeIf(lob_child -> (iob_child.equals(lob_child.getFile())));
     }
 
     /**

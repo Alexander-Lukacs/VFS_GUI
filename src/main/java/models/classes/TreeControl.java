@@ -1,5 +1,8 @@
 package models.classes;
 
+import builder.RestClientBuilder;
+import cache.DataCache;
+import client.RestClient;
 import fileTree.interfaces.Tree;
 import fileTree.models.TreeImpl;
 import javafx.scene.Node;
@@ -23,11 +26,17 @@ public class TreeControl {
     private Tree gob_tree;
     private TreeView<String> gob_treeView;
     private ContextMenu gob_contextMenu;
+    private RestClient gob_restClient;
 
     public TreeControl(TreeView<String> iob_treeView, String iva_ip, String iva_port) {
         this.gob_treeView = iob_treeView;
         File lob_rootDirectory = new File(Utils.getUserBasePath());
         File lob_serverDirectory = new File(Utils.getUserBasePath() + "\\" + iva_ip + "_" + iva_port);
+        DataCache lob_dataCache = DataCache.getDataCache();
+        gob_restClient = RestClientBuilder.buildRestClientWithAuth(lob_dataCache.get(DataCache.GC_IP_KEY),
+                lob_dataCache.get(DataCache.GC_PORT_KEY),
+                lob_dataCache.get(DataCache.GC_EMAIL_KEY),
+                lob_dataCache.get(DataCache.GC_PASSWORD_KEY));
 
         //create the root directory if it does not exist
         if (!lob_rootDirectory.exists() || !lob_rootDirectory.isDirectory()) {
@@ -202,12 +211,19 @@ public class TreeControl {
     private void deleteFile() {
         //-------------------------------Variables----------------------------------------
         File lob_selectedFile = buildFileFromSelectedItem();
+        String lva_relativePath;
         //--------------------------------------------------------------------------------
+        try {
+            lva_relativePath = getRelativePath(lob_selectedFile.getCanonicalPath());
+            gob_restClient.deleteOnServer(lva_relativePath);
 
-        TreeItem<String> lob_selectedItem = gob_treeView.getSelectionModel().getSelectedItem();
-        lob_selectedItem.getParent().getChildren().remove(lob_selectedItem);
-        gob_tree.deleteFile(lob_selectedFile);
-        gob_treeView.refresh();
+            TreeItem<String> lob_selectedItem = gob_treeView.getSelectionModel().getSelectedItem();
+            lob_selectedItem.getParent().getChildren().remove(lob_selectedItem);
+            gob_tree.deleteFile(lob_selectedFile);
+            gob_treeView.refresh();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     private void deleteDirectoryOnly() {
@@ -238,6 +254,7 @@ public class TreeControl {
         String lva_newFilePath;
         int lva_counter = 1;
         TreeItem<String> lob_selectedItem;
+        String lva_relativeFilePath;
         //--------------------------------------------------------------------------------
         try {
             lob_selectedItem = gob_treeView.getSelectionModel().getSelectedItem();
@@ -258,11 +275,14 @@ public class TreeControl {
                 } while (lob_newFile.exists());
             }
 
-            System.out.println(lob_newFile.getCanonicalPath());
+            lva_relativeFilePath = getRelativePath(lob_newFile.getCanonicalPath());
+
             if (isDirectory) {
                 gob_tree.addFile(lob_newFile, true);
+                gob_restClient.createDirectoryOnServer(lva_relativeFilePath);
             } else {
                 gob_tree.addFile(lob_newFile, false);
+                gob_restClient.uploadFilesToServer(lob_newFile, lva_relativeFilePath);
             }
 
             addTreeItem(lob_selectedItem, lob_newFile);
@@ -284,5 +304,11 @@ public class TreeControl {
         }
         lob_path.insert(0, Utils.getUserBasePath());
         return gob_tree.getFile(lob_path.toString());
+    }
+
+    private String getRelativePath(String iva_filePath) throws IOException {
+        String lva_regex = gob_tree.getRoot().getCanonicalPath();
+        lva_regex = lva_regex.replaceAll("\\\\", "\\\\\\\\");
+        return iva_filePath.replaceFirst(lva_regex + "\\\\", "");
     }
 }

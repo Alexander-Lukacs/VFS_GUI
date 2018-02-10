@@ -1,6 +1,12 @@
 package client;
 
+import builder.RestClientBuilder;
+import cache.DataCache;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.jersey.multipart.FormDataMultiPart;
+import com.sun.jersey.multipart.MultiPart;
+import com.sun.jersey.multipart.file.FileDataBodyPart;
+import com.sun.jersey.multipart.impl.MultiPartWriter;
 import models.classes.UserImpl;
 import models.interfaces.User;
 import org.glassfish.jersey.client.ClientConfig;
@@ -14,6 +20,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -26,6 +33,7 @@ import static client.constants.HttpStatusCodes.GC_HTTP_OK;
 public class RestClient {
 
     private WebTarget webTarget;
+    private Client gob_client;
 
     public RestClient(String baseUrl) {
         Client client = ClientBuilder.newClient();
@@ -35,9 +43,9 @@ public class RestClient {
     public RestClient(String baseUrl, String iva_email, String iva_password) {
         HttpAuthenticationFeature authDetails = HttpAuthenticationFeature.basic(iva_email, iva_password);
         ClientConfig config = new ClientConfig(authDetails);
-        Client client = ClientBuilder.newClient(config);
-        client.register(authDetails);
-        webTarget = client.target(baseUrl);
+        gob_client = ClientBuilder.newClient(config);
+        gob_client.register(authDetails);
+        webTarget = gob_client.target(baseUrl);
     }
 
     public HttpMessage registerNewUser(User user) throws IOException {
@@ -114,5 +122,30 @@ public class RestClient {
         lob_httpMessage.setHttpStatus(response.getStatus());
 
         return lob_httpMessage;
+    }
+
+    public void uploadFilesToServer(File iob_filesToUpload, String iva_relativeFilePath) {
+        DataCache lob_dataCache = DataCache.getDataCache();
+        webTarget = gob_client.target("http://" + lob_dataCache.get(DataCache.GC_IP_KEY) + ":" + lob_dataCache.get(DataCache.GC_PORT_KEY) + "/api/auth/files/upload").queryParam("path", iva_relativeFilePath);
+
+
+        final FileDataBodyPart lob_filePart = new FileDataBodyPart("attachment", iob_filesToUpload);
+        MultiPart lob_multiPart = new FormDataMultiPart().bodyPart(lob_filePart);
+
+        //webTarget.path("/auth/files/upload").queryParam("path", iva_relativeFilePath);
+        webTarget.register(MultiPartWriter.class);
+        Response lob_response = webTarget.request().post(Entity.entity(lob_multiPart, lob_multiPart.getMediaType()));
+
+        System.out.println(iob_filesToUpload.getName() + ": " + lob_response.getStatus());
+    }
+
+    public void createDirectoryOnServer(String iva_relativeDirectoryPath) {
+        Response lob_response = webTarget.path("/auth/files/createDirectory").request().post(Entity.entity(iva_relativeDirectoryPath, MediaType.TEXT_PLAIN));
+        System.out.println(lob_response.getStatus());
+    }
+
+    public void deleteOnServer(String iva_relativePath) {
+        Response lob_response = webTarget.path("/auth/files/delete").request().post(Entity.entity(iva_relativePath, MediaType.TEXT_PLAIN));
+        System.out.println(lob_response.getStatus());
     }
 }
