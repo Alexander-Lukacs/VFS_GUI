@@ -127,24 +127,6 @@ public class RestClient {
         return createRestRequest(GC_REST_ADD_ADMIN_PATH, iob_user);
     }
 
-//----------------------------------------------------------------------------------------------------------------------
-
-    private RestResponse createRestRequest(String iva_requestPath, User iob_user) {
-        RestResponse lob_restResponse = new RestResponse();
-
-        try {
-            Response response = gob_webTarget.path(iva_requestPath).request()
-                    .put(Entity.entity(iob_user, MediaType.APPLICATION_JSON));
-
-            lob_restResponse.setResponseMessage(response.readEntity(String.class));
-            lob_restResponse.setHttpStatus(response.getStatus());
-        } catch (Exception ex) {
-            new AlertWindows().createExceptionAlert(ex.getMessage(), ex);
-        }
-
-        return lob_restResponse;
-    }
-
 // ---------------------------------------------------------------------------------------------------------------------
 // Upload a File to the Server
 // ---------------------------------------------------------------------------------------------------------------------
@@ -196,5 +178,23 @@ public class RestClient {
         Response lob_response = gob_webTarget.path("/auth/files/removeDirectoryOnly").request()
                 .post(Entity.entity(iva_relativePath, MediaType.TEXT_PLAIN));
         System.out.println(lob_response.getStatus());
+    }
+
+//----------------------------------------------------------------------------------------------------------------------
+
+    private RestResponse createRestRequest(String iva_requestPath, User iob_user) {
+        RestResponse lob_restResponse = new RestResponse();
+
+        try {
+            Response response = gob_webTarget.path(iva_requestPath).request()
+                    .put(Entity.entity(iob_user, MediaType.APPLICATION_JSON));
+
+            lob_restResponse.setResponseMessage(response.readEntity(String.class));
+            lob_restResponse.setHttpStatus(response.getStatus());
+        } catch (Exception ex) {
+            new AlertWindows().createExceptionAlert(ex.getMessage(), ex);
+        }
+
+        return lob_restResponse;
     }
 }
