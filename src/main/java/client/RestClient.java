@@ -1,6 +1,5 @@
 package client;
 
-import builder.RestClientBuilder;
 import cache.DataCache;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.multipart.FormDataMultiPart;
@@ -34,7 +33,6 @@ import static client.constants.RestResourcesPaths.*;
 
 public class RestClient {
     private WebTarget gob_webTarget;
-    private Client gob_client;
 
     public RestClient(String baseUrl) {
         Client lob_client = ClientBuilder.newClient();
@@ -147,28 +145,56 @@ public class RestClient {
         return lob_restResponse;
     }
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Upload a File to the Server
+// ---------------------------------------------------------------------------------------------------------------------
     public void uploadFilesToServer(File iob_filesToUpload, String iva_relativeFilePath) {
         DataCache lob_dataCache = DataCache.getDataCache();
-        gob_webTarget = gob_client.target("http://" + lob_dataCache.get(DataCache.GC_IP_KEY) + ":" + lob_dataCache.get(DataCache.GC_PORT_KEY) + "/api/auth/files/upload").queryParam("path", iva_relativeFilePath);
 
+        HttpAuthenticationFeature lob_authDetails = HttpAuthenticationFeature.basic(
+                lob_dataCache.get(DataCache.GC_EMAIL_KEY),
+                lob_dataCache.get(DataCache.GC_PASSWORD_KEY)
+
+        );
+        ClientConfig lob_config = new ClientConfig(lob_authDetails);
+        Client lob_client = ClientBuilder.newClient(lob_config);
+        lob_client.register(lob_authDetails);
+
+        WebTarget lob_target = lob_client.target("http://" + lob_dataCache.get(DataCache.GC_IP_KEY) + ":" + lob_dataCache.get(DataCache.GC_PORT_KEY) + "/api/auth/files/upload").queryParam("path", iva_relativeFilePath);
+        lob_target.register(MultiPartWriter.class);
 
         final FileDataBodyPart lob_filePart = new FileDataBodyPart("attachment", iob_filesToUpload);
         MultiPart lob_multiPart = new FormDataMultiPart().bodyPart(lob_filePart);
 
-        //webTarget.path("/auth/files/upload").queryParam("path", iva_relativeFilePath);
-        gob_webTarget.register(MultiPartWriter.class);
-        Response lob_response = gob_webTarget.request().post(Entity.entity(lob_multiPart, lob_multiPart.getMediaType()));
+        Response lob_response = lob_target.request().post(Entity.entity(lob_multiPart, lob_multiPart.getMediaType()));
 
         System.out.println(iob_filesToUpload.getName() + ": " + lob_response.getStatus());
     }
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Create a new Directory on the Server
+// ---------------------------------------------------------------------------------------------------------------------
     public void createDirectoryOnServer(String iva_relativeDirectoryPath) {
-        Response lob_response = gob_webTarget.path("/auth/files/createDirectory").request().post(Entity.entity(iva_relativeDirectoryPath, MediaType.TEXT_PLAIN));
+        Response lob_response = gob_webTarget.path("/auth/files/createDirectory").request()
+                .post(Entity.entity(iva_relativeDirectoryPath, MediaType.TEXT_PLAIN));
         System.out.println(lob_response.getStatus());
     }
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Delete a File or a Directory on the Server
+// ---------------------------------------------------------------------------------------------------------------------
     public void deleteOnServer(String iva_relativePath) {
-        Response lob_response = gob_webTarget.path("/auth/files/delete").request().post(Entity.entity(iva_relativePath, MediaType.TEXT_PLAIN));
+        Response lob_response = gob_webTarget.path("/auth/files/delete").request()
+                .post(Entity.entity(iva_relativePath, MediaType.TEXT_PLAIN));
+        System.out.println(lob_response.getStatus());
+    }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Delete a Directory and move the that it contained one up
+// ---------------------------------------------------------------------------------------------------------------------
+    public void deleteDirectoryOnly(String iva_relativePath) {
+        Response lob_response = gob_webTarget.path("/auth/files/removeDirectoryOnly").request()
+                .post(Entity.entity(iva_relativePath, MediaType.TEXT_PLAIN));
         System.out.println(lob_response.getStatus());
     }
 }

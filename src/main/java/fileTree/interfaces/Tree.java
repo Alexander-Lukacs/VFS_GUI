@@ -126,6 +126,22 @@ public interface Tree {
     boolean moveFile(String iva_path, String iva_destinationPath);
 
     /**
+     * rename a file
+     * @param iva_path path of the file to renam
+     * @param iva_newName new file name
+     * @return true if the file was renamed, otherwise false
+     */
+    boolean renameFile(String iva_path, String iva_newName);
+
+    /**
+     * rename a file
+     * @param iob_file file to rename
+     * @param iva_newName new file name
+     * @return true if the file was renamed, otherwise false
+     */
+    boolean renameFile(File iob_file, String iva_newName);
+
+    /**
      * compare this tree
      * @param iob_tree tree to compare to
      * @return the difference between the two trees

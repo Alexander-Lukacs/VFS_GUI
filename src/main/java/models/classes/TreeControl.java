@@ -5,17 +5,16 @@ import cache.DataCache;
 import client.RestClient;
 import fileTree.interfaces.Tree;
 import fileTree.models.TreeImpl;
+import fileTree.models.WatcherService;
 import javafx.scene.Node;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import tools.Utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 
 import static models.constants.TreeControlConstants.*;
 
@@ -61,6 +60,9 @@ public class TreeControl {
             );
 
             gob_treeView.setEditable(true);
+            Collection<File> lob_directoriesToWatch = gob_tree.getAllDirectories();
+            lob_directoriesToWatch.add(gob_tree.getRoot());
+            new WatcherService(lob_directoriesToWatch).start();
 
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -229,14 +231,26 @@ public class TreeControl {
     private void deleteDirectoryOnly() {
         //-------------------------------Variables----------------------------------------
         File lob_selectedFile = buildFileFromSelectedItem();
+        String lva_relativePath;
         //--------------------------------------------------------------------------------
 
-        TreeItem<String> lob_selectedItem = gob_treeView.getSelectionModel().getSelectedItem();
-        TreeItem<String> lob_parentItem = lob_selectedItem.getParent();
-        lob_parentItem.getChildren().addAll(lob_selectedItem.getChildren());
-        lob_parentItem.getChildren().remove(lob_selectedItem);
-        gob_tree.deleteDirectoryOnly(lob_selectedFile);
-        gob_treeView.refresh();
+        try {
+            TreeItem<String> lob_selectedItem = gob_treeView.getSelectionModel().getSelectedItem();
+            lva_relativePath = getRelativePath(lob_selectedFile.getCanonicalPath());
+
+            if (!gob_tree.deleteDirectoryOnly(lob_selectedFile)) {
+                return;
+            }
+
+            TreeItem<String> lob_parentItem = lob_selectedItem.getParent();
+            lob_parentItem.getChildren().addAll(lob_selectedItem.getChildren());
+            lob_parentItem.getChildren().remove(lob_selectedItem);
+
+            gob_restClient.deleteDirectoryOnly(lva_relativePath);
+            gob_treeView.refresh();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     private void createNewDirectory() {

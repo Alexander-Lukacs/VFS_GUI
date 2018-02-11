@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 
 public class TreeImpl implements Tree {
@@ -22,10 +23,6 @@ public class TreeImpl implements Tree {
             throw new IOException();
         }
         this.gva_basePath = this.gva_rootDirectory.replaceFirst("[^\\\\]*$", "");
-    }
-
-    public String getBasePath (){
-        return gva_basePath;
     }
 
     public FileNode getRootNode() {
@@ -116,7 +113,7 @@ public class TreeImpl implements Tree {
     @Override
     public File getFile(String iva_path) {
         //---------------------------Variables-----------------------------------
-        FileNode lob_getNode = null;
+        FileNode lob_getNode;
         //-----------------------------------------------------------------------
         try {
             lob_getNode = searchNode(this.gob_rootNode ,iva_path,0);
@@ -229,7 +226,7 @@ public class TreeImpl implements Tree {
 
             //delete all children as well
             for (FileNode lob_file : lob_nodeToRemove.getChildren()) {
-                deleteFile(lob_file.getFile());
+                deleteFile(lob_file.getFile().getCanonicalPath());
             }
 
             lob_nodeToRemove.removeAllChildren();
@@ -332,7 +329,6 @@ public class TreeImpl implements Tree {
         //----------------------Variables-----------------------
         FileNode lob_parent;
         FileNode lob_node;
-        boolean lva_moveFailed = true;
         //------------------------------------------------------
 
         try {
@@ -351,16 +347,17 @@ public class TreeImpl implements Tree {
             if (lob_parent != null) {
                 for (FileNode lob_child : lob_node.getChildren()) {
                     if(!moveFile(lob_child.getFile(), lob_parent.getFile().getCanonicalPath())){
-                        lva_moveFailed = false;
+                        return false;
                     }
+
                     lob_node.removeChild(lob_node.getFile());
                     lob_child.setParent(lob_parent);
                     lob_parent.addChild(lob_child);
                 }
                 lob_parent.removeChild(lob_node.getFile());
-                if (lva_moveFailed) {
-                    lob_node.getFile().delete();
-                }
+                refreshTree(gob_rootNode, "");
+
+                lob_node.getFile().delete();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -372,17 +369,27 @@ public class TreeImpl implements Tree {
     /**
      * move a file
      *
-     * @param iob_node file to move
+     * @param iob_file file to move
      * @param iva_destinationNode new file path
      * @return true if the file was moved, otherwise false
      */
     @Override
-    public boolean moveFile(File iob_node, String iva_destinationNode) {
+    public boolean moveFile(File iob_file, String iva_destinationNode) {
+
         try {
-            if (iob_node.isDirectory()) {
-                FileUtils.moveDirectoryToDirectory(iob_node, iob_node.getParentFile().getParentFile(), false);
+            FileNode lob_fileNode = searchNode(gob_rootNode, iob_file.getCanonicalPath(), 0);
+            FileNode lob_destination = searchNode(gob_rootNode, iva_destinationNode, 0);
+            File lob_destinationFile;
+            if (lob_fileNode == null || lob_destination == null) {
+                return false;
+            }
+
+            lob_destinationFile = lob_destination.getFile();
+
+            if (lob_fileNode.getFile().isDirectory()) {
+                FileUtils.moveDirectoryToDirectory(iob_file, lob_destinationFile, false);
             } else {
-                FileUtils.moveFileToDirectory(iob_node, iob_node.getParentFile().getParentFile(), false);
+                FileUtils.moveFileToDirectory(iob_file, lob_destinationFile, false);
             }
             return true;
         } catch (Exception e) {
@@ -413,56 +420,147 @@ public class TreeImpl implements Tree {
     }
 
     /**
-     * compare this tree
+     * rename a file
+     *
+     * @param iva_path    path of the file to renam
+     * @param iva_newName new file name
+     * @return true if the file was renamed, otherwise false
+     */
+    @Override
+    public boolean renameFile(String iva_path, String iva_newName) {
+        //--------------------------Variables-----------------------
+        FileNode lob_node;
+        //----------------------------------------------------------
+
+        try {
+            lob_node = searchNode(gob_rootNode, iva_path, 0);
+            if (lob_node == null) {
+                return false;
+            }
+
+            iva_newName = iva_path.replaceFirst("[^\\\\]*$", iva_newName);
+            return lob_node.getFile().renameTo(new File(iva_newName));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * rename a file
+     *
+     * @param iob_file    file to rename
+     * @param iva_newName new file name
+     * @return true if the file was renamed, otherwise false
+     */
+    @Override
+    public boolean renameFile(File iob_file, String iva_newName) {
+        try {
+            return renameFile(iob_file.getCanonicalPath(), iva_newName);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * compare two trees
      *
      * @param iob_tree tree to compare to
      * @return the difference between the two trees
      */
     @Override
     public TreeDifference compareTrees(Tree iob_tree) {
-        return null;
+        //------------------Variables----------------------------
+        TreeDifference lob_difference = new TreeDifferenceImpl();
+        Collection<File> lco_thisFiles = getAll();
+        Collection<File> lco_compareFiles = iob_tree.getAll();
+        String lva_thisRootPath;
+        String lva_treeRootPath;
+        String lva_thisFilePath;
+        String lva_treeFilePath;
+        Iterator<File> lob_treeFileIterator;
+        Iterator<File> lob_thisFileIterator;
+        File lob_treeFile;
+        File lob_thisFile;
+        //-------------------------------------------------------
+
+        try {
+            lva_thisRootPath = this.gva_rootDirectory;
+            lva_treeRootPath = iob_tree.getRoot().getCanonicalPath();
+
+            for (lob_thisFileIterator = lco_thisFiles.iterator(); lob_thisFileIterator.hasNext();) {
+                lob_thisFile = lob_thisFileIterator.next();
+                //remove everything including from the path including root to get a relative path
+                lva_thisFilePath = lob_thisFile.getCanonicalPath();
+                lva_thisFilePath = lva_thisFilePath.replace(lva_thisRootPath, "");
+                for(lob_treeFileIterator = lco_compareFiles.iterator(); lob_treeFileIterator.hasNext();) {
+                    lob_treeFile = lob_treeFileIterator.next();
+                    lva_treeFilePath = lob_treeFile.getCanonicalPath();
+                    lva_treeFilePath = lva_treeFilePath.replace(lva_treeRootPath, "");
+                    //check if the relative paths are the same
+                    if (lva_thisFilePath.equals(lva_treeFilePath)) {
+                        //check if the file on the server is newer
+                        if (lob_thisFile.lastModified() > lob_treeFile.lastModified()) {
+                            //add the file to the update list
+                            lob_difference.addFileToUpdate(lva_treeFilePath);
+                            lob_treeFileIterator.remove();
+                            lob_thisFileIterator.remove();
+                            break;
+                        }
+                    }
+                }
+            }
+
+            for (File lob_file : lco_thisFiles) {
+                lva_thisFilePath = lob_file.getCanonicalPath();
+                lva_thisFilePath = lva_thisFilePath.replace(lva_thisRootPath, "");
+                lob_difference.addFileToInsert(lva_thisFilePath);
+            }
+
+            for (File lob_file : lco_compareFiles) {
+                lva_treeFilePath = lob_file.getCanonicalPath();
+                lva_treeFilePath = lva_treeFilePath.replace(lva_treeRootPath, "");
+                lob_difference.addFileToInsert(lva_treeFilePath);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return lob_difference;
     }
 
-//    @Override
-//    public TreeDifference compareTrees(TreeInterface iob_tree) {
-//        //---------------------------Variables-----------------------------
-//        boolean lva_treeExceptionStatus = iob_tree.isExceptionActive();
-//        boolean lva_tmpExceptionStatus = this.gva_nodeNotFoundExceptionStatus;
-//        Collection<NodeInterface> lco_thisTreeCollection = this.getAll();
-//        Collection<NodeInterface> lco_treeCollection = iob_tree.getAll();
-//        Collection<NodeInterface> lco_nodesToUpdate = new ArrayList<>();
-//        Collection<NodeInterface> lco_nodesToDelete = new ArrayList<>();
-//        Collection<NodeInterface> lco_nodesToInsert = new ArrayList<>();
-//        NodeInterface lob_treeNode;
-//        TreeDifference rob_treeDifference = new TreeDifference();
-//        //-----------------------------------------------------------------
-//
-//        iob_tree.setNodeNotFoundExceptionStatus(false);
-//        this.gva_nodeNotFoundExceptionStatus = false;
-//
-//        for (NodeInterface lob_collectionNode : lco_thisTreeCollection) {
-//            lob_treeNode = iob_tree.getNode(lob_collectionNode.getPath());
-//
-//            if (lob_treeNode == null) {
-//                lco_nodesToDelete.add(lob_collectionNode);
-//            } else if (lob_treeNode.getSize() != lob_collectionNode.getSize()) {
-//                //the nodesize is different so it must be updated
-//                lco_nodesToUpdate.add(lob_treeNode);
-//            }
-//            lco_treeCollection.remove(lob_treeNode);
-//        }
-//
-//
-//
-//        rob_treeDifference.setNodesToUpdate(lco_nodesToUpdate);
-//        rob_treeDifference.setNodesToDelete(lco_nodesToDelete);
-//        rob_treeDifference.setNodesToInsert(lco_treeCollection);
-//
-//        iob_tree.setNodeNotFoundExceptionStatus(lva_treeExceptionStatus);
-//        this.gva_nodeNotFoundExceptionStatus = lva_tmpExceptionStatus;
-//
-//        return rob_treeDifference;
-//    }
+    /**
+     * its possible that some nodes point to files, do not exist anymore. This can happen after a directory or a file
+     * has been moved
+     *
+     * WARNIG: This method must be called with a node that points to a correct file, otherwise the
+     * behaviour is unexpected
+     *
+     * @param iob_nodeToUpdate node that could contain a non existing file
+     * @param iva_parentPath path of the parent file (must have a correct file path)
+     */
+    private void refreshTree(FileNode iob_nodeToUpdate, String iva_parentPath) {
+        //---------------------------------Variables----------------------------
+        String lva_newFilePath;
+        //----------------------------------------------------------------------
+
+        try {
+            if (!iob_nodeToUpdate.getFile().exists()) {
+                lva_newFilePath = iva_parentPath + "\\" + iob_nodeToUpdate.getFile().getName();
+
+                iob_nodeToUpdate.setFile(new File(lva_newFilePath));
+            }
+
+            for (FileNode lob_child : iob_nodeToUpdate.getChildren()) {
+                refreshTree(lob_child, iob_nodeToUpdate.getFile().getCanonicalPath());
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
 
     private FileNode addNode(FileNode iob_parent, FileNode iob_nodeToInsert, int depth) throws IOException{
         //------------------------------------Variables---------------------------------------------------------
@@ -523,7 +621,7 @@ public class TreeImpl implements Tree {
         return iva_path.split("\\\\");
     }
 
-    public String removeBasePath(String iva_path) {
+    private String removeBasePath(String iva_path) {
         String lva_replacePattern = this.gva_basePath.replaceAll("\\\\", "\\\\\\\\");
         return iva_path.replaceFirst(lva_replacePattern, "");
     }
