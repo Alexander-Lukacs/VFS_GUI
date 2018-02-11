@@ -5,6 +5,7 @@ import cache.DataCache;
 import client.RestClient;
 import fileTree.interfaces.Tree;
 import fileTree.models.TreeImpl;
+import fileTree.models.TreeSingleton;
 import fileTree.models.WatcherService;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -48,7 +49,9 @@ public class TreeControl {
         }
 
         try {
-            gob_tree = new TreeImpl(lob_serverDirectory.getCanonicalPath());
+            TreeSingleton.setTreeRootPath(lob_serverDirectory.getCanonicalPath());
+            gob_tree = TreeSingleton.getInstance().getTree();
+
             TreeItem<String> lob_root = new TreeItem<>(gob_tree.getRoot().getName());
             lob_root.setGraphic(getTreeIcon(GC_DIRECTORY_ICON));
             gob_treeView.setRoot(lob_root);
@@ -62,8 +65,8 @@ public class TreeControl {
             gob_treeView.setEditable(true);
             Collection<File> lob_directoriesToWatch = gob_tree.getAllDirectories();
             lob_directoriesToWatch.add(gob_tree.getRoot());
-            new WatcherService(lob_directoriesToWatch).start();
 
+            new WatcherService(lob_directoriesToWatch).start();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
