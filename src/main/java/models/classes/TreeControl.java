@@ -11,6 +11,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import tools.TreeTool;
 import tools.Utils;
 
 import java.io.File;
@@ -28,8 +29,7 @@ public class TreeControl {
     private ContextMenu gob_contextMenu;
     private RestClient gob_restClient;
 
-    public TreeControl(TreeView<String> iob_treeView, String iva_ip, String iva_port) {
-        this.gob_treeView = iob_treeView;
+    public TreeControl(String iva_ip, String iva_port) {
         File lob_rootDirectory = new File(Utils.getUserBasePath());
         File lob_serverDirectory = new File(Utils.getUserBasePath() + "\\" + iva_ip + "_" + iva_port);
         DataCache lob_dataCache = DataCache.getDataCache();
@@ -51,9 +51,10 @@ public class TreeControl {
         try {
             TreeSingleton.setTreeRootPath(lob_serverDirectory.getCanonicalPath());
             gob_tree = TreeSingleton.getInstance().getTree();
+            gob_treeView = TreeSingleton.getInstance().getTreeView();
 
             TreeItem<String> lob_root = new TreeItem<>(gob_tree.getRoot().getName());
-            lob_root.setGraphic(getTreeIcon(GC_DIRECTORY_ICON));
+            lob_root.setGraphic(TreeTool.getInstance().getTreeIcon(GC_DIRECTORY_ICON));
             gob_treeView.setRoot(lob_root);
             addFilesToTree(gob_tree.getRoot(), gob_treeView.getRoot());
             buildContextMenu();
@@ -86,19 +87,19 @@ public class TreeControl {
                 for (File lob_directoryChildFile : lob_fileList) {
                     //if the directory contains another directory, do the same for it
                     if (lob_directoryChildFile.isDirectory()) {
-                        lob_newItem = addTreeItem(iob_treeItem, lob_directoryChildFile);
+                        lob_newItem = TreeTool.getInstance().addTreeItem(iob_treeItem, lob_directoryChildFile);
 
                         addFilesToTree(lob_directoryChildFile, lob_newItem);
                     } else {
                         //add normal file
                         addFile(lob_directoryChildFile, false);
-                        addTreeItem(iob_treeItem, lob_directoryChildFile);
+                        TreeTool.getInstance().addTreeItem(iob_treeItem, lob_directoryChildFile);
                     }
                 }
             }
         } else {
             addFile(iob_file, false);
-            addTreeItem(iob_treeItem, iob_file);
+            TreeTool.getInstance().addTreeItem(iob_treeItem, iob_file);
         }
     }
 
@@ -106,47 +107,47 @@ public class TreeControl {
         this.gob_tree.addFile(iob_file, iva_isDirectory);
     }
 
-    private TreeItem<String> addTreeItem(TreeItem<String> iob_parent, File iob_file) {
-        String lva_fileType;
-        TreeItem<String> rob_child = new TreeItem<>(iob_file.getName());
-        if (iob_file.isDirectory()) {
-            rob_child.setGraphic(getTreeIcon(GC_DIRECTORY_ICON));
-        } else {
-            lva_fileType = iob_file.getName().replaceFirst(".*\\.","");
-            rob_child.setGraphic(getTreeIcon(lva_fileType));
-        }
-
-        iob_parent.getChildren().add(rob_child);
-        return rob_child;
-    }
-
-    private Node getTreeIcon(String iva_iconName) {
-        ImageView rob_imageView;
-        switch (iva_iconName) {
-            case GC_DIRECTORY_ICON:
-                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("images/fileIcons/ICON_DIR.png")));
-                break;
-            case GC_TEXT_FILE:
-                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("images/fileIcons/ICON_TXT.png")));
-                break;
-            case GC_EXCEL_FILE:
-                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("images/fileIcons/ICON_EXCEL.png")));
-                break;
-            case GC_PDF_FILE:
-                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("images/fileIcons/ICON_PDF.png")));
-                break;
-            case GC_WORD_FILE:
-                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("images/fileIcons/ICON_WORD.png")));
-                break;
-            case GC_XML_FILE:
-                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("images/fileIcons/ICON_XML.png")));
-                break;
-            default:
-                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("images/fileIcons/ICON_FILE.png")));
-        }
-
-        return rob_imageView;
-    }
+//    public TreeItem<String> addTreeItem(TreeItem<String> iob_parent, File iob_file) {
+//        String lva_fileType;
+//        TreeItem<String> rob_child = new TreeItem<>(iob_file.getName());
+//        if (iob_file.isDirectory()) {
+//            rob_child.setGraphic(getTreeIcon(GC_DIRECTORY_ICON));
+//        } else {
+//            lva_fileType = iob_file.getName().replaceFirst(".*\\.","");
+//            rob_child.setGraphic(getTreeIcon(lva_fileType));
+//        }
+//
+//        iob_parent.getChildren().add(rob_child);
+//        return rob_child;
+//    }
+//
+//    public Node getTreeIcon(String iva_iconName) {
+//        ImageView rob_imageView;
+//        switch (iva_iconName) {
+//            case GC_DIRECTORY_ICON:
+//                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("images/fileIcons/ICON_DIR.png")));
+//                break;
+//            case GC_TEXT_FILE:
+//                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("images/fileIcons/ICON_TXT.png")));
+//                break;
+//            case GC_EXCEL_FILE:
+//                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("images/fileIcons/ICON_EXCEL.png")));
+//                break;
+//            case GC_PDF_FILE:
+//                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("images/fileIcons/ICON_PDF.png")));
+//                break;
+//            case GC_WORD_FILE:
+//                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("images/fileIcons/ICON_WORD.png")));
+//                break;
+//            case GC_XML_FILE:
+//                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("images/fileIcons/ICON_XML.png")));
+//                break;
+//            default:
+//                rob_imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("images/fileIcons/ICON_FILE.png")));
+//        }
+//
+//        return rob_imageView;
+//    }
 
     private void buildContextMenu() {
         //-----------------------Variables---------------------------------
@@ -257,11 +258,11 @@ public class TreeControl {
     }
 
     private void createNewDirectory() {
-        createFileOrDirectory("\\neuer Ordner$", true);
+        createFileOrDirectory("\\Neuer Ordner$", true);
     }
 
     private void createNewFile() {
-        createFileOrDirectory("\\neue Datei$.txt", false);
+        createFileOrDirectory("\\Neue Datei$.txt", false);
     }
 
     private void createFileOrDirectory(String iva_name, boolean isDirectory) {
@@ -294,6 +295,8 @@ public class TreeControl {
 
             lva_relativeFilePath = getRelativePath(lob_newFile.getCanonicalPath());
 
+            TreeSingleton.getInstance().getDuplicateFilePrevention().putCreated(lob_newFile.toPath());
+
             if (isDirectory) {
                 gob_tree.addFile(lob_newFile, true);
                 gob_restClient.createDirectoryOnServer(lva_relativeFilePath);
@@ -302,7 +305,8 @@ public class TreeControl {
                 gob_restClient.uploadFilesToServer(lob_newFile, lva_relativeFilePath);
             }
 
-            addTreeItem(lob_selectedItem, lob_newFile);
+
+            TreeTool.getInstance().addTreeItem(lob_selectedItem, lob_newFile);
             gob_treeView.refresh();
 
         } catch (IOException ex) {
