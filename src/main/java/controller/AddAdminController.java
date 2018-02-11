@@ -9,8 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import models.classes.UserImpl;
-import models.interfaces.User;
+import models.classes.User;
 import tools.Utils;
 
 import java.util.List;
@@ -31,7 +30,7 @@ public class AddAdminController {
     private AnchorPane gob_rootPane;
     @FXML
     private ListView<String> gob_lvUser;
-    private List<UserImpl> gob_userList;
+    private List<User> gob_userList;
 
     private DataCache gob_dataCache;
 

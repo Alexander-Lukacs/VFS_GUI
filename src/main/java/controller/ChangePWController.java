@@ -1,6 +1,5 @@
 package controller;
 
-import builder.ModelObjectBuilder;
 import builder.RestClientBuilder;
 import cache.DataCache;
 import client.RestClient;
@@ -10,7 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
-import models.interfaces.User;
+import models.classes.User;
 import tools.AlertWindows;
 import tools.Utils;
 import tools.Validation;
@@ -88,7 +87,7 @@ public class ChangePWController {
             lob_restClient = RestClientBuilder.buildRestClientWithAuth(lva_ip, lva_port,
                     lva_email, lva_oldCachedPassword);
 
-            lob_user = ModelObjectBuilder.getUserObject();
+            lob_user = new User();
             lob_user.setEmail(lva_email);
             lob_user.setPassword(lva_newPassword);
 

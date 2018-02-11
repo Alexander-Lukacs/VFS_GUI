@@ -4,8 +4,7 @@ import cache.DataCache;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.SelectionMode;
-import models.classes.UserImpl;
-import models.interfaces.User;
+import models.classes.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +34,7 @@ public class ListView {
         }
     }
 
-    public void loadUserList(javafx.scene.control.ListView<String> iob_lvUser, List<UserImpl> iob_userList){
+    public void loadUserList(javafx.scene.control.ListView<String> iob_lvUser, List<User> iob_userList) {
 
         List<String> lli_userList = new ArrayList<>();
 
