@@ -6,7 +6,6 @@ import tools.TreeTool;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,8 +34,6 @@ public class WatcherService extends Thread{
         try (WatchService service = FileSystems.getDefault().newWatchService()){
             gob_service = service;
             for (File lob_directoryToRegister : gco_files) {
-                System.out.println("register");
-                //registerDirectory(lob_directoryToRegister);
                 register(lob_directoryToRegister);
             }
 
@@ -53,53 +50,25 @@ public class WatcherService extends Thread{
                     lob_file = new File(lva_newFilePath);
 
                     if (lob_kind == ENTRY_CREATE) {
-//                        System.out.println(TreeSingleton.getInstance().getDuplicateFilePrevention().isFileCreated(lob_file.toPath()));
-//                        if(TreeSingleton.getInstance().getDuplicateFilePrevention().isFileCreated(lob_file.toPath())) {
-//                            TreeSingleton.getInstance().getDuplicateFilePrevention().removeCreated(lob_file.toPath());
-//                        } else {
-//                            addToTree(lob_file);
-//                            if (lob_file.isDirectory()) {
-//                                TreeSingleton.getInstance().getTree().addFile(lob_file, true);
-//                            } else {
-//                                TreeSingleton.getInstance().getTree().addFile(lob_file, false);
-//                            }
-//                        }
-//
-//                        if (lob_file.isDirectory()) {
-//                            System.out.println("registriert: " + lob_file.getCanonicalPath());
-//                            register(lob_file);
-//                        } else {
-//                            System.out.println("hinzufügen: " + lob_file.getCanonicalPath());
-//                        }
                         registerDirectory(lob_file);
                     }
 
                     if (lob_kind == ENTRY_DELETE) {
                         System.out.println(lob_file.getCanonicalPath());
+                        gob_keyMap.remove(lob_watchKey);
                     }
                 }
+//                boolean valid = lob_watchKey.reset();
+//                if (!valid) {
+//                    gob_keyMap.remove(lob_watchKey);
+//                }
             } while(lob_watchKey.reset());
-            System.out.println("errör");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private void registerDirectory(File iob_file) {
-        Path lob_path = iob_file.toPath();
-//        try {
-//            for (File lob_file : lob_path.toFile().listFiles()) {
-//
-//                if (lob_path.toFile().isDirectory()) {
-//                    register(lob_file);
-//                }
-//                registerDirectory(lob_file);
-//            }
-//
-//        } catch (Exception ex) {
-//            ex.printStackTrace();
-//        }
-
         try {
 
             if(TreeSingleton.getInstance().getDuplicateFilePrevention().isFileCreated(iob_file.toPath())) {
@@ -128,6 +97,7 @@ public class WatcherService extends Thread{
                 StandardWatchEventKinds.ENTRY_DELETE),
                 lob_path
         );
+        System.out.println("register: " + iob_file.getCanonicalPath());
     }
 
     private void addToTree(File iob_file) {
