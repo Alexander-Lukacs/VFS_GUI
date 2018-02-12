@@ -25,7 +25,9 @@ public class PreventFileDuplicates {
                 lob_value.gva_created = true;
             }
         } finally {
-            gob_lock.unlock();
+            if (gob_lock.isHeldByCurrentThread()) {
+                gob_lock.unlock();
+            }
         }
     }
 
@@ -40,7 +42,9 @@ public class PreventFileDuplicates {
                 lob_value.gva_deleted = true;
             }
         } finally {
-            gob_lock.unlock();
+            if (gob_lock.isHeldByCurrentThread()) {
+                gob_lock.unlock();
+            }
         }
     }
 
@@ -56,7 +60,9 @@ public class PreventFileDuplicates {
                 }
             }
         } finally {
-            gob_lock.unlock();
+            if (gob_lock.isHeldByCurrentThread()) {
+                gob_lock.unlock();
+            }
         }
     }
 
@@ -72,7 +78,9 @@ public class PreventFileDuplicates {
                 }
             }
         } finally {
-            gob_lock.unlock();
+            if (gob_lock.isHeldByCurrentThread()) {
+                gob_lock.unlock();
+            }
         }
     }
 
@@ -80,10 +88,11 @@ public class PreventFileDuplicates {
         gob_lock.lock();
         try {
             FileDuplicateValue lob_value = gob_map.get(iob_key);
-            //gob_lock.unlock();
             return lob_value != null && lob_value.gva_created;
         } finally {
-            gob_lock.unlock();
+            if (gob_lock.isHeldByCurrentThread()) {
+                gob_lock.unlock();
+            }
         }
     }
 
@@ -94,7 +103,9 @@ public class PreventFileDuplicates {
             gob_lock.unlock();
             return lob_value != null && lob_value.gva_deleted;
         } finally {
-            gob_lock.unlock();
+            if (gob_lock.isHeldByCurrentThread()) {
+                gob_lock.unlock();
+            }
         }
     }
 

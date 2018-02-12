@@ -3,6 +3,7 @@ package fileTree.models;
 import builder.RestClientBuilder;
 import cache.DataCache;
 import client.RestClient;
+import fileTree.interfaces.FileChangeListener;
 import fileTree.interfaces.Tree;
 import javafx.scene.control.*;
 import tools.TreeTool;
@@ -10,9 +11,8 @@ import tools.Utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collection;
-
-import static models.constants.TreeControlConstants.*;
 
 public class TreeControl {
 
@@ -59,9 +59,48 @@ public class TreeControl {
 
             gob_treeView.setEditable(true);
             Collection<File> lob_directoriesToWatch = gob_tree.getAllDirectories();
+            lob_directoriesToWatch.clear();
             lob_directoriesToWatch.add(gob_tree.getRoot());
 
-            new WatcherService(lob_directoriesToWatch).start();
+            NewWatchService w = new NewWatchService(gob_tree.getRoot().toPath(), new FileChangeListener() {
+                @Override
+                public void fileAdded(Path iob_path) {
+                    boolean lob_isDirectory = iob_path.toFile().isDirectory();
+                    System.out.println("fileAdded: " + iob_path);
+                    TreeTool.getInstance().addToTreeView(iob_path.toFile());
+                    TreeSingleton.getInstance().getTree().addFile(iob_path.toFile(), lob_isDirectory);
+                }
+
+                @Override
+                public void fileDeleted(Path iob_path) {
+                    System.out.println("fileDeleted: " + iob_path);
+                    try {
+                        String[] test = getRelativePath(iob_path.toString()).split("\\\\");
+                        int counter = 0;
+                        TreeItem<String> item = TreeSingleton.getInstance().getTreeView().getRoot();
+
+                        while (counter < test.length) {
+                            for (TreeItem<String> lob_child : item.getChildren()) {
+                                if (lob_child.getValue().equals(test[counter])) {
+                                    item = lob_child;
+                                    break;
+                                }
+                            }
+                            counter++;
+                        }
+                        TreeItem<String> parent = item.getParent();
+                        parent.getChildren().remove(item);
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void renamed(Path iob_oldPath, Path iob_newPath) {
+                    System.out.println("renamed: " + iob_newPath);
+                }
+            });
+            w.start();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -177,10 +216,20 @@ public class TreeControl {
 
             TreeItem<String> lob_selectedItem = gob_treeView.getSelectionModel().getSelectedItem();
             lob_selectedItem.getParent().getChildren().remove(lob_selectedItem);
+            addAll(lob_selectedFile);
             gob_tree.deleteFile(lob_selectedFile);
-            gob_treeView.refresh();
         } catch (IOException ex) {
             ex.printStackTrace();
+        }
+    }
+
+    private void addAll(File iob_file) {
+        TreeSingleton.getInstance().getDuplicateFilePrevention().putDeleted(iob_file.toPath());
+
+        if (iob_file.isDirectory()) {
+            for (File file : iob_file.listFiles()) {
+                addAll(file);
+            }
         }
     }
 
