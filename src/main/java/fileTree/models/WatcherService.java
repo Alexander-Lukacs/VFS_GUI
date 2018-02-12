@@ -53,30 +53,31 @@ public class WatcherService extends Thread{
                     lob_file = new File(lva_newFilePath);
 
                     if (lob_kind == ENTRY_CREATE) {
-                        if(TreeSingleton.getInstance().getDuplicateFilePrevention().isFileCreated(lob_file.toPath())) {
-                            TreeSingleton.getInstance().getDuplicateFilePrevention().removeCreated(lob_file.toPath());
-                        } else {
-                            addToTree(lob_file);
-                            if (lob_file.isDirectory()) {
-                                TreeSingleton.getInstance().getTree().addFile(lob_file, true);
-                            } else {
-                                TreeSingleton.getInstance().getTree().addFile(lob_file, false);
-                            }
-                        }
-
-                        if (lob_file.isDirectory()) {
-                            System.out.println("registriert: " + lob_file.getCanonicalPath());
-                            registerDirectory(lob_file);
-                        } else {
-                            System.out.println("hinzufügen: " + lob_file.getCanonicalPath());
-                        }
+//                        System.out.println(TreeSingleton.getInstance().getDuplicateFilePrevention().isFileCreated(lob_file.toPath()));
+//                        if(TreeSingleton.getInstance().getDuplicateFilePrevention().isFileCreated(lob_file.toPath())) {
+//                            TreeSingleton.getInstance().getDuplicateFilePrevention().removeCreated(lob_file.toPath());
+//                        } else {
+//                            addToTree(lob_file);
+//                            if (lob_file.isDirectory()) {
+//                                TreeSingleton.getInstance().getTree().addFile(lob_file, true);
+//                            } else {
+//                                TreeSingleton.getInstance().getTree().addFile(lob_file, false);
+//                            }
+//                        }
+//
+//                        if (lob_file.isDirectory()) {
+//                            System.out.println("registriert: " + lob_file.getCanonicalPath());
+//                            register(lob_file);
+//                        } else {
+//                            System.out.println("hinzufügen: " + lob_file.getCanonicalPath());
+//                        }
+                        registerDirectory(lob_file);
                     }
 
                     if (lob_kind == ENTRY_DELETE) {
                         System.out.println(lob_file.getCanonicalPath());
                     }
                 }
-
             } while(lob_watchKey.reset());
             System.out.println("errör");
         } catch (Exception e) {
@@ -86,17 +87,35 @@ public class WatcherService extends Thread{
 
     private void registerDirectory(File iob_file) {
         Path lob_path = iob_file.toPath();
+//        try {
+//            for (File lob_file : lob_path.toFile().listFiles()) {
+//
+//                if (lob_path.toFile().isDirectory()) {
+//                    register(lob_file);
+//                }
+//                registerDirectory(lob_file);
+//            }
+//
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//        }
+
         try {
-            Files.walkFileTree(lob_path, new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult preVisitDirectory(Path lob_dir, BasicFileAttributes attrs)
-                        throws IOException
-                {
-                    register(lob_dir.toFile());
-                    return FileVisitResult.CONTINUE;
+
+            if(TreeSingleton.getInstance().getDuplicateFilePrevention().isFileCreated(iob_file.toPath())) {
+                TreeSingleton.getInstance().getDuplicateFilePrevention().removeCreated(iob_file.toPath());
+            } else {
+                addToTree(iob_file);
+            }
+
+            if (iob_file.isDirectory()) {
+                register(iob_file);
+                for (File lob_file : iob_file.listFiles()) {
+                    registerDirectory(lob_file);
                 }
-            });
-        } catch (IOException ex) {
+            }
+
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -109,7 +128,6 @@ public class WatcherService extends Thread{
                 StandardWatchEventKinds.ENTRY_DELETE),
                 lob_path
         );
-        System.out.println(lob_path);
     }
 
     private void addToTree(File iob_file) {
