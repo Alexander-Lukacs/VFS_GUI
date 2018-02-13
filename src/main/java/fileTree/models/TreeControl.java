@@ -107,8 +107,8 @@ public class TreeControl {
                 }
 
                 @Override
-                public void renamed(Path iob_oldPath, Path iob_newPath) {
-                    System.out.println("renamed: " + iob_newPath);
+                public void renamedOrMoved(Path iob_oldPath, Path iob_newPath) {
+                    System.out.println("renamedOrMoved: " + iob_oldPath + " TO " + iob_newPath);
                 }
             });
             w.start();
@@ -227,19 +227,29 @@ public class TreeControl {
 
             TreeItem<String> lob_selectedItem = gob_treeView.getSelectionModel().getSelectedItem();
             lob_selectedItem.getParent().getChildren().remove(lob_selectedItem);
-            addAll(lob_selectedFile);
+            addAllDeleted(lob_selectedFile);
             gob_tree.deleteFile(lob_selectedFile);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
-    private void addAll(File iob_file) {
+    private void addAllDeleted(File iob_file) {
         TreeSingleton.getInstance().getDuplicateFilePrevention().putDeleted(iob_file.toPath());
 
         if (iob_file.isDirectory()) {
             for (File file : iob_file.listFiles()) {
-                addAll(file);
+                addAllDeleted(file);
+            }
+        }
+    }
+
+    private void addAllMovedOrRenamed(File iob_file) {
+        TreeSingleton.getInstance().getDuplicateFilePrevention().putRenamedOrMove(iob_file.toPath());
+
+        if (iob_file.isDirectory()) {
+            for (File file : iob_file.listFiles()) {
+                addAllDeleted(file);
             }
         }
     }
@@ -254,6 +264,10 @@ public class TreeControl {
             TreeItem<String> lob_selectedItem = gob_treeView.getSelectionModel().getSelectedItem();
             lva_relativePath = getRelativePath(lob_selectedFile.getCanonicalPath());
 
+            for (File lob_child : lob_selectedFile.listFiles()) {
+                addAllMovedOrRenamed(lob_child);
+            }
+
             if (!gob_tree.deleteDirectoryOnly(lob_selectedFile)) {
                 return;
             }
@@ -262,8 +276,8 @@ public class TreeControl {
             lob_parentItem.getChildren().addAll(lob_selectedItem.getChildren());
             lob_parentItem.getChildren().remove(lob_selectedItem);
 
+            TreeSingleton.getInstance().getDuplicateFilePrevention().putDeleted(lob_selectedFile.toPath());
             gob_restClient.deleteDirectoryOnly(lva_relativePath);
-            gob_treeView.refresh();
         } catch (IOException ex) {
             ex.printStackTrace();
         }

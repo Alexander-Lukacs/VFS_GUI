@@ -18,9 +18,9 @@ public interface FileChangeListener extends EventListener{
     void fileDeleted(Path iob_path);
 
     /**
-     * if a file was moved or renamed in the root directory or a subdirectoy this method is called
+     * if a file was moved or renamedOrMoved in the root directory or a subdirectoy this method is called
      * @param iob_oldPath old path of the file
      * @param iob_newPath new path of the file
      */
-    void renamed(Path iob_oldPath, Path iob_newPath);
+    void renamedOrMoved(Path iob_oldPath, Path iob_newPath);
 }

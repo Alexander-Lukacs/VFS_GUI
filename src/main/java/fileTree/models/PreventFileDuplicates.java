@@ -19,7 +19,7 @@ public class PreventFileDuplicates {
         try {
             FileDuplicateValue lob_value = gob_map.get(iob_key);
             if (lob_value == null) {
-                lob_value = new FileDuplicateValue(true, false);
+                lob_value = new FileDuplicateValue(true, false, false);
                 gob_map.put(iob_key, lob_value);
             } else {
                 lob_value.gva_created = true;
@@ -36,10 +36,27 @@ public class PreventFileDuplicates {
         try {
             FileDuplicateValue lob_value = gob_map.get(iob_key);
             if (lob_value == null) {
-                lob_value = new FileDuplicateValue(false, true);
+                lob_value = new FileDuplicateValue(false, true, false);
                 gob_map.put(iob_key, lob_value);
             } else {
                 lob_value.gva_deleted = true;
+            }
+        } finally {
+            if (gob_lock.isHeldByCurrentThread()) {
+                gob_lock.unlock();
+            }
+        }
+    }
+
+    public void putRenamedOrMove(Path iob_key) {
+        gob_lock.lock();
+        try {
+            FileDuplicateValue lob_value = gob_map.get(iob_key);
+            if (lob_value == null) {
+                lob_value = new FileDuplicateValue(false, false, true);
+                gob_map.put(iob_key, lob_value);
+            } else {
+                lob_value.gva_renamedOrRemoved = true;
             }
         } finally {
             if (gob_lock.isHeldByCurrentThread()) {
@@ -53,7 +70,7 @@ public class PreventFileDuplicates {
         try {
             FileDuplicateValue lob_value = gob_map.get(iob_key);
             if (lob_value != null) {
-                if (!lob_value.gva_deleted) {
+                if (!lob_value.gva_deleted && !lob_value.gva_renamedOrRemoved) {
                     gob_map.remove(iob_key);
                 } else {
                     lob_value.gva_created = false;
@@ -71,10 +88,28 @@ public class PreventFileDuplicates {
         try {
             FileDuplicateValue lob_value = gob_map.get(iob_key);
             if (lob_value != null) {
-                if (!lob_value.gva_created) {
+                if (!lob_value.gva_created && !lob_value.gva_renamedOrRemoved) {
                     gob_map.remove(iob_key);
                 } else {
                     lob_value.gva_deleted = false;
+                }
+            }
+        } finally {
+            if (gob_lock.isHeldByCurrentThread()) {
+                gob_lock.unlock();
+            }
+        }
+    }
+
+    public void removeRenamedOrDeleted(Path iob_key) {
+        gob_lock.lock();
+        try {
+            FileDuplicateValue lob_value = gob_map.get(iob_key);
+            if (lob_value != null) {
+                if (!lob_value.gva_created && !lob_value.gva_deleted) {
+                    gob_map.remove(iob_key);
+                } else {
+                    lob_value.gva_renamedOrRemoved = false;
                 }
             }
         } finally {
@@ -100,8 +135,19 @@ public class PreventFileDuplicates {
         gob_lock.lock();
         try {
             FileDuplicateValue lob_value = gob_map.get(iob_key);
-            gob_lock.unlock();
             return lob_value != null && lob_value.gva_deleted;
+        } finally {
+            if (gob_lock.isHeldByCurrentThread()) {
+                gob_lock.unlock();
+            }
+        }
+    }
+
+    public boolean isFileRenamedOrRemoved(Path iob_key) {
+        gob_lock.lock();
+        try {
+            FileDuplicateValue lob_value = gob_map.get(iob_key);
+            return lob_value != null && lob_value.gva_renamedOrRemoved;
         } finally {
             if (gob_lock.isHeldByCurrentThread()) {
                 gob_lock.unlock();
@@ -117,10 +163,12 @@ public class PreventFileDuplicates {
     private class FileDuplicateValue {
         private boolean gva_created;
         private boolean gva_deleted;
+        private boolean gva_renamedOrRemoved;
 
-        private FileDuplicateValue(boolean iva_created, boolean iva_deleted) {
+        private FileDuplicateValue(boolean iva_created, boolean iva_deleted, boolean iva_renamedOrRemoved) {
             this.gva_created = iva_created;
             this.gva_deleted = iva_deleted;
+            this.gva_renamedOrRemoved = iva_renamedOrRemoved;
         }
     }
 }
