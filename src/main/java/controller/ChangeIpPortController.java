@@ -8,7 +8,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import tools.AlertWindows;
 import tools.Validation;
-import tools.XmlTool;
+import tools.XmlTools;
 
 import static cache.DataCache.*;
 import static controller.constants.SettingsConstants.GC_ADMIN_ADD;
@@ -53,9 +53,8 @@ public class ChangeIpPortController {
                 AnchorPane lob_pane = lob_loader.load();
                 gob_rootPane.getChildren().setAll(lob_pane);
             }
-        } catch (Exception e) {
-
-        }
+            // TODO schauen ob es eine besser Methode gibt, als ein leerer catch block
+        } catch (Exception ignore) {}
     }
 
     public void onClick() {
@@ -66,9 +65,12 @@ public class ChangeIpPortController {
 
         if (Validation.isIpValid(lva_ip)) {
             if (Validation.isPortValid(lva_port)) {
+
                 lob_dataCache.replaceData(GC_IP_KEY, lva_ip);
                 lob_dataCache.replaceData(GC_PORT_KEY, lva_port);
-                XmlTool.createXml(lva_ip, lva_port, lob_dataCache.get(GC_EMAIL_KEY), lob_dataCache.get(GC_PASSWORD_KEY));
+                XmlTools.setIp(lva_ip);
+                XmlTools.setPort(lva_port);
+
             } else {
                 new AlertWindows().createWarningAlert(GC_WARNING_PORT);
             }

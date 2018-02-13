@@ -3,6 +3,7 @@ package controller;
 import builder.RestClientBuilder;
 import cache.DataCache;
 import client.RestClient;
+import fileTree.models.TreeControl;
 import fileTree.models.TreeSingleton;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -15,12 +16,10 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import fileTree.models.TreeControl;
 import tools.AlertWindows;
 
 import java.io.IOException;
 
-import static cache.DataCache.*;
 import static controller.constants.ApplicationConstants.GC_APPLICATION_ICON_PATH;
 import static controller.constants.SettingsConstants.*;
 
@@ -28,9 +27,6 @@ public class MainController {
 
     @FXML
     private Button gob_btnSettings;
-
-    @FXML
-    private TreeView<String> gob_treeView; //TODO Könte lokal gemacht werden, nur wie?
 
     @FXML
     private VBox gob_vBox = new VBox();
@@ -67,10 +63,10 @@ public class MainController {
         }
     }
 
-    public void initialize() throws IOException {
+    public void initialize() {
         gob_userCache = DataCache.getDataCache();
         TreeControl lob_treeControl = new TreeControl(gob_userCache.get(DataCache.GC_IP_KEY), gob_userCache.get(DataCache.GC_PORT_KEY));
-        gob_treeView = TreeSingleton.getInstance().getTreeView();
+        TreeView<String> gob_treeView = TreeSingleton.getInstance().getTreeView();
         gob_vBox.getChildren().add(gob_treeView);
     }
 

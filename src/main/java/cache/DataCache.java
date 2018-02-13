@@ -1,12 +1,11 @@
 package cache;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by Florian on 07.02.2018.
- *
+ * <p>
  * Data Cache to store user information
  */
 public class DataCache {
@@ -22,6 +21,10 @@ public class DataCache {
     private static Map<String, String> gob_dataCacheMap;
     private static DataCache gob_dataCache;
 
+    private DataCache() {
+        gob_dataCacheMap = new HashMap<>();
+    }
+
     /**
      * Singleton instance of the data cache
      *
@@ -35,14 +38,10 @@ public class DataCache {
         return gob_dataCache;
     }
 
-    private DataCache() {
-        gob_dataCacheMap = new HashMap<>();
-    }
-
     /**
      * Store a value in the cache
      *
-     * @param iva_key key
+     * @param iva_key   key
      * @param iva_value value
      */
     public void put(String iva_key, String iva_value) {
@@ -69,14 +68,10 @@ public class DataCache {
     /**
      * Replace a value
      *
-     * @param iva_key key
+     * @param iva_key   key
      * @param iva_value new value
      */
     public void replaceData(String iva_key, String iva_value) {
         gob_dataCacheMap.replace(iva_key, iva_value);
-    }
-
-    public Collection<String> getAllValues() {
-        return gob_dataCacheMap.values();
     }
 }

@@ -13,7 +13,7 @@ import models.classes.User;
 import tools.AlertWindows;
 import tools.Utils;
 import tools.Validation;
-import tools.XmlTool;
+import tools.XmlTools;
 
 import static cache.DataCache.*;
 import static client.constants.HttpStatusCodes.GC_HTTP_OK;
@@ -62,9 +62,8 @@ public class ChangePWController {
                 AnchorPane lob_pane = lob_loader.load();
                 gob_rootPane.getChildren().setAll(lob_pane);
             }
-        } catch (Exception e) {
-
-        }
+            // TODO schauen ob es eine besser Methode gibt, als ein leerer catch block
+        } catch (Exception ignore) {}
 
     }
 
@@ -72,9 +71,6 @@ public class ChangePWController {
         RestResponse lob_restResponse;
         RestClient lob_restClient;
         User lob_user;
-
-        String lva_ip = gob_dataCache.get(GC_IP_KEY);
-        String lva_port = gob_dataCache.get(GC_PORT_KEY);
 
         String lva_email = gob_dataCache.get(GC_EMAIL_KEY);
         String lva_oldCachedPassword = gob_dataCache.get(GC_PASSWORD_KEY);
@@ -96,7 +92,7 @@ public class ChangePWController {
                 Utils.printResponseMessage(lob_restResponse);
 
                 if (lob_restResponse.getHttpStatus() == GC_HTTP_OK) {
-                    XmlTool.createXml(lva_ip, lva_port, lva_email, lva_newPassword);
+                    XmlTools.setPassword(lva_newPassword);
                     gob_dataCache.replaceData(GC_PASSWORD_KEY, lva_newPassword);
                     // TODO close stage
                 }

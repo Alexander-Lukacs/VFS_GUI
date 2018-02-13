@@ -8,8 +8,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class NotifyServerThread extends Thread {
-    private static final int acceptTimeoutMillis = 500;
-    private static final int notifyServerPort = 32001;
+    private static final int GC_ACCEPT_TIMEOUT_MILLIS = 500;
+    private static final int GC_NOTIFY_SERVER_PORT = 32001;
 
     @Override
     public void run() {
@@ -20,8 +20,8 @@ public class NotifyServerThread extends Thread {
 
         try {
 
-            lob_notifyServer = new ServerSocket(notifyServerPort);
-            lob_notifyServer.setSoTimeout(acceptTimeoutMillis);
+            lob_notifyServer = new ServerSocket(GC_NOTIFY_SERVER_PORT);
+            lob_notifyServer.setSoTimeout(GC_ACCEPT_TIMEOUT_MILLIS);
 
             while (!isInterrupted()) {
                 try {

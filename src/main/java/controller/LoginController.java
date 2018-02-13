@@ -18,7 +18,7 @@ import models.classes.User;
 import tools.AlertWindows;
 import tools.Utils;
 import tools.Validation;
-import tools.XmlTool;
+import tools.XmlTools;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -53,9 +53,8 @@ public class LoginController {
     private TextField gob_tf_port;
     @FXML
     private TabPane gob_tabPane = new TabPane();
-    private String[] gob_ipPortEmailPasswordArray = new String[4];
+
     private DataCache gob_dataCache;
-    private Thread gob_notifyThread;
 
     @FXML
     public void initialize() {
@@ -68,15 +67,15 @@ public class LoginController {
                     }
                 }
         );
-        gob_ipPortEmailPasswordArray = XmlTool.readFromXml();
+
         setTextFromXmlToTf();
     }
 
     private void setTextFromXmlToTf() {
-        gob_tf_ipAddress.setText(gob_ipPortEmailPasswordArray[0]);
-        gob_tf_port.setText(gob_ipPortEmailPasswordArray[1]);
-        gob_tf_userLoginEmail.setText(gob_ipPortEmailPasswordArray[2]);
-        gob_tf_loginPassword.setText(gob_ipPortEmailPasswordArray[3]);
+        gob_tf_ipAddress.setText(XmlTools.getIp());
+        gob_tf_port.setText(XmlTools.getPort());
+        gob_tf_userLoginEmail.setText(XmlTools.getEmail());
+        gob_tf_loginPassword.setText(XmlTools.getPassword());
     }
 
     /**
@@ -108,7 +107,11 @@ public class LoginController {
                 if (lob_user != null) {
                     gob_dataCache.put(GC_PASSWORD_KEY, lva_password);
                     cacheUser(lob_user);
-                    XmlTool.createXml(lva_ip, lva_port, lva_email, lva_password);
+
+                    XmlTools.setIp(lva_ip);
+                    XmlTools.setPort(lva_port);
+                    XmlTools.setEmail(lva_email);
+                    XmlTools.setPassword(lva_password);
 
                     mainController.start(gob_stage);
                     close();
@@ -146,7 +149,11 @@ public class LoginController {
 
                 if (lob_restResponse.getHttpStatus() == GC_HTTP_OK) {
                     gob_tabPane.getSelectionModel().selectFirst();
-                    XmlTool.createXml(lva_ip, lva_port, lva_email, lva_password);
+
+                    XmlTools.setPort(lva_port);
+                    XmlTools.setIp(lva_ip);
+                    XmlTools.setEmail(lva_email);
+                    XmlTools.setPassword(lva_password);
                 }
 
             }
