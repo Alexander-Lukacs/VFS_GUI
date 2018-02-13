@@ -55,6 +55,7 @@ public class LoginController {
     private TabPane gob_tabPane = new TabPane();
     private String[] gob_ipPortEmailPasswordArray = new String[4];
     private DataCache gob_dataCache;
+    private Thread gob_notifyThread;
 
     @FXML
     public void initialize() {
@@ -108,6 +109,7 @@ public class LoginController {
                     gob_dataCache.put(GC_PASSWORD_KEY, lva_password);
                     cacheUser(lob_user);
                     XmlTool.createXml(lva_ip, lva_port, lva_email, lva_password);
+
                     mainController.start(gob_stage);
                     close();
                 }
