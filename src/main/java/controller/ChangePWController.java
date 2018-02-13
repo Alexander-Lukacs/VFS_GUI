@@ -62,9 +62,8 @@ public class ChangePWController {
                 AnchorPane lob_pane = lob_loader.load();
                 gob_rootPane.getChildren().setAll(lob_pane);
             }
-        } catch (Exception e) {
-
-        }
+            // TODO schauen ob es eine besser Methode gibt, als ein leerer catch block
+        } catch (Exception ignore) {}
 
     }
 
@@ -72,9 +71,6 @@ public class ChangePWController {
         RestResponse lob_restResponse;
         RestClient lob_restClient;
         User lob_user;
-
-        String lva_ip = gob_dataCache.get(GC_IP_KEY);
-        String lva_port = gob_dataCache.get(GC_PORT_KEY);
 
         String lva_email = gob_dataCache.get(GC_EMAIL_KEY);
         String lva_oldCachedPassword = gob_dataCache.get(GC_PASSWORD_KEY);

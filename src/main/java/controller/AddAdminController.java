@@ -1,7 +1,6 @@
 package controller;
 
 import builder.RestClientBuilder;
-import cache.DataCache;
 import client.RestClient;
 import client.RestResponse;
 import javafx.fxml.FXML;
@@ -14,7 +13,6 @@ import tools.Utils;
 
 import java.util.List;
 
-import static cache.DataCache.*;
 import static client.constants.HttpStatusCodes.GC_HTTP_OK;
 import static controller.constants.SettingsConstants.GC_CHANGE_IP_PORT;
 import static controller.constants.SettingsConstants.GC_CHANGE_PW;
@@ -32,12 +30,8 @@ public class AddAdminController {
     private ListView<String> gob_lvUser;
     private List<User> gob_userList;
 
-    private DataCache gob_dataCache;
-
     public void initialize() {
         RestClient lob_restClient;
-        gob_dataCache = DataCache.getDataCache();
-
         lob_restClient = RestClientBuilder.buildRestClientWithAuth();
 
         gob_userList = lob_restClient.getAllUser();
@@ -62,8 +56,8 @@ public class AddAdminController {
                 AnchorPane lob_pane = lob_loader.load();
                 gob_rootPane.getChildren().setAll(lob_pane);
             }
-        } catch (Exception e) {
-
+            // TODO schauen ob es eine besser Methode gibt, als ein leerer catch block
+        } catch (Exception ignore) {
         }
     }
 

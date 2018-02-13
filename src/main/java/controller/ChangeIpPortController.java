@@ -53,9 +53,8 @@ public class ChangeIpPortController {
                 AnchorPane lob_pane = lob_loader.load();
                 gob_rootPane.getChildren().setAll(lob_pane);
             }
-        } catch (Exception e) {
-
-        }
+            // TODO schauen ob es eine besser Methode gibt, als ein leerer catch block
+        } catch (Exception ignore) {}
     }
 
     public void onClick() {
