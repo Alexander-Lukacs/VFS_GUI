@@ -18,10 +18,11 @@ public class NotifyServerThread extends Thread {
         String lva_message;
 
         try {
-            while (!isInterrupted()) {
 
-                lob_notifyServer = new ServerSocket(notifyServerPort);
-                lob_notifyServer.setSoTimeout(acceptTimeoutMillis);
+            lob_notifyServer = new ServerSocket(notifyServerPort);
+            lob_notifyServer.setSoTimeout(acceptTimeoutMillis);
+
+            while (!isInterrupted()) {
                 lob_client = lob_notifyServer.accept();
 
                 lob_inputStream = new BufferedReader(new InputStreamReader(lob_client.getInputStream()));
@@ -31,7 +32,12 @@ public class NotifyServerThread extends Thread {
                 if (lva_message.equals("was ganz tolles")) {
                     //TODO do amazing stuff
                 }
+
+                lob_client.close();
+                lob_inputStream.close();
             }
+
+            lob_notifyServer.close();
 
         } catch (IOException ex) {
             ex.printStackTrace();
