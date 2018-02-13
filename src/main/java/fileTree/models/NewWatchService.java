@@ -87,6 +87,11 @@ public class NewWatchService implements Runnable{
         lco_scanned.keySet().forEach(lob_key -> {
             if (TreeSingleton.getInstance().getDuplicateFilePrevention().isFileCreated(lob_key)) {
                 TreeSingleton.getInstance().getDuplicateFilePrevention().removeCreated(lob_key);
+                try {
+                    register(lob_key);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             } else {
                 test.add(lob_key.toFile());
             }
