@@ -13,7 +13,7 @@ import models.classes.User;
 import tools.AlertWindows;
 import tools.Utils;
 import tools.Validation;
-import tools.XmlTool;
+import tools.XmlTools;
 
 import static cache.DataCache.*;
 import static client.constants.HttpStatusCodes.GC_HTTP_OK;
@@ -96,7 +96,7 @@ public class ChangePWController {
                 Utils.printResponseMessage(lob_restResponse);
 
                 if (lob_restResponse.getHttpStatus() == GC_HTTP_OK) {
-                    XmlTool.setPassword(lva_newPassword);
+                    XmlTools.setPassword(lva_newPassword);
                     gob_dataCache.replaceData(GC_PASSWORD_KEY, lva_newPassword);
                     // TODO close stage
                 }

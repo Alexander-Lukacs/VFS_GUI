@@ -14,7 +14,7 @@ import java.io.IOException;
 /**
  * Created by Mesut on 09.02.2018.
  */
-public class XmlTool {
+public class XmlTools {
     private static final String GC_ROOT_ELEMENT_NAME = "server";
     private static final String GC_IP_ELEMENT_NAME = "ip";
     private static final String GC_PORT_ELEMENT_NAME = "port";
@@ -164,6 +164,6 @@ public class XmlTool {
     }
 
     private static String getXmlFilePath() {
-        return XmlTool.class.getClassLoader().getResource("properties.xml").getPath();
+        return XmlTools.class.getClassLoader().getResource("properties.xml").getPath();
     }
 }
