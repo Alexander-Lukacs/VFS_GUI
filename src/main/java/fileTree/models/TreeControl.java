@@ -69,6 +69,15 @@ public class TreeControl {
                     System.out.println("fileAdded: " + iob_path);
                     TreeTool.getInstance().addToTreeView(iob_path.toFile());
                     TreeSingleton.getInstance().getTree().addFile(iob_path.toFile(), lob_isDirectory);
+                    try {
+                        if (iob_path.toFile().isDirectory()) {
+                            gob_restClient.createDirectoryOnServer(getRelativePath(iob_path.toString()));
+                        } else {
+                            gob_restClient.uploadFilesToServer(iob_path.toFile(), getRelativePath(iob_path.toString()));
+                        }
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
                 }
 
                 @Override
@@ -90,6 +99,8 @@ public class TreeControl {
                         }
                         TreeItem<String> parent = item.getParent();
                         parent.getChildren().remove(item);
+
+                        gob_restClient.deleteOnServer(getRelativePath(iob_path.toString()));
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
