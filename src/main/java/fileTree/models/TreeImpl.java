@@ -558,7 +558,7 @@ public class TreeImpl implements Tree {
             lva_parentNodePath = lob_oldFileNode.getParent().getFile().getCanonicalPath();
             lva_parentFilePath = lob_oldFileNode.getFile().getParent();
             //the node must be moved in the tree if the parents of the file and the node are not the same
-            if (!lva_parentFilePath.equals(lva_parentNodePath)) {
+            if (!lva_parentFilePath.equals(lva_parentNodePath) || iob_newFile.isDirectory()) {
                 lob_newParent = searchNode(gob_rootNode, lva_parentFilePath, 0);
                 if (lob_newParent == null) {
                     return false;
