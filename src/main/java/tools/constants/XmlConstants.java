@@ -4,10 +4,9 @@ package tools.constants;
  * Created by Mesut on 09.02.2018.
  */
 public abstract class XmlConstants {
-    public static final String GC_SERVER_PROPERTIES = "Properties";
-    public static final String GC_SERVER_NAME = "Server";
-    public static final String GC_SERVER_IP = "IP";
-    public static final String GC_SERVER_PORT = "Port";
-    public static final String GC_USER_EMAIL = "Email";
-    public static final String GC_USER_PASSWORD = "Password";
+    public static final String GC_ROOT_ELEMENT_NAME = "server";
+    public static final String GC_IP_ELEMENT_NAME = "ip";
+    public static final String GC_PORT_ELEMENT_NAME = "port";
+    public static final String GC_EMAIL_ELEMENT_NAME = "email";
+    public static final String GC_PASSWORD_ELEMENT_NAME = "password";
 }

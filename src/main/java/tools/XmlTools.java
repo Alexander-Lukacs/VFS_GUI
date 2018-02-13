@@ -10,47 +10,44 @@ import org.jdom2.output.XMLOutputter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Objects;
+
+import static tools.constants.XmlConstants.*;
 
 /**
  * Created by Mesut on 09.02.2018.
  */
 public class XmlTools {
-    private static final String GC_ROOT_ELEMENT_NAME = "server";
-    private static final String GC_IP_ELEMENT_NAME = "ip";
-    private static final String GC_PORT_ELEMENT_NAME = "port";
-    private static final String GC_EMAIL_ELEMENT_NAME = "email";
-    private static final String GC_PASSWORD_ELEMENT_NAME = "password";
+    public static String getIp() {
+        return readXml(GC_IP_ELEMENT_NAME);
+    }
 
     public static void setIp(String iva_newIp) {
         modify(GC_IP_ELEMENT_NAME, iva_newIp);
-    }
-
-    public static void setPort(String iva_newPort) {
-        modify(GC_PORT_ELEMENT_NAME, iva_newPort);
-    }
-
-    public static void setEmail(String iva_newEmail) {
-        modify(GC_EMAIL_ELEMENT_NAME, iva_newEmail);
-    }
-
-    public static void setPassword(String iva_password) {
-        modify(GC_PASSWORD_ELEMENT_NAME, iva_password);
-    }
-
-    public static String getIp() {
-        return readXml(GC_IP_ELEMENT_NAME);
     }
 
     public static String getPort() {
         return readXml(GC_PORT_ELEMENT_NAME);
     }
 
+    public static void setPort(String iva_newPort) {
+        modify(GC_PORT_ELEMENT_NAME, iva_newPort);
+    }
+
     public static String getEmail() {
         return readXml(GC_EMAIL_ELEMENT_NAME);
     }
 
+    public static void setEmail(String iva_newEmail) {
+        modify(GC_EMAIL_ELEMENT_NAME, iva_newEmail);
+    }
+
     public static String getPassword() {
         return readXml(GC_PASSWORD_ELEMENT_NAME);
+    }
+
+    public static void setPassword(String iva_password) {
+        modify(GC_PASSWORD_ELEMENT_NAME, iva_password);
     }
 
     private static void modify(String iva_elementName, String iva_newValue) {
@@ -104,10 +101,10 @@ public class XmlTools {
 
             lob_rootElement = lob_doc.getRootElement();
 
-            lob_selectedElement =  lob_rootElement.getChild(iva_elementToRead);
+            lob_selectedElement = lob_rootElement.getChild(iva_elementToRead);
             lob_elementValue = lob_selectedElement.getText();
 
-        } catch(JDOMException | IOException ex) {
+        } catch (JDOMException | IOException ex) {
             ex.printStackTrace();
         }
 
@@ -164,6 +161,6 @@ public class XmlTools {
     }
 
     private static String getXmlFilePath() {
-        return XmlTools.class.getClassLoader().getResource("properties.xml").getPath();
+        return Objects.requireNonNull(XmlTools.class.getClassLoader().getResource("properties.xml")).getPath();
     }
 }
