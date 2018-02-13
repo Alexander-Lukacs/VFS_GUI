@@ -3,6 +3,7 @@ package controller;
 import builder.RestClientBuilder;
 import cache.DataCache;
 import client.RestClient;
+import fileTree.models.TreeSingleton;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,7 +15,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import models.classes.TreeControl;
+import fileTree.models.TreeControl;
 import tools.AlertWindows;
 
 import java.io.IOException;
@@ -68,8 +69,8 @@ public class MainController {
 
     public void initialize() throws IOException {
         gob_userCache = DataCache.getDataCache();
-        gob_treeView = new TreeView<>();
-        TreeControl lob_treeControl = new TreeControl(gob_treeView, gob_userCache.get(GC_IP_KEY), gob_userCache.get(DataCache.GC_PORT_KEY));
+        TreeControl lob_treeControl = new TreeControl(gob_userCache.get(DataCache.GC_IP_KEY), gob_userCache.get(DataCache.GC_PORT_KEY));
+        gob_treeView = TreeSingleton.getInstance().getTreeView();
         gob_vBox.getChildren().add(gob_treeView);
     }
 

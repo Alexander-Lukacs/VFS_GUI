@@ -1,6 +1,7 @@
 package fileTree.models;
 
 import fileTree.interfaces.Tree;
+import javafx.scene.control.TreeView;
 
 import java.io.IOException;
 
@@ -8,6 +9,8 @@ public class TreeSingleton {
     private static TreeSingleton gob_instance;
     private Tree gob_tree;
     private static String gva_treeRoot;
+    private TreeView<String> gob_treeView;
+    private PreventFileDuplicates gob_preventFileDuplicated;
 
     public static TreeSingleton getInstance() {
         if (gob_instance == null) {
@@ -28,7 +31,17 @@ public class TreeSingleton {
         return this.gob_tree;
     }
 
+    public TreeView<String> getTreeView() {
+        return this.gob_treeView;
+    }
+
+    public PreventFileDuplicates getDuplicateFilePrevention() {
+        return this.gob_preventFileDuplicated;
+    }
+
     private TreeSingleton() throws IOException{
         gob_tree = new TreeImpl(gva_treeRoot);
+        gob_treeView = new TreeView<>();
+        gob_preventFileDuplicated = new PreventFileDuplicates();
     }
 }

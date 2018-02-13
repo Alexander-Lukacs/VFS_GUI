@@ -1,5 +1,6 @@
 package fileTree.models;
 
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import fileTree.interfaces.*;
 import org.apache.commons.io.FileUtils;
 
@@ -211,37 +212,30 @@ public class TreeImpl implements Tree {
     @Override
     public boolean deleteFile(String iva_path) {
         //---------------------------Variables-----------------------------------
-        FileNode lob_nodeToRemove;
-        FileNode lob_parentNode;
+        FileNode lob_parent;
+        FileNode lob_nodeToDelete;
+        boolean lva_deleteResult;
         //-----------------------------------------------------------------------
-
         try {
-            lob_nodeToRemove = searchNode(this.gob_rootNode,iva_path,0);
-            if (lob_nodeToRemove == null) {
+            lob_nodeToDelete = searchNode(gob_rootNode, iva_path, 0);
+
+            if (lob_nodeToDelete == null) {
                 return false;
             }
 
-            lob_parentNode = lob_nodeToRemove.getParent();
-            lob_nodeToRemove.setParent(null);
+            lob_parent = lob_nodeToDelete.getParent();
 
-            //delete all children as well
-            for (FileNode lob_file : lob_nodeToRemove.getChildren()) {
-                deleteFile(lob_file.getFile().getCanonicalPath());
+            lva_deleteResult = delete(iva_path);
+
+            if (lob_parent != null) {
+                lob_parent.removeChild(lob_nodeToDelete.getFile());
             }
 
-            lob_nodeToRemove.removeAllChildren();
-
-            lob_nodeToRemove.getFile().delete();
-
-            if (lob_parentNode != null) {
-                lob_parentNode.removeChild(lob_nodeToRemove.getFile());
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
             return false;
         }
-        return true;
+        return lva_deleteResult;
     }
 
     /**
@@ -719,6 +713,35 @@ public class TreeImpl implements Tree {
      */
     private boolean createDirectory(FileNode iob_node) {
         return iob_node.getFile().mkdir();
+    }
+
+    private boolean delete(String iva_path) {
+        //---------------------------Variables-----------------------------------
+        FileNode lob_nodeToRemove;
+        //-----------------------------------------------------------------------
+
+        try {
+            lob_nodeToRemove = searchNode(this.gob_rootNode,iva_path,0);
+            if (lob_nodeToRemove == null) {
+                return false;
+            }
+
+            lob_nodeToRemove.setParent(null);
+
+            //delete all children as well
+            Iterator<FileNode> lob_iterator;
+            for (lob_iterator = lob_nodeToRemove.getChildren().iterator(); lob_iterator.hasNext();) {
+                FileNode lob_file = lob_iterator.next();
+                delete(lob_file.getFile().getCanonicalPath());
+                lob_iterator.remove();
+            }
+            lob_nodeToRemove.getFile().delete();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 }
 
