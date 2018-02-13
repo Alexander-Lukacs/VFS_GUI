@@ -96,7 +96,7 @@ public class ChangePWController {
                 Utils.printResponseMessage(lob_restResponse);
 
                 if (lob_restResponse.getHttpStatus() == GC_HTTP_OK) {
-                    XmlTool.createXml(lva_ip, lva_port, lva_email, lva_newPassword);
+                    XmlTool.setPassword(lva_newPassword);
                     gob_dataCache.replaceData(GC_PASSWORD_KEY, lva_newPassword);
                     // TODO close stage
                 }

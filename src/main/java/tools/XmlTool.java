@@ -1,118 +1,169 @@
 package tools;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.File;
-
-import static tools.constants.XmlConstants.*;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * Created by Mesut on 09.02.2018.
  */
 public class XmlTool {
+    private static final String GC_ROOT_ELEMENT_NAME = "server";
+    private static final String GC_IP_ELEMENT_NAME = "ip";
+    private static final String GC_PORT_ELEMENT_NAME = "port";
+    private static final String GC_EMAIL_ELEMENT_NAME = "email";
+    private static final String GC_PASSWORD_ELEMENT_NAME = "password";
 
-    public static String[] readFromXml() {
-
-        String[] lob_ipPortEmailPasswordArray = new String[4];
-
-        if (checkIfFileExist()) {
-
-            try {
-
-                File fXmlFile = new File(Utils.getUserBasePath() + "\\properties.xml");
-                DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-                Document doc = dBuilder.parse(fXmlFile);
-
-                doc.getDocumentElement().normalize();
-
-                NodeList nList = doc.getElementsByTagName("Server");
-
-                for (int temp = 0; temp < nList.getLength(); temp++) {
-
-                    Node nNode = nList.item(temp);
-
-                    if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-
-                        Element eElement = (Element) nNode;
-
-                        lob_ipPortEmailPasswordArray[0] = eElement.getElementsByTagName("IP").item(0).getTextContent();
-                        lob_ipPortEmailPasswordArray[1] = eElement.getElementsByTagName("Port").item(0).getTextContent();
-                        lob_ipPortEmailPasswordArray[2] = eElement.getElementsByTagName("Email").item(0).getTextContent();
-                        lob_ipPortEmailPasswordArray[3] = eElement.getElementsByTagName("Password").item(0).getTextContent();
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            lob_ipPortEmailPasswordArray[0] = "";
-            lob_ipPortEmailPasswordArray[1] = "";
-            lob_ipPortEmailPasswordArray[2] = "";
-            lob_ipPortEmailPasswordArray[3] = "";
-        }
-        return lob_ipPortEmailPasswordArray;
+    public static void setIp(String iva_newIp) {
+        modify(GC_IP_ELEMENT_NAME, iva_newIp);
     }
 
+    public static void setPort(String iva_newPort) {
+        modify(GC_PORT_ELEMENT_NAME, iva_newPort);
+    }
 
-    public static void createXml(String iva_ip, String iva_port, String iva_email, String iva_password) {
+    public static void setEmail(String iva_newEmail) {
+        modify(GC_EMAIL_ELEMENT_NAME, iva_newEmail);
+    }
+
+    public static void setPassword(String iva_password) {
+        modify(GC_PASSWORD_ELEMENT_NAME, iva_password);
+    }
+
+    public static String getIp() {
+        return readXml(GC_IP_ELEMENT_NAME);
+    }
+
+    public static String getPort() {
+        return readXml(GC_PORT_ELEMENT_NAME);
+    }
+
+    public static String getEmail() {
+        return readXml(GC_EMAIL_ELEMENT_NAME);
+    }
+
+    public static String getPassword() {
+        return readXml(GC_PASSWORD_ELEMENT_NAME);
+    }
+
+    private static void modify(String iva_elementName, String iva_newValue) {
+        File lob_inputFile;
+        SAXBuilder lob_saxBuilder;
+        Document lob_doc;
+        Element lob_rootElement;
+        Element lob_elementToModify;
+
+        if (checkIfFileNotExist()) {
+            createXml();
+        }
+
         try {
+            lob_inputFile = new File(getXmlFilePath());
+            lob_saxBuilder = new SAXBuilder();
+            lob_doc = lob_saxBuilder.build(lob_inputFile);
+            lob_rootElement = lob_doc.getRootElement();
 
-            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
-            // root elements
-            Document doc = docBuilder.newDocument();
-            Element rootElement = doc.createElement(GC_SERVER_PROPERTIES);
-            doc.appendChild(rootElement);
+            lob_elementToModify = lob_rootElement.getChild(iva_elementName);
+            lob_elementToModify.setText(iva_newValue);
 
-            // server elements
-            Element server = doc.createElement(GC_SERVER_NAME);
-            rootElement.appendChild(server);
+            XMLOutputter xmlOutput = new XMLOutputter();
 
-            Element email = doc.createElement(GC_USER_EMAIL);
-            email.appendChild(doc.createTextNode(iva_email));
-            server.appendChild(email);
+            xmlOutput.setFormat(Format.getPrettyFormat());
+            xmlOutput.output(lob_doc, new FileWriter(getXmlFilePath()));
 
-            Element password = doc.createElement(GC_USER_PASSWORD);
-            password.appendChild(doc.createTextNode(iva_password));
-            server.appendChild(password);
-
-            // ip elements
-            Element ip = doc.createElement(GC_SERVER_IP);
-            ip.appendChild(doc.createTextNode(iva_ip));
-            server.appendChild(ip);
-
-            // port elements
-            Element port = doc.createElement(GC_SERVER_PORT);
-            port.appendChild(doc.createTextNode(iva_port));
-            server.appendChild(port);
-
-            // write the content into xml file
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            DOMSource source = new DOMSource(doc);
-            StreamResult result = new StreamResult(new File(Utils.getUserBasePath() + "\\properties.xml"));
-
-            transformer.transform(source, result);
-        } catch (ParserConfigurationException | TransformerException ex) {
+        } catch (JDOMException | IOException ex) {
             ex.printStackTrace();
         }
     }
 
-    private static boolean checkIfFileExist() {
-        File lob_file = new File(Utils.getUserBasePath() + "\\properties.xml");
-        return lob_file.exists();
+    private static String readXml(String iva_elementToRead) {
+        File lob_inputFile;
+        SAXBuilder lob_saxBuilder;
+
+        Document lob_doc;
+        Element lob_rootElement;
+        Element lob_selectedElement;
+        String lob_elementValue = "";
+
+        if (checkIfFileNotExist()) {
+            createXml();
+        }
+
+        try {
+            lob_inputFile = new File(getXmlFilePath());
+            lob_saxBuilder = new SAXBuilder();
+            lob_doc = lob_saxBuilder.build(lob_inputFile);
+
+            lob_rootElement = lob_doc.getRootElement();
+
+            lob_selectedElement =  lob_rootElement.getChild(iva_elementToRead);
+            lob_elementValue = lob_selectedElement.getText();
+
+        } catch(JDOMException | IOException ex) {
+            ex.printStackTrace();
+        }
+
+        return lob_elementValue;
+    }
+
+    private static void createXml() {
+        Document lob_doc;
+
+        Element lob_rootElement;
+        Element lob_ipElement;
+        Element lob_portElement;
+        Element lob_emailElement;
+        Element lob_passwordElement;
+
+        XMLOutputter lob_xmlOutput;
+        String lva_xmlFilePath;
+
+        try {
+            // root element
+            lob_rootElement = new Element(GC_ROOT_ELEMENT_NAME);
+            lob_doc = new Document(lob_rootElement);
+
+            // ip element
+            lob_ipElement = new Element(GC_IP_ELEMENT_NAME);
+
+            // port element
+            lob_portElement = new Element(GC_PORT_ELEMENT_NAME);
+
+            // email element
+            lob_emailElement = new Element(GC_EMAIL_ELEMENT_NAME);
+
+            // password element
+            lob_passwordElement = new Element(GC_PASSWORD_ELEMENT_NAME);
+
+            lob_doc.getRootElement().addContent(lob_ipElement);
+            lob_doc.getRootElement().addContent(lob_portElement);
+            lob_doc.getRootElement().addContent(lob_emailElement);
+            lob_doc.getRootElement().addContent(lob_passwordElement);
+
+            lob_xmlOutput = new XMLOutputter();
+            lob_xmlOutput.setFormat(Format.getPrettyFormat());
+
+            lva_xmlFilePath = getXmlFilePath();
+            lob_xmlOutput.output(lob_doc, new FileWriter(lva_xmlFilePath));
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private static boolean checkIfFileNotExist() {
+        return !new File(getXmlFilePath()).exists();
+    }
+
+    private static String getXmlFilePath() {
+        return XmlTool.class.getClassLoader().getResource("properties.xml").getPath();
     }
 }

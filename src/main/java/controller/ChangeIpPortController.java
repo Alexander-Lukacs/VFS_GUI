@@ -66,9 +66,12 @@ public class ChangeIpPortController {
 
         if (Validation.isIpValid(lva_ip)) {
             if (Validation.isPortValid(lva_port)) {
+
                 lob_dataCache.replaceData(GC_IP_KEY, lva_ip);
                 lob_dataCache.replaceData(GC_PORT_KEY, lva_port);
-                XmlTool.createXml(lva_ip, lva_port, lob_dataCache.get(GC_EMAIL_KEY), lob_dataCache.get(GC_PASSWORD_KEY));
+                XmlTool.setIp(lva_ip);
+                XmlTool.setPort(lva_port);
+
             } else {
                 new AlertWindows().createWarningAlert(GC_WARNING_PORT);
             }
