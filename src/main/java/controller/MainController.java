@@ -1,6 +1,8 @@
 package controller;
 
+import builder.RestClientBuilder;
 import cache.DataCache;
+import client.RestClient;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,6 +19,7 @@ import tools.AlertWindows;
 
 import java.io.IOException;
 
+import static cache.DataCache.*;
 import static controller.constants.ApplicationConstants.GC_APPLICATION_ICON_PATH;
 import static controller.constants.SettingsConstants.*;
 
@@ -39,6 +42,8 @@ public class MainController {
      */
 
     public void onClick(ActionEvent e) throws RuntimeException, IOException {
+        RestClient lob_restClient;
+
         if (((Button) e.getSource()).getText().equals(GC_SETTINGS)) {
             FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("views/settings.fxml"));
             AnchorPane lob_pane = lob_loader.load();
@@ -51,9 +56,11 @@ public class MainController {
             lob_stage.show();
 
         } else if (((Button) e.getSource()).getText().equals(GC_LOGOUT)) {
-            gob_userCache.clearDataCache();
+            lob_restClient = RestClientBuilder.buildRestClientWithAuth();
+            lob_restClient.unregisterClient();
             Stage stage = ((Stage) gob_btnSettings.getScene().getWindow());
             stage.close();
+            gob_userCache.clearDataCache();
             LoginController ob_x = new LoginController();
             ob_x.start(stage);
         }
@@ -62,7 +69,7 @@ public class MainController {
     public void initialize() throws IOException {
         gob_userCache = DataCache.getDataCache();
         gob_treeView = new TreeView<>();
-        TreeControl lob_treeControl = new TreeControl(gob_treeView, gob_userCache.get(DataCache.GC_IP_KEY), gob_userCache.get(DataCache.GC_PORT_KEY));
+        TreeControl lob_treeControl = new TreeControl(gob_treeView, gob_userCache.get(GC_IP_KEY), gob_userCache.get(DataCache.GC_PORT_KEY));
         gob_vBox.getChildren().add(gob_treeView);
     }
 

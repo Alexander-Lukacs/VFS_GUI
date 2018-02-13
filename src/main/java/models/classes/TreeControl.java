@@ -32,11 +32,8 @@ public class TreeControl {
         this.gob_treeView = iob_treeView;
         File lob_rootDirectory = new File(Utils.getUserBasePath());
         File lob_serverDirectory = new File(Utils.getUserBasePath() + "\\" + iva_ip + "_" + iva_port);
-        DataCache lob_dataCache = DataCache.getDataCache();
-        gob_restClient = RestClientBuilder.buildRestClientWithAuth(lob_dataCache.get(DataCache.GC_IP_KEY),
-                lob_dataCache.get(DataCache.GC_PORT_KEY),
-                lob_dataCache.get(DataCache.GC_EMAIL_KEY),
-                lob_dataCache.get(DataCache.GC_PASSWORD_KEY));
+
+        gob_restClient = RestClientBuilder.buildRestClientWithAuth();
 
         //create the root directory if it does not exist
         if (!lob_rootDirectory.exists() || !lob_rootDirectory.isDirectory()) {

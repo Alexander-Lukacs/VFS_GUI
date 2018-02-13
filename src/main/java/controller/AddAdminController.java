@@ -38,12 +38,7 @@ public class AddAdminController {
         RestClient lob_restClient;
         gob_dataCache = DataCache.getDataCache();
 
-        String lva_email = gob_dataCache.get(GC_EMAIL_KEY);
-        String lva_password = gob_dataCache.get(GC_PASSWORD_KEY);
-        String lva_ip = gob_dataCache.get(GC_IP_KEY);
-        String lva_port = gob_dataCache.get(GC_PORT_KEY);
-
-        lob_restClient = RestClientBuilder.buildRestClientWithAuth(lva_ip, lva_port, lva_email, lva_password);
+        lob_restClient = RestClientBuilder.buildRestClientWithAuth();
 
         gob_userList = lob_restClient.getAllUser();
 
@@ -73,15 +68,10 @@ public class AddAdminController {
     }
 
     public void onClick() {
-        String lva_ip = gob_dataCache.get(GC_IP_KEY);
-        String lva_port = gob_dataCache.get(GC_PORT_KEY);
-        String lva_password = gob_dataCache.get(GC_PASSWORD_KEY);
-        String lva_email = gob_dataCache.get(GC_EMAIL_KEY);
-
         RestResponse lob_restResponse;
         RestClient lob_restClient;
 
-        lob_restClient = RestClientBuilder.buildRestClientWithAuth(lva_ip, lva_port, lva_email, lva_password);
+        lob_restClient = RestClientBuilder.buildRestClientWithAuth();
 
         for (User lob_user : gob_userList) {
             if (lob_user.getEmail().equals(gob_lvUser.getSelectionModel().getSelectedItem())) {

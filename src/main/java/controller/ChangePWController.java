@@ -84,8 +84,7 @@ public class ChangePWController {
 
         if (isPasswordDataValid(lva_oldPassword, lva_oldCachedPassword, lva_newPassword, lva_confirmPassword)) {
 
-            lob_restClient = RestClientBuilder.buildRestClientWithAuth(lva_ip, lva_port,
-                    lva_email, lva_oldCachedPassword);
+            lob_restClient = RestClientBuilder.buildRestClientWithAuth();
 
             lob_user = new User();
             lob_user.setEmail(lva_email);

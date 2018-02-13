@@ -130,6 +130,7 @@ public class RestClient {
 // ---------------------------------------------------------------------------------------------------------------------
 // Upload a File to the Server
 // ---------------------------------------------------------------------------------------------------------------------
+
     public void uploadFilesToServer(File iob_filesToUpload, String iva_relativeFilePath) {
         DataCache lob_dataCache = DataCache.getDataCache();
 
@@ -156,6 +157,7 @@ public class RestClient {
 // ---------------------------------------------------------------------------------------------------------------------
 // Create a new Directory on the Server
 // ---------------------------------------------------------------------------------------------------------------------
+
     public void createDirectoryOnServer(String iva_relativeDirectoryPath) {
         Response lob_response = gob_webTarget.path("/auth/files/createDirectory").request()
                 .post(Entity.entity(iva_relativeDirectoryPath, MediaType.TEXT_PLAIN));
@@ -165,6 +167,7 @@ public class RestClient {
 // ---------------------------------------------------------------------------------------------------------------------
 // Delete a File or a Directory on the Server
 // ---------------------------------------------------------------------------------------------------------------------
+
     public void deleteOnServer(String iva_relativePath) {
         Response lob_response = gob_webTarget.path("/auth/files/delete").request()
                 .post(Entity.entity(iva_relativePath, MediaType.TEXT_PLAIN));
@@ -174,6 +177,7 @@ public class RestClient {
 // ---------------------------------------------------------------------------------------------------------------------
 // Delete a Directory and move the that it contained one up
 // ---------------------------------------------------------------------------------------------------------------------
+
     public void deleteDirectoryOnly(String iva_relativePath) {
         Response lob_response = gob_webTarget.path("/auth/files/removeDirectoryOnly").request()
                 .post(Entity.entity(iva_relativePath, MediaType.TEXT_PLAIN));
@@ -181,6 +185,14 @@ public class RestClient {
     }
 
 //----------------------------------------------------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Unregister the Client from Server
+// ---------------------------------------------------------------------------------------------------------------------
+
+    public void unregisterClient() {
+        gob_webTarget.path(GC_REST_UNREGISTER_CLIENT).request().get();
+    }
 
     private RestResponse createRestRequest(String iva_requestPath, User iob_user) {
         RestResponse lob_restResponse = new RestResponse();
