@@ -1,6 +1,5 @@
 package fileTree.models;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import fileTree.interfaces.*;
 import org.apache.commons.io.FileUtils;
 
@@ -349,7 +348,7 @@ public class TreeImpl implements Tree {
                     lob_parent.addChild(lob_child);
                 }
                 lob_parent.removeChild(lob_node.getFile());
-                refreshTree(gob_rootNode, "");
+                refreshTreeParentNodes(gob_rootNode, "");
 
                 lob_node.getFile().delete();
             }
@@ -385,6 +384,9 @@ public class TreeImpl implements Tree {
             } else {
                 FileUtils.moveFileToDirectory(iob_file, lob_destinationFile, false);
             }
+            lob_fileNode.getParent().getChildren().remove(lob_fileNode);
+            lob_destination.getChildren().add(lob_fileNode);
+            lob_fileNode.setParent(lob_destination);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -527,6 +529,57 @@ public class TreeImpl implements Tree {
     }
 
     /**
+     * replace the file of a node and move the node to the corresponding position in the tree
+     *
+     * @param iob_file    the old file that is not needed or does not exist anymore
+     * @param iob_newFile the new file
+     * @param iob_nodePointer use this only if you are sure that the node is in the correct position and just the file has
+     *                      to be replaced
+     */
+    @Override
+    public boolean replaceFile(File iob_file, File iob_newFile, FileNode iob_nodePointer) {
+        try {
+            String lva_filePath;
+            FileNode lob_oldFileNode;
+            if (iob_nodePointer == null) {
+                lob_oldFileNode = searchNode(gob_rootNode, iob_file.getCanonicalPath(), 0);
+            } else {
+                lob_oldFileNode = iob_nodePointer;
+            }
+
+            FileNode lob_newParent;
+            String lva_parentNodePath;
+            String lva_parentFilePath;
+            if (lob_oldFileNode == null) {
+                return false;
+            }
+
+            lob_oldFileNode.setFile(iob_newFile);
+            lva_parentNodePath = lob_oldFileNode.getParent().getFile().getCanonicalPath();
+            lva_parentFilePath = lob_oldFileNode.getFile().getParent();
+            //the node must be moved in the tree if the parents of the file and the node are not the same
+            if (!lva_parentFilePath.equals(lva_parentNodePath)) {
+                lob_newParent = searchNode(gob_rootNode, lva_parentFilePath, 0);
+                if (lob_newParent == null) {
+                    return false;
+                }
+                lob_oldFileNode.getParent().getChildren().remove(lob_oldFileNode);
+                lob_newParent.getChildren().add(lob_oldFileNode);
+                lob_oldFileNode.setParent(lob_newParent);
+                for (FileNode lob_child : lob_oldFileNode.getChildren()) {
+                    lva_filePath = iob_newFile.getCanonicalPath() + "\\" + lob_child.getFile().getName();
+                    replaceFile(lob_child.getFile(), new File(lva_filePath), lob_child);
+                }
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * its possible that some nodes point to files, do not exist anymore. This can happen after a directory or a file
      * has been moved
      *
@@ -536,7 +589,7 @@ public class TreeImpl implements Tree {
      * @param iob_nodeToUpdate node that could contain a non existing file
      * @param iva_parentPath path of the parent file (must have a correct file path)
      */
-    private void refreshTree(FileNode iob_nodeToUpdate, String iva_parentPath) {
+    private void refreshTreeParentNodes(FileNode iob_nodeToUpdate, String iva_parentPath) {
         //---------------------------------Variables----------------------------
         String lva_newFilePath;
         //----------------------------------------------------------------------
@@ -549,7 +602,7 @@ public class TreeImpl implements Tree {
             }
 
             for (FileNode lob_child : iob_nodeToUpdate.getChildren()) {
-                refreshTree(lob_child, iob_nodeToUpdate.getFile().getCanonicalPath());
+                refreshTreeParentNodes(lob_child, iob_nodeToUpdate.getFile().getCanonicalPath());
             }
         } catch (IOException ex) {
             ex.printStackTrace();

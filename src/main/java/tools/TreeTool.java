@@ -56,6 +56,41 @@ public class TreeTool {
         return new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("images/fileIcons/ICON_FILE.png")));
     }
 
+    public void removeFromTreeView(File iob_file) {
+        try {
+            boolean lva_childFound;
+            String[] test = getRelativePath(iob_file.getCanonicalPath()).split("\\\\");
+            int counter = 0;
+            TreeItem<String> item = TreeSingleton.getInstance().getTreeView().getRoot();
+
+
+            while (counter < test.length) {
+                lva_childFound = false;
+                for (TreeItem<String> lob_child : item.getChildren()) {
+                    if (lob_child.getValue().equals(test[counter])) {
+                        item = lob_child;
+                        lva_childFound = true;
+                        break;
+                    }
+                }
+                if (!lva_childFound) {
+                    return;
+                }
+                counter++;
+            }
+            TreeItem<String> parent = item.getParent();
+            parent.getChildren().remove(item);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public String getRelativePath(String iva_filePath) throws IOException {
+        String lva_regex = TreeSingleton.getInstance().getTree().getRoot().getCanonicalPath();
+        lva_regex = lva_regex.replaceAll("\\\\", "\\\\\\\\");
+        return iva_filePath.replaceFirst(lva_regex + "\\\\", "");
+    }
+
     public void addToTreeView(File iob_file) {
         try {
             TreeItem<String> lob_pointer = TreeSingleton.getInstance().getTreeView().getRoot();

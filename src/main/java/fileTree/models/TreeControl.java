@@ -59,7 +59,7 @@ public class TreeControl {
             lob_directoriesToWatch.clear();
             lob_directoriesToWatch.add(gob_tree.getRoot());
 
-            NewWatchService w = new NewWatchService(gob_tree.getRoot().toPath(), new FileChangeListener() {
+            DirectoryWatchService w = new DirectoryWatchService(gob_tree.getRoot().toPath(), new FileChangeListener() {
                 @Override
                 public void fileAdded(Path iob_path) {
                     boolean lob_isDirectory = iob_path.toFile().isDirectory();
@@ -68,9 +68,9 @@ public class TreeControl {
                     TreeSingleton.getInstance().getTree().addFile(iob_path.toFile(), lob_isDirectory);
                     try {
                         if (iob_path.toFile().isDirectory()) {
-                            gob_restClient.createDirectoryOnServer(getRelativePath(iob_path.toString()));
+                            gob_restClient.createDirectoryOnServer(TreeTool.getInstance().getRelativePath(iob_path.toString()));
                         } else {
-                            gob_restClient.uploadFilesToServer(iob_path.toFile(), getRelativePath(iob_path.toString()));
+                            gob_restClient.uploadFilesToServer(iob_path.toFile(), TreeTool.getInstance().getRelativePath(iob_path.toString()));
                         }
                     } catch (IOException ex) {
                         ex.printStackTrace();
@@ -81,23 +81,8 @@ public class TreeControl {
                 public void fileDeleted(Path iob_path) {
                     System.out.println("fileDeleted: " + iob_path);
                     try {
-                        String[] test = getRelativePath(iob_path.toString()).split("\\\\");
-                        int counter = 0;
-                        TreeItem<String> item = TreeSingleton.getInstance().getTreeView().getRoot();
-
-                        while (counter < test.length) {
-                            for (TreeItem<String> lob_child : item.getChildren()) {
-                                if (lob_child.getValue().equals(test[counter])) {
-                                    item = lob_child;
-                                    break;
-                                }
-                            }
-                            counter++;
-                        }
-                        TreeItem<String> parent = item.getParent();
-                        parent.getChildren().remove(item);
-
-                        gob_restClient.deleteOnServer(getRelativePath(iob_path.toString()));
+                        TreeTool.getInstance().removeFromTreeView(iob_path.toFile());
+                        gob_restClient.deleteOnServer(TreeTool.getInstance().getRelativePath(iob_path.toString()));
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
@@ -106,6 +91,9 @@ public class TreeControl {
                 @Override
                 public void renamedOrMoved(Path iob_oldPath, Path iob_newPath) {
                     System.out.println("renamedOrMoved: " + iob_oldPath + " TO " + iob_newPath);
+                    TreeSingleton.getInstance().getTree().replaceFile(iob_oldPath.toFile(), iob_newPath.toFile(), null);
+                    TreeTool.getInstance().removeFromTreeView(iob_oldPath.toFile());
+                    TreeTool.getInstance().addToTreeView(iob_newPath.toFile());
                 }
             });
             w.start();
@@ -219,7 +207,7 @@ public class TreeControl {
         String lva_relativePath;
         //--------------------------------------------------------------------------------
         try {
-            lva_relativePath = getRelativePath(lob_selectedFile.getCanonicalPath());
+            lva_relativePath = TreeTool.getInstance().getRelativePath(lob_selectedFile.getCanonicalPath());
             gob_restClient.deleteOnServer(lva_relativePath);
 
             TreeItem<String> lob_selectedItem = gob_treeView.getSelectionModel().getSelectedItem();
@@ -259,7 +247,7 @@ public class TreeControl {
 
         try {
             TreeItem<String> lob_selectedItem = gob_treeView.getSelectionModel().getSelectedItem();
-            lva_relativePath = getRelativePath(lob_selectedFile.getCanonicalPath());
+            lva_relativePath = TreeTool.getInstance().getRelativePath(lob_selectedFile.getCanonicalPath());
 
             for (File lob_child : lob_selectedFile.listFiles()) {
                 addAllMovedOrRenamed(lob_child);
@@ -316,7 +304,7 @@ public class TreeControl {
                 } while (lob_newFile.exists());
             }
 
-            lva_relativeFilePath = getRelativePath(lob_newFile.getCanonicalPath());
+            lva_relativeFilePath = TreeTool.getInstance().getRelativePath(lob_newFile.getCanonicalPath());
 
             TreeSingleton.getInstance().getDuplicateFilePrevention().putCreated(lob_newFile.toPath());
 
@@ -350,9 +338,5 @@ public class TreeControl {
         return gob_tree.getFile(lob_path.toString());
     }
 
-    private String getRelativePath(String iva_filePath) throws IOException {
-        String lva_regex = gob_tree.getRoot().getCanonicalPath();
-        lva_regex = lva_regex.replaceAll("\\\\", "\\\\\\\\");
-        return iva_filePath.replaceFirst(lva_regex + "\\\\", "");
-    }
+
 }

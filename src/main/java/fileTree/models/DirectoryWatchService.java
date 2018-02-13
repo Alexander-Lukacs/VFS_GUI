@@ -1,7 +1,6 @@
 package fileTree.models;
 
 import fileTree.interfaces.FileChangeListener;
-import fileTree.interfaces.Tree;
 import org.apache.commons.io.comparator.PathFileComparator;
 
 import java.io.File;
@@ -12,7 +11,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.*;
 
-public class NewWatchService implements Runnable{
+public class DirectoryWatchService implements Runnable{
     private HashMap<Path, FileTime> gob_registerdPaths;
     private Path gob_root;
     private FileChangeListener gob_listender;
@@ -25,7 +24,7 @@ public class NewWatchService implements Runnable{
      * @param iob_listener call the fitting method if something happens in the registered directories
      * @throws IOException if the root is no directory or does not exist.
      */
-    NewWatchService(Path iob_root, FileChangeListener iob_listener) throws IOException {
+    DirectoryWatchService(Path iob_root, FileChangeListener iob_listener) throws IOException {
         //-------------------------------Variables--------------------------------------
         Collection<Path> lco_firstScan;
         //------------------------------------------------------------------------------
@@ -75,27 +74,37 @@ public class NewWatchService implements Runnable{
         boolean wasFileRenamedOrMoved = false;
 
         for (Map.Entry<Path, FileTime> lob_entry : lco_tmp.entrySet()) {
+
+            //iterate over the scanned files
             for (Iterator<Map.Entry<Path, FileTime>> lob_scannedIterator = lco_scanned.entrySet().iterator(); lob_scannedIterator.hasNext();) {
                 Map.Entry<Path, FileTime> lob_scannedEntry = lob_scannedIterator.next();
+
+                //the file was moved if the creation time of the file that was "added" is the same as the one that was "deleted"
                 if (lob_scannedEntry.getValue().toMillis() == lob_entry.getValue().toMillis()) {
 
+                    //the file was already moved from the ui, just ignore it then
                     if (lob_duplicates.isFileRenamedOrRemoved(lob_entry.getKey())) {
                         lob_duplicates.removeRenamedOrDeleted(lob_entry.getKey());
                     } else {
+                        //add the file to the map
                         lco_renamedOrMoved.put(lob_entry.getKey().toFile(), lob_scannedEntry.getKey().toFile());
                     }
                     wasFileRenamedOrMoved = true;
+                    //remove the old file path from the registered items
                     gob_registerdPaths.remove(lob_entry.getKey());
+                    //add the new path to the registered items
                     register(lob_scannedEntry.getKey());
+                    //remove the file from the scanned map to speed up further iterations
                     lob_scannedIterator.remove();
                 }
             }
 
+            //the file was not moved or renamed
             if (!wasFileRenamedOrMoved) {
+                //the file was deleted so delete it from the registered items
                 gob_registerdPaths.remove(lob_entry.getKey());
                 if (TreeSingleton.getInstance().getDuplicateFilePrevention().isFileDeted(lob_entry.getKey())) {
                     TreeSingleton.getInstance().getDuplicateFilePrevention().removeDeleted(lob_entry.getKey());
-                    gob_registerdPaths.remove(lob_entry.getKey());
                 } else {
                     lli_delete.add(lob_entry.getKey().toFile());
                 }
@@ -115,26 +124,15 @@ public class NewWatchService implements Runnable{
             }
         });
 
-        ArrayList<File> test2 = new ArrayList<>(lco_renamedOrMoved.keySet());
-        for (File file : test2) {
-            System.out.println("RENAMED: " + file.toPath() + " TO " + lco_renamedOrMoved.get(file).toPath());
-            gob_listender.renamedOrMoved(file.toPath(), lco_renamedOrMoved.get(file).toPath());
-
-        }
+        ArrayList<File> lli_renamedOrMovedKeySet = new ArrayList<>(lco_renamedOrMoved.keySet());
+        lli_renamedOrMovedKeySet.sort(PathFileComparator.PATH_COMPARATOR);
+        filesMovedOrRenamed(lli_renamedOrMovedKeySet, lco_renamedOrMoved);
 
         lli_delete.sort(PathFileComparator.PATH_REVERSE);
-        for (File file : lli_delete) {
-            System.out.println("DELETED: " + file.toPath());
-            gob_listender.fileDeleted(file.toPath());
-        }
+        filesDeleted(lli_delete);
 
         test.sort(PathFileComparator.PATH_COMPARATOR);
-        fileAdded(test);
-//        for (File file : test) {
-//            System.out.println("ADDED: " + file.toPath());
-//            register(file.toPath());
-//            gob_listender.fileAdded(file.toPath());
-//        }
+        filesAdded(test);
 
         System.out.println("----------------------------------------------------------");
         for (Map.Entry<Path, FileTime> lob_entry : gob_registerdPaths.entrySet()) {
@@ -143,7 +141,34 @@ public class NewWatchService implements Runnable{
         System.out.println("----------------------------------------------------------");
     }
 
-    private void fileAdded(Collection<File> ico_files) {
+    /**
+     * call the fileMovedOrRenamed method of the listener for every file that was moved or renamed
+     * @param ico_files contains all old file paths
+     * @param ico_renamedOrMoved contains all new file paths
+     */
+    private void filesMovedOrRenamed(Collection<File> ico_files, HashMap<File, File> ico_renamedOrMoved) {
+        for (File lob_file : ico_files) {
+            System.out.println("RENAMED: " + lob_file.toPath() + " TO " + ico_renamedOrMoved.get(lob_file).toPath());
+            gob_listender.renamedOrMoved(lob_file.toPath(), ico_renamedOrMoved.get(lob_file).toPath());
+        }
+    }
+
+    /**
+     * call the fileDeleted method of the listener for every file that was deleted
+     * @param ico_files contains all files that were deleted
+     */
+    private void filesDeleted(Collection<File> ico_files) {
+        for (File lob_file : ico_files) {
+            System.out.println("DELETED: " + lob_file.toPath());
+            gob_listender.fileDeleted(lob_file.toPath());
+        }
+    }
+
+    /**
+     * call the fileAdded method of the listener for every file that was added
+     * @param ico_files contains all files that were added
+     */
+    private void filesAdded(Collection<File> ico_files) {
         for (File lob_file : ico_files) {
             try {
                 System.out.println("ADDED: " + lob_file.toPath());
@@ -200,7 +225,8 @@ public class NewWatchService implements Runnable{
      * start the scan routine in a new Thread
      */
     public void start() {
-        Thread lob_runnerThread = new Thread(this, NewWatchService.class.getSimpleName());
+        Thread lob_runnerThread = new Thread(this, DirectoryWatchService.class.getSimpleName());
+        lob_runnerThread.setDaemon(true);
         lob_runnerThread.start();
     }
 
