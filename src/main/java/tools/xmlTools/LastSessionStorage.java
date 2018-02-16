@@ -22,7 +22,7 @@ public class LastSessionStorage {
             createXml();
         }
 
-        return readXml(GC_IP_ELEMENT_NAME, GC_IP_ELEMENT_NAME);
+        return readXml(GC_IP_ELEMENT_NAME, GC_FILE_NAME);
     }
 
     public static void setIp(String iva_newIp) {
@@ -38,7 +38,7 @@ public class LastSessionStorage {
             createXml();
         }
 
-        return readXml(GC_PORT_ELEMENT_NAME, GC_IP_ELEMENT_NAME);
+        return readXml(GC_PORT_ELEMENT_NAME, GC_FILE_NAME);
     }
 
     public static void setPort(String iva_newPort) {
@@ -54,7 +54,7 @@ public class LastSessionStorage {
             createXml();
         }
 
-        return readXml(GC_EMAIL_ELEMENT_NAME, GC_IP_ELEMENT_NAME);
+        return readXml(GC_EMAIL_ELEMENT_NAME, GC_FILE_NAME);
     }
 
     public static void setEmail(String iva_newEmail) {
@@ -70,7 +70,7 @@ public class LastSessionStorage {
             createXml();
         }
 
-        return readXml(GC_PASSWORD_ELEMENT_NAME, GC_IP_ELEMENT_NAME);
+        return readXml(GC_PASSWORD_ELEMENT_NAME, GC_FILE_NAME);
     }
 
     public static void setPassword(String iva_password) {
@@ -124,5 +124,22 @@ public class LastSessionStorage {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+    }
+
+    public static void main(String[] args) {
+        System.out.println(getIp());
+        System.out.println(getPort());
+        System.out.println(getEmail());
+        System.out.println(getPassword());
+
+        setIp("127.0.0.1");
+        setPort("8080");
+        setEmail("f.hennrich1@gmx.de");
+        setPassword("Passwort1");
+
+        System.out.println(getIp());
+        System.out.println(getPort());
+        System.out.println(getEmail());
+        System.out.println(getPassword());
     }
 }
