@@ -61,8 +61,6 @@ public class DirectoryNameMapper {
         }
     }
 
-
-
     public static String getPrivateDirectoryName() {
         if (checkIfFileNotExist(GC_FILE_NAME)) {
             createXmlFile();
@@ -76,7 +74,7 @@ public class DirectoryNameMapper {
             createXmlFile();
         }
 
-        modify(GC_PRIVATE_DIR_ELEMENT, iva_dirName,GC_FILE_NAME);
+        modify(GC_PRIVATE_DIR_ELEMENT, iva_dirName, GC_FILE_NAME);
     }
 
     public static String getPublicDirectoryName() {
@@ -109,6 +107,56 @@ public class DirectoryNameMapper {
         addSharedDirectoryElement(String.valueOf(iva_sharedDirectoryId), iva_sharedDirectoryName);
     }
 
+    public static boolean removeSharedDirectory(int iva_sharedDirectoryId) {
+        return removeElement(String.valueOf(iva_sharedDirectoryId));
+    }
+
+    private static boolean removeElement(String iva_elementId) {
+        XMLOutputter lob_xmlOutput;
+        String lva_xmlFilePath;
+        File lob_inputFile;
+        SAXBuilder lob_saxBuilder;
+        Document lob_doc;
+        Element lob_rootElement;
+        List<Element> lob_nodeList;
+        Element lob_selectedElement;
+        boolean hasChanged = false;
+
+
+        if (checkIfFileNotExist(GC_FILE_NAME)) {
+            createXmlFile();
+        }
+
+        try {
+            lob_inputFile = new File(getXmlFilePath(GC_FILE_NAME));
+            lob_saxBuilder = new SAXBuilder();
+            lob_doc = lob_saxBuilder.build(lob_inputFile);
+
+            lob_rootElement = lob_doc.getRootElement();
+
+            lob_selectedElement = lob_rootElement.getChild(GC_SHARED_DIR_ROOT_ELEMENT);
+            lob_nodeList = lob_selectedElement.getChildren();
+
+            for (Element lob_element : lob_nodeList) {
+                if (lob_element.getAttributeValue(GC_ATTRIBUTE_ID).equals(iva_elementId)) {
+                    lob_selectedElement.removeContent(lob_element);
+                    hasChanged = true;
+                }
+            }
+
+            lob_xmlOutput = new XMLOutputter();
+            lob_xmlOutput.setFormat(Format.getPrettyFormat());
+
+            lva_xmlFilePath = getXmlFilePath(GC_FILE_NAME);
+            lob_xmlOutput.output(lob_doc, new FileWriter(lva_xmlFilePath));
+
+        } catch (IOException | JDOMException ex) {
+            ex.printStackTrace();
+        }
+
+        return hasChanged;
+    }
+
     private static void addSharedDirectoryElement(String iva_elementId, String iva_elementText) {
         Element lob_newSharedDirectory = new Element(GC_SHARED_DIR);
         lob_newSharedDirectory.setAttribute(GC_ATTRIBUTE_ID, iva_elementId);
@@ -121,7 +169,6 @@ public class DirectoryNameMapper {
         Document lob_doc;
         Element lob_rootElement;
         Element lob_selectedElement;
-
 
         if (checkIfFileNotExist(GC_FILE_NAME)) {
             createXmlFile();
