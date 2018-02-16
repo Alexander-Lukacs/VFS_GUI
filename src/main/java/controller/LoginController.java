@@ -18,7 +18,7 @@ import models.classes.User;
 import tools.AlertWindows;
 import tools.Utils;
 import tools.Validation;
-import tools.XmlTools;
+import tools.xmlTools.LastSessionStorage;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -72,10 +72,10 @@ public class LoginController {
     }
 
     private void setTextFromXmlToTf() {
-        gob_tf_ipAddress.setText(XmlTools.getIp());
-        gob_tf_port.setText(XmlTools.getPort());
-        gob_tf_userLoginEmail.setText(XmlTools.getEmail());
-        gob_tf_loginPassword.setText(XmlTools.getPassword());
+        gob_tf_ipAddress.setText(LastSessionStorage.getIp());
+        gob_tf_port.setText(LastSessionStorage.getPort());
+        gob_tf_userLoginEmail.setText(LastSessionStorage.getEmail());
+        gob_tf_loginPassword.setText(LastSessionStorage.getPassword());
     }
 
     /**
@@ -108,10 +108,10 @@ public class LoginController {
                     gob_dataCache.put(GC_PASSWORD_KEY, lva_password);
                     cacheUser(lob_user);
 
-                    XmlTools.setIp(lva_ip);
-                    XmlTools.setPort(lva_port);
-                    XmlTools.setEmail(lva_email);
-                    XmlTools.setPassword(lva_password);
+                    LastSessionStorage.setIp(lva_ip);
+                    LastSessionStorage.setPort(lva_port);
+                    LastSessionStorage.setEmail(lva_email);
+                    LastSessionStorage.setPassword(lva_password);
 
                     mainController.start(gob_stage);
                     close();
@@ -150,10 +150,10 @@ public class LoginController {
                 if (lob_restResponse.getHttpStatus() == GC_HTTP_OK) {
                     gob_tabPane.getSelectionModel().selectFirst();
 
-                    XmlTools.setPort(lva_port);
-                    XmlTools.setIp(lva_ip);
-                    XmlTools.setEmail(lva_email);
-                    XmlTools.setPassword(lva_password);
+                    LastSessionStorage.setPort(lva_port);
+                    LastSessionStorage.setIp(lva_ip);
+                    LastSessionStorage.setEmail(lva_email);
+                    LastSessionStorage.setPassword(lva_password);
                 }
 
             }

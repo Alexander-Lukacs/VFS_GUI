@@ -3,7 +3,7 @@ package tools.constants;
 /**
  * Created by Mesut on 09.02.2018.
  */
-public abstract class XmlConstants {
+public abstract class LastSessionConstants {
     public static final String GC_ROOT_ELEMENT_NAME = "server";
     public static final String GC_IP_ELEMENT_NAME = "ip";
     public static final String GC_PORT_ELEMENT_NAME = "port";

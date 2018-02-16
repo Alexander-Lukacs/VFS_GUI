@@ -19,7 +19,7 @@ import java.io.File;
 import java.io.IOException;
 >>>>>>> Stashed changes
 
-import static tools.constants.XmlConstants.*;
+import static tools.constants.LastSessionConstants.*;
 
 /**
  * Created by Mesut on 09.02.2018.

@@ -8,7 +8,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import tools.AlertWindows;
 import tools.Validation;
-import tools.XmlTools;
+import tools.xmlTools.LastSessionStorage;
 
 import static cache.DataCache.*;
 import static controller.constants.SettingsConstants.GC_ADMIN_ADD;
@@ -68,8 +68,8 @@ public class ChangeIpPortController {
 
                 lob_dataCache.replaceData(GC_IP_KEY, lva_ip);
                 lob_dataCache.replaceData(GC_PORT_KEY, lva_port);
-                XmlTools.setIp(lva_ip);
-                XmlTools.setPort(lva_port);
+                LastSessionStorage.setIp(lva_ip);
+                LastSessionStorage.setPort(lva_port);
 
             } else {
                 new AlertWindows().createWarningAlert(GC_WARNING_PORT);
