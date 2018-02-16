@@ -125,21 +125,4 @@ public class LastSessionStorage {
             ex.printStackTrace();
         }
     }
-
-    public static void main(String[] args) {
-        System.out.println(getIp());
-        System.out.println(getPort());
-        System.out.println(getEmail());
-        System.out.println(getPassword());
-
-        setIp("127.0.0.1");
-        setPort("8080");
-        setEmail("f.hennrich1@gmx.de");
-        setPassword("Passwort1");
-
-        System.out.println(getIp());
-        System.out.println(getPort());
-        System.out.println(getEmail());
-        System.out.println(getPassword());
-    }
 }
