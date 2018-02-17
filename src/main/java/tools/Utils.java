@@ -1,8 +1,8 @@
 package tools;
 
-import client.RestResponse;
+import models.classes.RestResponse;
 
-import static client.constants.HttpStatusCodes.*;
+import static rest.constants.HttpStatusCodes.*;
 
 public class Utils {
     private static final String GC_FILE_BASE_PATH = "C:\\Users\\$\\Documents\\FileSystem";

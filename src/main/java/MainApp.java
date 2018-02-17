@@ -1,7 +1,7 @@
 import builder.RestClientBuilder;
 import cache.DataCache;
-import client.NotifyServerThread;
-import client.RestClient;
+import services.NotifyServerThread;
+import rest.RestClient;
 import controller.LoginController;
 import javafx.application.Application;
 import javafx.stage.Stage;

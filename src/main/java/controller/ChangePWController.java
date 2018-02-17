@@ -2,8 +2,8 @@ package controller;
 
 import builder.RestClientBuilder;
 import cache.DataCache;
-import client.RestClient;
-import client.RestResponse;
+import rest.RestClient;
+import models.classes.RestResponse;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ListView;
@@ -16,7 +16,7 @@ import tools.Validation;
 import tools.xmlTools.LastSessionStorage;
 
 import static cache.DataCache.*;
-import static client.constants.HttpStatusCodes.GC_HTTP_OK;
+import static rest.constants.HttpStatusCodes.GC_HTTP_OK;
 import static controller.constants.SettingsConstants.GC_ADMIN_ADD;
 import static controller.constants.SettingsConstants.GC_CHANGE_IP_PORT;
 import static tools.constants.AlertConstants.*;

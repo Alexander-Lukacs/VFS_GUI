@@ -1,7 +1,7 @@
 package builder;
 
 import cache.DataCache;
-import client.RestClient;
+import rest.RestClient;
 
 import static cache.DataCache.*;
 

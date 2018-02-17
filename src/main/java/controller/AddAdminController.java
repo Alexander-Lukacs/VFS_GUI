@@ -1,8 +1,8 @@
 package controller;
 
 import builder.RestClientBuilder;
-import client.RestClient;
-import client.RestResponse;
+import rest.RestClient;
+import models.classes.RestResponse;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ListView;
@@ -13,7 +13,7 @@ import tools.Utils;
 
 import java.util.List;
 
-import static client.constants.HttpStatusCodes.GC_HTTP_OK;
+import static rest.constants.HttpStatusCodes.GC_HTTP_OK;
 import static controller.constants.SettingsConstants.GC_CHANGE_IP_PORT;
 import static controller.constants.SettingsConstants.GC_CHANGE_PW;
 

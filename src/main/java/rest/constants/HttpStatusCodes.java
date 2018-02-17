@@ -1,4 +1,4 @@
-package client.constants;
+package rest.constants;
 
 public abstract class HttpStatusCodes {
     public static final int GC_HTTP_OK = 200;

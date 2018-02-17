@@ -1,8 +1,7 @@
 package fileTree.models;
 
 import builder.RestClientBuilder;
-import cache.DataCache;
-import client.RestClient;
+import rest.RestClient;
 import fileTree.interfaces.FileChangeListener;
 import fileTree.interfaces.Tree;
 import javafx.scene.control.*;

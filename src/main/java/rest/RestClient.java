@@ -1,4 +1,4 @@
-package client;
+package rest;
 
 import cache.DataCache;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,6 +6,8 @@ import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.MultiPart;
 import com.sun.jersey.multipart.file.FileDataBodyPart;
 import com.sun.jersey.multipart.impl.MultiPartWriter;
+import models.classes.RestResponse;
+import models.classes.SharedDirectory;
 import models.classes.User;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
@@ -23,8 +25,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import static client.constants.HttpStatusCodes.GC_HTTP_OK;
-import static client.constants.RestResourcesPaths.*;
+import static rest.constants.HttpStatusCodes.GC_HTTP_OK;
+import static rest.constants.RestResourcesPaths.*;
 
 /**
  * Created by Mesut on 25.01.2018.
@@ -54,7 +56,7 @@ public class RestClient {
 // ---------------------------------------------------------------------------------------------------------------------
 
     public RestResponse registerNewUser(User iob_user) {
-        return createRestRequest(GC_REST_ADD_USER_PATH, iob_user);
+        return createPutRequest(GC_REST_ADD_USER_PATH, iob_user);
     }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -98,7 +100,7 @@ public class RestClient {
 // ---------------------------------------------------------------------------------------------------------------------
 
     public RestResponse changePassword(User iob_user) {
-        return createRestRequest(GC_REST_CHANGE_PASSWORD_PATH, iob_user);
+        return createPutRequest(GC_REST_CHANGE_PASSWORD_PATH, iob_user);
     }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -124,7 +126,7 @@ public class RestClient {
 // ---------------------------------------------------------------------------------------------------------------------
 
     public RestResponse addNewAdmin(User iob_user) {
-        return createRestRequest(GC_REST_ADD_ADMIN_PATH, iob_user);
+        return createPutRequest(GC_REST_ADD_ADMIN_PATH, iob_user);
     }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -184,7 +186,7 @@ public class RestClient {
         System.out.println(lob_response.getStatus());
     }
 
-//----------------------------------------------------------------------------------------------------------------------
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Unregister the Client from Server
@@ -194,12 +196,64 @@ public class RestClient {
         gob_webTarget.path(GC_REST_UNREGISTER_CLIENT).request().get();
     }
 
-    private RestResponse createRestRequest(String iva_requestPath, User iob_user) {
+// ---------------------------------------------------------------------------------------------------------------------
+// Add new shared directory
+// ---------------------------------------------------------------------------------------------------------------------
+
+    public RestResponse addNewSharedDirectory(SharedDirectory iob_sharedDirectory) {
+        return createPostRequest(GC_REST_ADD_NEW_SHARED_DIRECTORY, iob_sharedDirectory);
+    }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Add new member to shared directory
+// ---------------------------------------------------------------------------------------------------------------------
+
+    public RestResponse addNewMemberToSharedDirectory(SharedDirectory iob_sharedDirectory, User iob_member) {
+        int lva_id = iob_sharedDirectory.getId();
+        return createPutRequest(GC_REST_ADD_NEW_MEMBER_TO_SHARED_DIR + lva_id, iob_member);
+    }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Delete shared directory
+// ---------------------------------------------------------------------------------------------------------------------
+
+    public RestResponse deleteSharedDirectory(SharedDirectory iob_sharedDirectory) {
+        return createPostRequest(GC_REST_DELETE_SHARED_DIRECTORY, iob_sharedDirectory);
+    }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Remove member from shared directory
+// ---------------------------------------------------------------------------------------------------------------------
+
+    public RestResponse removeMemberFromSharedDirectory(SharedDirectory iob_sharedDirectory, User iob_member) {
+        int lva_id = iob_sharedDirectory.getId();
+        return createPutRequest(GC_REST_REMOVE_MEMBER_FROM_SHARED_DIR + lva_id, iob_member);
+    }
+
+//----------------------------------------------------------------------------------------------------------------------
+
+    private RestResponse createPutRequest(String iva_requestPath, Object iob_user) {
         RestResponse lob_restResponse = new RestResponse();
 
         try {
             Response response = gob_webTarget.path(iva_requestPath).request()
                     .put(Entity.entity(iob_user, MediaType.APPLICATION_JSON));
+
+            lob_restResponse.setResponseMessage(response.readEntity(String.class));
+            lob_restResponse.setHttpStatus(response.getStatus());
+        } catch (Exception ex) {
+            new AlertWindows().createExceptionAlert(ex.getMessage(), ex);
+        }
+
+        return lob_restResponse;
+    }
+
+    private RestResponse createPostRequest(String iva_requestPath, Object iob_entity) {
+        RestResponse lob_restResponse = new RestResponse();
+
+        try {
+            Response response = gob_webTarget.path(iva_requestPath).request()
+                    .post(Entity.entity(iob_entity, MediaType.APPLICATION_JSON));
 
             lob_restResponse.setResponseMessage(response.readEntity(String.class));
             lob_restResponse.setHttpStatus(response.getStatus());

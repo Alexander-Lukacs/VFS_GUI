@@ -2,7 +2,7 @@ package controller;
 
 import builder.RestClientBuilder;
 import cache.DataCache;
-import client.RestClient;
+import rest.RestClient;
 import fileTree.models.TreeControl;
 import fileTree.models.TreeSingleton;
 import javafx.event.ActionEvent;

@@ -2,8 +2,8 @@ package controller;
 
 import builder.RestClientBuilder;
 import cache.DataCache;
-import client.RestClient;
-import client.RestResponse;
+import rest.RestClient;
+import models.classes.RestResponse;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 import static cache.DataCache.*;
-import static client.constants.HttpStatusCodes.GC_HTTP_OK;
+import static rest.constants.HttpStatusCodes.GC_HTTP_OK;
 import static controller.constants.ApplicationConstants.GC_APPLICATION_ICON_PATH;
 import static controller.constants.SettingsConstants.GC_VFS;
 import static tools.constants.AlertConstants.*;
