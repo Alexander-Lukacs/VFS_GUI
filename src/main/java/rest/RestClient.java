@@ -133,7 +133,7 @@ public class RestClient {
 // Upload a File to the Server
 // ---------------------------------------------------------------------------------------------------------------------
 
-    public void uploadFilesToServer(File iob_filesToUpload, String iva_relativeFilePath) {
+    public boolean uploadFilesToServer(File iob_filesToUpload, String iva_relativeFilePath) {
         DataCache lob_dataCache = DataCache.getDataCache();
 
         HttpAuthenticationFeature lob_authDetails = HttpAuthenticationFeature.basic(
@@ -154,26 +154,27 @@ public class RestClient {
         Response lob_response = lob_target.request().post(Entity.entity(lob_multiPart, lob_multiPart.getMediaType()));
 
         System.out.println(iob_filesToUpload.getName() + ": " + lob_response.getStatus());
+        return lob_response.getStatus() == 200;
     }
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Create a new Directory on the Server
 // ---------------------------------------------------------------------------------------------------------------------
 
-    public void createDirectoryOnServer(String iva_relativeDirectoryPath) {
+    public boolean createDirectoryOnServer(String iva_relativeDirectoryPath) {
         Response lob_response = gob_webTarget.path("/auth/files/createDirectory").request()
                 .post(Entity.entity(iva_relativeDirectoryPath, MediaType.TEXT_PLAIN));
-        System.out.println(lob_response.getStatus());
+        return lob_response.getStatus() == 200;
     }
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Delete a File or a Directory on the Server
 // ---------------------------------------------------------------------------------------------------------------------
 
-    public void deleteOnServer(String iva_relativePath) {
+    public boolean deleteOnServer(String iva_relativePath) {
         Response lob_response = gob_webTarget.path("/auth/files/delete").request()
                 .post(Entity.entity(iva_relativePath, MediaType.TEXT_PLAIN));
-        System.out.println(lob_response.getStatus());
+        return lob_response.getStatus() == 200;
     }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -186,7 +187,16 @@ public class RestClient {
         System.out.println(lob_response.getStatus());
     }
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Move or rename a file on the server
+// ---------------------------------------------------------------------------------------------------------------------
+    public void moveOrRename(String iva_relativePath, String iva_newRelativePath) {
+        Response lob_response = gob_webTarget.path("/auth/files/moveOrRename").queryParam("path", iva_relativePath).request()
+                .post(Entity.entity(iva_newRelativePath, MediaType.TEXT_PLAIN));
+        System.out.println(lob_response.getStatus());
+    }
 
+//----------------------------------------------------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Unregister the Client from Server

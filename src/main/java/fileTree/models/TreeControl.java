@@ -61,38 +61,48 @@ public class TreeControl {
             DirectoryWatchService w = new DirectoryWatchService(gob_tree.getRoot().toPath(), new FileChangeListener() {
                 @Override
                 public void fileAdded(Path iob_path) {
-                    boolean lob_isDirectory = iob_path.toFile().isDirectory();
+                    boolean lva_isDirectory = iob_path.toFile().isDirectory();
                     System.out.println("fileAdded: " + iob_path);
-                    TreeTool.getInstance().addToTreeView(iob_path.toFile());
-                    TreeSingleton.getInstance().getTree().addFile(iob_path.toFile(), lob_isDirectory);
-                    try {
-                        if (iob_path.toFile().isDirectory()) {
-                            gob_restClient.createDirectoryOnServer(TreeTool.getInstance().getRelativePath(iob_path.toString()));
-                        } else {
-                            gob_restClient.uploadFilesToServer(iob_path.toFile(), TreeTool.getInstance().getRelativePath(iob_path.toString()));
-                        }
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
+                    createFileOrDirectory(iob_path.toFile(), lva_isDirectory);
                 }
 
                 @Override
                 public void fileDeleted(Path iob_path) {
-                    System.out.println("fileDeleted: " + iob_path);
+                    if (TreeSingleton.getInstance().getDuplicateFilePrevention().isFileDeted(iob_path)) {
+                        TreeSingleton.getInstance().getDuplicateFilePrevention().removeDeleted(iob_path);
+                    } else {
+                        TreeItem<String> lob_itemToDelete = TreeTool.getInstance().getTreeItem(iob_path.toFile());
+                        deleteFile(iob_path.toFile(), lob_itemToDelete);
+                    }
+                }
+
+                @Override
+                public void fileMoved(Path iob_oldPath, Path iob_newPath) {
+                    //TODO funktioniert NOCH NICHT!!! (Dateien werden intern noch nicht richtig verschoben, das verschieben einer Datei kann zu
+                    // unvorhergesehenem Verhalten führen)
                     try {
-                        TreeTool.getInstance().removeFromTreeView(iob_path.toFile());
-                        gob_restClient.deleteOnServer(TreeTool.getInstance().getRelativePath(iob_path.toString()));
+                        System.out.println("renamedOrMoved: " + iob_oldPath + " TO " + iob_newPath);
+                        TreeSingleton.getInstance().getTree().replaceFile(iob_oldPath.toFile(), iob_newPath.toFile(), null);
+//                        TreeTool.getInstance().removeFromTreeView(iob_oldPath.toFile());
+//                        TreeTool.getInstance().addToTreeView(iob_newPath.toFile());
+                        TreeItem<String> lob_item = TreeTool.getInstance().getTreeItem(iob_oldPath.toFile());
+                        TreeItem<String> lob_parent = TreeTool.getInstance().getTreeItem(iob_newPath.getParent().toFile());
+
+                        lob_item.getParent().getChildren().remove(lob_item);
+                        lob_parent.getChildren().add(lob_item);
+
+                        String lva_oldRelativePath = TreeTool.getInstance().getRelativePath(iob_oldPath.toString());
+                        String lva_newRelativePath = TreeTool.getInstance().getRelativePath(iob_newPath.toString());
+                        gob_restClient.moveOrRename(lva_oldRelativePath, lva_newRelativePath);
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
                 }
 
                 @Override
-                public void renamedOrMoved(Path iob_oldPath, Path iob_newPath) {
-                    System.out.println("renamedOrMoved: " + iob_oldPath + " TO " + iob_newPath);
-                    TreeSingleton.getInstance().getTree().replaceFile(iob_oldPath.toFile(), iob_newPath.toFile(), null);
-                    TreeTool.getInstance().removeFromTreeView(iob_oldPath.toFile());
-                    TreeTool.getInstance().addToTreeView(iob_newPath.toFile());
+                public void fileRenamed(Path iob_path, String iva_newName) {
+                    System.out.println("RENAMED: " + iob_path + " TO: " + iva_newName);
+                    TreeSingleton.getInstance().getTree().renameFile(iob_path.toFile(), iva_newName);
                 }
             });
             w.start();
@@ -146,9 +156,13 @@ public class TreeControl {
 
         gob_contextMenu = new ContextMenu();
         lob_deleteFile = new MenuItem("Delete");
-        lob_deleteFile.setOnAction(event ->
-            deleteFile()
-        );
+        lob_deleteFile.setOnAction(event -> {
+            File lob_selectedFile = buildFileFromSelectedItem();
+            TreeItem<String> lob_selectedItem = gob_treeView.getSelectionModel().getSelectedItem();
+            if (deleteFile(lob_selectedFile, lob_selectedItem)) {
+                addAllDeleted(lob_selectedFile);
+            }
+        });
 
         lob_newDirectory = new MenuItem("New Directory");
         lob_newDirectory.setOnAction(event ->
@@ -181,6 +195,10 @@ public class TreeControl {
         File lob_selectedFile = buildFileFromSelectedItem();
         //--------------------------------------------------------------------------------
 
+        if (gob_treeView.getSelectionModel().getSelectedItem() == null) {
+            return;
+        }
+
         for (MenuItem lob_item : gob_contextMenu.getItems()) {
             if (!lob_selectedFile.isDirectory() && lob_item.getText().equals("Delete only Directory")) {
                 lob_item.setDisable(true);
@@ -200,22 +218,28 @@ public class TreeControl {
 
     }
 
-    private void deleteFile() {
+    /**
+     * delete a file on the client, explorer and server
+     * @param iob_file file to delete
+     * @param iob_itemToDelete item to delete in the tree
+     * @return true if all files were deleted, otherwise false
+     */
+    private boolean deleteFile(File iob_file, TreeItem<String> iob_itemToDelete) {
         //-------------------------------Variables----------------------------------------
-        File lob_selectedFile = buildFileFromSelectedItem();
         String lva_relativePath;
         //--------------------------------------------------------------------------------
         try {
-            lva_relativePath = TreeTool.getInstance().getRelativePath(lob_selectedFile.getCanonicalPath());
-            gob_restClient.deleteOnServer(lva_relativePath);
+            lva_relativePath = TreeTool.getInstance().getRelativePath(iob_file.getCanonicalPath());
+            if (!gob_restClient.deleteOnServer(lva_relativePath)) {
+                return false;
+            }
 
-            TreeItem<String> lob_selectedItem = gob_treeView.getSelectionModel().getSelectedItem();
-            lob_selectedItem.getParent().getChildren().remove(lob_selectedItem);
-            addAllDeleted(lob_selectedFile);
-            gob_tree.deleteFile(lob_selectedFile);
+            iob_itemToDelete.getParent().getChildren().remove(iob_itemToDelete);
+            return gob_tree.deleteFile(iob_file);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+        return false;
     }
 
     private void addAllDeleted(File iob_file) {
@@ -268,60 +292,80 @@ public class TreeControl {
     }
 
     private void createNewDirectory() {
-        createFileOrDirectory("\\Neuer Ordner$", true);
+        File lob_newFile = buildNewFile("\\Neuer Ordner$");
+        createFileOrDirectory(lob_newFile,true);
+        TreeSingleton.getInstance().getDuplicateFilePrevention().putCreated(lob_newFile.toPath());
     }
 
     private void createNewFile() {
-        createFileOrDirectory("\\Neue Datei$.txt", false);
+        File lob_newFile = buildNewFile("\\Neue Datei$.txt");
+        createFileOrDirectory(lob_newFile, false);
+        TreeSingleton.getInstance().getDuplicateFilePrevention().putCreated(lob_newFile.toPath());
+
     }
 
-    private void createFileOrDirectory(String iva_name, boolean isDirectory) {
-        //-------------------------------Variables----------------------------------------
+    private File buildNewFile(String iva_name) {
+        //-------------------------------Variables----------------------------
         File lob_selectedFile = buildFileFromSelectedItem();
+        File lob_newFile;
+        int lva_counter = 1;
+        String lva_newFilePath;
+        //--------------------------------------------------------------------
+
+        if (lob_selectedFile.isDirectory()) {
+            lva_newFilePath = lob_selectedFile.toPath().toString();
+        } else {
+            lva_newFilePath = lob_selectedFile.getParentFile().toPath().toString();
+        }
+
+        lva_newFilePath += iva_name;
+        lob_newFile = new File(lva_newFilePath.replaceFirst("\\$", ""));
+
+        if (lob_newFile.exists()) {
+            do {
+                lob_newFile = new File(lva_newFilePath.replaceFirst("\\$", "(" + lva_counter + ")"));
+                lva_counter++;
+            } while (lob_newFile.exists());
+        }
+        return lob_newFile;
+    }
+
+    private boolean createFileOrDirectory(File iob_newFile, boolean isDirectory) {
+        //-------------------------------Variables----------------------------
         File lob_newFile;
         String lva_newFilePath;
         int lva_counter = 1;
-        TreeItem<String> lob_selectedItem;
         String lva_relativeFilePath;
-        //--------------------------------------------------------------------------------
+        //--------------------------------------------------------------------
         try {
-            lob_selectedItem = gob_treeView.getSelectionModel().getSelectedItem();
-            if (lob_selectedFile.isFile()) {
-                lva_newFilePath = lob_selectedFile.getParentFile().getCanonicalPath();
-                lob_selectedItem = lob_selectedItem.getParent();
-            } else {
-                lva_newFilePath = lob_selectedFile.getCanonicalPath();
-            }
+//            if (iob_newFile.isDirectory()) {
+//                lva_newFilePath = iob_newFile.getCanonicalPath();
+//            } else {
+//                lva_newFilePath = iob_newFile.getParentFile().getCanonicalPath();
+//            }
 
-            lva_newFilePath += iva_name;
-            lob_newFile = new File(lva_newFilePath.replaceFirst("\\$", ""));
+//            lva_newFilePath += iva_name;
+//            lob_newFile = new File(lva_newFilePath.replaceFirst("\\$", ""));
 
-            if (lob_newFile.exists()) {
-                do {
-                    lob_newFile = new File(lva_newFilePath.replaceFirst("\\$", "(" + lva_counter + ")"));
-                    lva_counter++;
-                } while (lob_newFile.exists());
-            }
+            lva_relativeFilePath = TreeTool.getInstance().getRelativePath(iob_newFile.getCanonicalPath());
 
-            lva_relativeFilePath = TreeTool.getInstance().getRelativePath(lob_newFile.getCanonicalPath());
-
-            TreeSingleton.getInstance().getDuplicateFilePrevention().putCreated(lob_newFile.toPath());
-
+            gob_tree.addFile(iob_newFile, isDirectory);
+            TreeTool.getInstance().addToTreeView(iob_newFile);
             if (isDirectory) {
-                gob_tree.addFile(lob_newFile, true);
-                gob_restClient.createDirectoryOnServer(lva_relativeFilePath);
+                if (!gob_restClient.createDirectoryOnServer(lva_relativeFilePath)) {
+                    return false;
+                }
             } else {
-                gob_tree.addFile(lob_newFile, false);
-                gob_restClient.uploadFilesToServer(lob_newFile, lva_relativeFilePath);
+                if (!gob_restClient.uploadFilesToServer(iob_newFile, lva_relativeFilePath)) {
+                    return false;
+                }
             }
 
-
-            TreeTool.getInstance().addTreeItem(lob_selectedItem, lob_newFile);
-            gob_treeView.refresh();
 
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+        return true;
     }
 
     private File buildFileFromSelectedItem() {

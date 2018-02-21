@@ -435,7 +435,8 @@ public class TreeImpl implements Tree {
             }
 
             iva_newName = iva_path.replaceFirst("[^\\\\]*$", iva_newName);
-            return lob_node.getFile().renameTo(new File(iva_newName));
+            lob_node.setFile(new File(iva_newName));
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
         }

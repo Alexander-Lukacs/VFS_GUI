@@ -34,6 +34,10 @@ public class TreeTool {
         return rob_child;
     }
 
+    public TreeItem<String> getTreeItem(File iob_file) {
+        return searchTreeItem(iob_file);
+    }
+
     public Node getTreeIcon(String iva_iconName) {
         javax.swing.Icon icon = FileSystemView.getFileSystemView().getSystemIcon(new File(iva_iconName));
 
@@ -57,11 +61,47 @@ public class TreeTool {
     }
 
     public void removeFromTreeView(File iob_file) {
+//        try {
+//            boolean lva_childFound;
+//            String[] test = getRelativePath(iob_file.getCanonicalPath()).split("\\\\");
+//            int counter = 0;
+//            TreeItem<String> item = TreeSingleton.getInstance().getTreeView().getRoot();
+//
+//
+//            while (counter < test.length) {
+//                lva_childFound = false;
+//                for (TreeItem<String> lob_child : item.getChildren()) {
+//                    if (lob_child.getValue().equals(test[counter])) {
+//                        item = lob_child;
+//                        lva_childFound = true;
+//                        break;
+//                    }
+//                }
+//                if (!lva_childFound) {
+//                    return;
+//                }
+//                counter++;
+//            }
+            TreeItem<String> lob_item = searchTreeItem(iob_file);
+            if (lob_item == null) {
+                return;
+            }
+            TreeItem<String> lob_parent = lob_item.getParent();
+            lob_parent.getChildren().remove(lob_item);
+//        } catch (IOException ex) {
+//            ex.printStackTrace();
+//        }
+    }
+
+    private TreeItem<String> searchTreeItem(File iob_file) {
+        TreeItem<String> item = TreeSingleton.getInstance().getTreeView().getRoot();
+        if (iob_file.equals(TreeSingleton.getInstance().getTree().getRoot())) {
+            return item;
+        }
         try {
             boolean lva_childFound;
             String[] test = getRelativePath(iob_file.getCanonicalPath()).split("\\\\");
             int counter = 0;
-            TreeItem<String> item = TreeSingleton.getInstance().getTreeView().getRoot();
 
 
             while (counter < test.length) {
@@ -74,15 +114,14 @@ public class TreeTool {
                     }
                 }
                 if (!lva_childFound) {
-                    return;
+                    return null;
                 }
                 counter++;
             }
-            TreeItem<String> parent = item.getParent();
-            parent.getChildren().remove(item);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+        return item;
     }
 
     public String getRelativePath(String iva_filePath) throws IOException {

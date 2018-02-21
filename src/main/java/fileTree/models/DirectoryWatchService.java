@@ -58,7 +58,8 @@ public class DirectoryWatchService implements Runnable{
         HashMap<Path, FileTime> lco_scanned;
         ArrayList<File> lli_delete = new ArrayList<>();
         PreventFileDuplicates lob_duplicates = TreeSingleton.getInstance().getDuplicateFilePrevention();
-        HashMap<File, File> lco_renamedOrMoved = new HashMap<>();
+        HashMap<File, File> lco_moved = new HashMap<>();
+        HashMap<File, File> lco_renamed = new HashMap<>();
         //------------------------------------------------------------------
 
         //scan the complete fileTree that is watched
@@ -82,18 +83,34 @@ public class DirectoryWatchService implements Runnable{
                 //the file was moved if the creation time of the file that was "added" is the same as the one that was "deleted"
                 if (lob_scannedEntry.getValue().toMillis() == lob_entry.getValue().toMillis()) {
 
-                    //the file was already moved from the ui, just ignore it then
+                    //the file was already moved from the UI, just ignore it
                     if (lob_duplicates.isFileRenamedOrRemoved(lob_entry.getKey())) {
                         lob_duplicates.removeRenamedOrDeleted(lob_entry.getKey());
                     } else {
-                        //add the file to the map
-                        lco_renamedOrMoved.put(lob_entry.getKey().toFile(), lob_scannedEntry.getKey().toFile());
+                        //now we have 3 cases
+
+                        //first case: the file was just renamed
+                        if (!lob_entry.getKey().toFile().getName().equals(lob_scannedEntry.getKey().toFile().getName())) {
+                            String oldFileName = lob_entry.getKey().toString().replaceFirst("[^\\\\]*$", lob_entry.getKey().toFile().getName());
+                            lco_renamed.put(new File(oldFileName), lob_scannedEntry.getKey().toFile());
+
+                            //second case: the file was moved and renamed
+                            if (!lob_entry.getKey().startsWith(lob_scannedEntry.getKey().getParent())) {
+                                lco_moved.put(lob_entry.getKey().toFile(), new File(oldFileName));
+                            }
+
+                        //third case: the file was just moved
+                        } else {
+                            lco_moved.put(lob_entry.getKey().toFile(), lob_scannedEntry.getKey().toFile());
+                        }
                     }
                     wasFileRenamedOrMoved = true;
                     //remove the old file path from the registered items
                     gob_registerdPaths.remove(lob_entry.getKey());
+
                     //add the new path to the registered items
                     register(lob_scannedEntry.getKey());
+
                     //remove the file from the scanned map to speed up further iterations
                     lob_scannedIterator.remove();
                 }
@@ -103,11 +120,7 @@ public class DirectoryWatchService implements Runnable{
             if (!wasFileRenamedOrMoved) {
                 //the file was deleted so delete it from the registered items
                 gob_registerdPaths.remove(lob_entry.getKey());
-                if (TreeSingleton.getInstance().getDuplicateFilePrevention().isFileDeted(lob_entry.getKey())) {
-                    TreeSingleton.getInstance().getDuplicateFilePrevention().removeDeleted(lob_entry.getKey());
-                } else {
-                    lli_delete.add(lob_entry.getKey().toFile());
-                }
+                lli_delete.add(lob_entry.getKey().toFile());
             }
         }
         ArrayList<File> test = new ArrayList<>();
@@ -124,11 +137,16 @@ public class DirectoryWatchService implements Runnable{
             }
         });
 
-        ArrayList<File> lli_renamedOrMovedKeySet = new ArrayList<>(lco_renamedOrMoved.keySet());
-        lli_renamedOrMovedKeySet.sort(PathFileComparator.PATH_COMPARATOR);
-        filesMovedOrRenamed(lli_renamedOrMovedKeySet, lco_renamedOrMoved);
+        for (Map.Entry<File, File> entry : lco_renamed.entrySet()) {
+            System.out.println("OLD: " + entry.getKey() + " NEW: " + entry.getValue());
+            gob_listender.fileRenamed(entry.getKey().toPath(), entry.getValue().getName());
+        }
 
-        lli_delete.sort(PathFileComparator.PATH_REVERSE);
+
+        ArrayList<File> lli_renamedOrMovedKeySet = new ArrayList<>(lco_moved.keySet());
+        lli_renamedOrMovedKeySet.sort(PathFileComparator.PATH_COMPARATOR);
+        filesMoved(lli_renamedOrMovedKeySet, lco_moved);
+
         filesDeleted(lli_delete);
 
         test.sort(PathFileComparator.PATH_COMPARATOR);
@@ -143,22 +161,26 @@ public class DirectoryWatchService implements Runnable{
 
     /**
      * call the fileMovedOrRenamed method of the listener for every file that was moved or renamed
-     * @param ico_files contains all old file paths
+     * @param ili_files contains all old file paths
      * @param ico_renamedOrMoved contains all new file paths
      */
-    private void filesMovedOrRenamed(Collection<File> ico_files, HashMap<File, File> ico_renamedOrMoved) {
-        for (File lob_file : ico_files) {
+    private void filesMoved(ArrayList<File> ili_files, HashMap<File, File> ico_renamedOrMoved) {
+        filterChildren(ili_files);
+        //ili_files.sort(PathFileComparator.PATH_COMPARATOR);
+        for (File lob_file : ili_files) {
             System.out.println("RENAMED: " + lob_file.toPath() + " TO " + ico_renamedOrMoved.get(lob_file).toPath());
-            gob_listender.renamedOrMoved(lob_file.toPath(), ico_renamedOrMoved.get(lob_file).toPath());
+            gob_listender.fileMoved(lob_file.toPath(), ico_renamedOrMoved.get(lob_file).toPath());
         }
     }
 
     /**
      * call the fileDeleted method of the listener for every file that was deleted
-     * @param ico_files contains all files that were deleted
+     * @param ili_files contains all files that were deleted
      */
-    private void filesDeleted(Collection<File> ico_files) {
-        for (File lob_file : ico_files) {
+    private void filesDeleted(ArrayList<File> ili_files) {
+        filterChildren(ili_files);
+
+        for (File lob_file : ili_files) {
             System.out.println("DELETED: " + lob_file.toPath());
             gob_listender.fileDeleted(lob_file.toPath());
         }
@@ -176,6 +198,24 @@ public class DirectoryWatchService implements Runnable{
                 gob_listender.fileAdded(lob_file.toPath());
             } catch (IOException ex) {
                 ex.printStackTrace();
+            }
+        }
+    }
+
+    private void filterChildren(ArrayList<File> ili_files) {
+        ili_files.sort(PathFileComparator.PATH_COMPARATOR);
+        Path lob_currentParent = null;
+        File lob_currentNode;
+        for (Iterator<File> lob_iterator = ili_files.iterator(); lob_iterator.hasNext();) {
+            lob_currentNode = lob_iterator.next();
+            if (lob_currentParent == null) {
+                lob_currentParent = lob_currentNode.toPath();
+            } else {
+                if (lob_currentNode.toPath().startsWith(lob_currentParent)) {
+                    lob_iterator.remove();
+                } else {
+                    lob_currentParent = lob_currentNode.toPath();
+                }
             }
         }
     }
@@ -213,7 +253,7 @@ public class DirectoryWatchService implements Runnable{
     public void run() {
         try {
             while(gob_isRunning) {
-                Thread.sleep(5000);
+                Thread.sleep(10000);
                 scanRootAndCompare();
             }
         } catch (Exception ex) {
