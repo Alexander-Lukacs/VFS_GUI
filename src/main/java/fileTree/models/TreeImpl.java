@@ -5,6 +5,7 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -339,9 +340,9 @@ public class TreeImpl implements Tree {
 
             if (lob_parent != null) {
                 for (FileNode lob_child : lob_node.getChildren()) {
-                    if(!moveFile(lob_child.getFile(), lob_parent.getFile().getCanonicalPath())){
-                        return false;
-                    }
+//                    if(!moveFile(lob_child.getFile(), lob_parent.getFile().getCanonicalPath())){
+//                        return false;
+//                    }
 
                     lob_node.removeChild(lob_node.getFile());
                     lob_child.setParent(lob_parent);
@@ -361,13 +362,15 @@ public class TreeImpl implements Tree {
 
     /**
      * move a file
-     *
      * @param iob_file file to move
      * @param iva_destinationNode new file path
+     * @param iva_moveJustInTree its possible that the file was already moved by the os or the user, to prevent errors
+     *                           this parameter is used to move the file just in the tree object and not on the
+     *                           file system
      * @return true if the file was moved, otherwise false
      */
     @Override
-    public boolean moveFile(File iob_file, String iva_destinationNode) {
+    public boolean moveFile(File iob_file, String iva_destinationNode, boolean iva_moveJustInTree) {
 
         try {
             FileNode lob_fileNode = searchNode(gob_rootNode, iob_file.getCanonicalPath(), 0);
@@ -379,14 +382,17 @@ public class TreeImpl implements Tree {
 
             lob_destinationFile = lob_destination.getFile();
 
-            if (lob_fileNode.getFile().isDirectory()) {
-                FileUtils.moveDirectoryToDirectory(iob_file, lob_destinationFile, false);
-            } else {
-                FileUtils.moveFileToDirectory(iob_file, lob_destinationFile, false);
+            if (!iva_moveJustInTree) {
+                if (lob_fileNode.getFile().isDirectory()) {
+                    FileUtils.moveDirectoryToDirectory(iob_file, lob_destinationFile, false);
+                } else {
+                    FileUtils.moveFileToDirectory(iob_file, lob_destinationFile, false);
+                }
             }
             lob_fileNode.getParent().getChildren().remove(lob_fileNode);
             lob_destination.getChildren().add(lob_fileNode);
             lob_fileNode.setParent(lob_destination);
+            changeFilePath(lob_fileNode.getParent().getFile().toPath(), lob_fileNode);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -395,20 +401,37 @@ public class TreeImpl implements Tree {
     }
 
     /**
+     * this method is used to update all file paths after the file was moved
+     * @param iob_basePath
+     * @param iob_node
+     */
+    private void changeFilePath(Path iob_basePath, FileNode iob_node) {
+        String lva_newFilePath = iob_basePath.toString() + "\\" + iob_node.getFile().getName();
+        iob_node.setFile(new File(lva_newFilePath));
+
+        if (iob_node.getFile().isDirectory()) {
+            for (FileNode lob_child : iob_node.getChildren()) {
+                changeFilePath(iob_node.getFile().toPath(), lob_child);
+            }
+        }
+    }
+
+    /**
      * move a file
-     *
-     * @param iva_path            file path to move
+     * @param iva_path file path to move
      * @param iva_destinationPath new file path
+     * @param iva_moveJustInTree its possible that the file was already moved by the os or the user, to prevent errors
+     *                           this parameter is used to move the file just in the tree object and not on the
+     *                           file system
      * @return true if the file was moved, otherwise false
      */
-    @Override
-    public boolean moveFile(String iva_path, String iva_destinationPath) {
+    public boolean moveFile(String iva_path, String iva_destinationPath, boolean iva_moveJustInTree) {
         //---------------Variables-------------
         FileNode lob_node;
         //-------------------------------------
         try {
             lob_node = searchNode(this.gob_rootNode, iva_path, 0);
-            return lob_node != null && moveFile(lob_node.getFile(), iva_destinationPath);
+            return lob_node != null && moveFile(lob_node.getFile(), iva_destinationPath, iva_moveJustInTree);
         } catch (IOException e) {
             e.printStackTrace();
             return false;

@@ -111,19 +111,25 @@ public interface Tree {
 
     /**
      * move a file
-     * @param iob_node file to move
+     * @param iob_file file to move
      * @param iva_destinationNode new file path
+     * @param iva_moveJustInTree its possible that the file was already moved by the os or the user, to prevent errors
+     *                           this parameter is used to move the file just in the tree object and not on the
+     *                           file system
      * @return true if the file was moved, otherwise false
      */
-    boolean moveFile(File iob_node, String iva_destinationNode);
+    boolean moveFile(File iob_file, String iva_destinationNode, boolean iva_moveJustInTree);
 
     /**
      * move a file
      * @param iva_path file path to move
      * @param iva_destinationPath new file path
+     * @param iva_moveJustInTree its possible that the file was already moved by the os or the user, to prevent errors
+     *                           this parameter is used to move the file just in the tree object and not on the
+     *                           file system
      * @return true if the file was moved, otherwise false
      */
-    boolean moveFile(String iva_path, String iva_destinationPath);
+    boolean moveFile(String iva_path, String iva_destinationPath, boolean iva_moveJustInTree);
 
     /**
      * rename a file

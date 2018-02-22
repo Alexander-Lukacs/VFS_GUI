@@ -78,22 +78,18 @@ public class TreeControl {
 
                 @Override
                 public void fileMoved(Path iob_oldPath, Path iob_newPath) {
-                    //TODO funktioniert NOCH NICHT!!! (Dateien werden intern noch nicht richtig verschoben, das verschieben einer Datei kann zu
-                    // unvorhergesehenem Verhalten führen)
                     try {
-                        System.out.println("renamedOrMoved: " + iob_oldPath + " TO " + iob_newPath);
-                        TreeSingleton.getInstance().getTree().replaceFile(iob_oldPath.toFile(), iob_newPath.toFile(), null);
-//                        TreeTool.getInstance().removeFromTreeView(iob_oldPath.toFile());
-//                        TreeTool.getInstance().addToTreeView(iob_newPath.toFile());
                         TreeItem<String> lob_item = TreeTool.getInstance().getTreeItem(iob_oldPath.toFile());
+                        TreeTool.getInstance().removeFromTreeView(iob_oldPath.toFile());
                         TreeItem<String> lob_parent = TreeTool.getInstance().getTreeItem(iob_newPath.getParent().toFile());
-
-                        lob_item.getParent().getChildren().remove(lob_item);
                         lob_parent.getChildren().add(lob_item);
 
+                        String lva_destination = iob_newPath.toString().replaceFirst("\\\\[^\\\\]*$", "");
+                        TreeSingleton.getInstance().getTree().moveFile(iob_oldPath.toFile(), lva_destination, true);
+
                         String lva_oldRelativePath = TreeTool.getInstance().getRelativePath(iob_oldPath.toString());
-                        String lva_newRelativePath = TreeTool.getInstance().getRelativePath(iob_newPath.toString());
-                        gob_restClient.moveOrRename(lva_oldRelativePath, lva_newRelativePath);
+                        String lva_newRelativePath = TreeTool.getInstance().getRelativePath(lva_destination + "\\");
+                        gob_restClient.moveFile(lva_oldRelativePath, lva_newRelativePath);
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
