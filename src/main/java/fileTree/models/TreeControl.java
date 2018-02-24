@@ -5,7 +5,6 @@ import fileTree.interfaces.FileChangeListener;
 import fileTree.interfaces.Tree;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
-import javafx.util.Callback;
 import rest.RestClient;
 import tools.TreeTool;
 import tools.Utils;
@@ -70,8 +69,8 @@ public class TreeControl {
 
                 @Override
                 public void fileDeleted(Path iob_path) {
-                    if (TreeSingleton.getInstance().getDuplicateFilePrevention().isFileDeted(iob_path)) {
-                        TreeSingleton.getInstance().getDuplicateFilePrevention().removeDeleted(iob_path);
+                    if (TreeSingleton.getInstance().getDuplicateOperationsPrevention().wasFileDeted(iob_path)) {
+                        TreeSingleton.getInstance().getDuplicateOperationsPrevention().removeDeleted(iob_path);
                     } else {
                         TreeItem<String> lob_itemToDelete = TreeTool.getInstance().getTreeItem(iob_path.toFile());
                         deleteFile(iob_path.toFile(), lob_itemToDelete);
@@ -80,20 +79,10 @@ public class TreeControl {
 
                 @Override
                 public void fileMoved(Path iob_oldPath, Path iob_newPath) {
-                    try {
-                        TreeItem<String> lob_item = TreeTool.getInstance().getTreeItem(iob_oldPath.toFile());
-                        TreeTool.getInstance().removeFromTreeView(iob_oldPath.toFile());
-                        TreeItem<String> lob_parent = TreeTool.getInstance().getTreeItem(iob_newPath.getParent().toFile());
-                        lob_parent.getChildren().add(lob_item);
-
-                        String lva_destination = iob_newPath.toString().replaceFirst("\\\\[^\\\\]*$", "");
-                        TreeSingleton.getInstance().getTree().moveFile(iob_oldPath.toFile(), lva_destination, true);
-
-                        String lva_oldRelativePath = TreeTool.getInstance().getRelativePath(iob_oldPath.toString());
-                        String lva_newRelativePath = TreeTool.getInstance().getRelativePath(lva_destination + "\\");
-                        gob_restClient.moveFile(lva_oldRelativePath, lva_newRelativePath);
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
+                    if (TreeSingleton.getInstance().getDuplicateOperationsPrevention().wasFilesMoved(iob_oldPath)) {
+                        TreeSingleton.getInstance().getDuplicateOperationsPrevention().removeMoved(iob_oldPath);
+                    } else {
+                        moveFile(iob_oldPath, iob_newPath.getParent());
                     }
                 }
 
@@ -338,8 +327,29 @@ public class TreeControl {
         return false;
     }
 
+    private void moveFile(Path iob_path, Path iob_destination) {
+        //-------------------------Variables------------------------------------
+        TreeTool lob_tool = TreeTool.getInstance();
+        TreeItem<String> lob_item = lob_tool.getTreeItem(iob_path.toFile());
+        TreeItem<String> lob_parent = TreeTool.getInstance().getTreeItem(iob_destination.toFile());
+        //----------------------------------------------------------------------
+        try {
+            lob_tool.removeFromTreeView(iob_path.toFile());
+            lob_parent.getChildren().add(lob_item);
+
+            String lva_destination = iob_destination.toString();
+            TreeSingleton.getInstance().getTree().moveFile(iob_path.toFile(), lva_destination, true);
+
+            String lva_oldRelativePath = TreeTool.getInstance().getRelativePath(iob_path.toString());
+            String lva_newRelativePath = TreeTool.getInstance().getRelativePath(lva_destination + "\\");
+            gob_restClient.moveFile(lva_oldRelativePath, lva_newRelativePath);
+        }catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
     private void addAllDeleted(File iob_file) {
-        TreeSingleton.getInstance().getDuplicateFilePrevention().putDeleted(iob_file.toPath());
+        TreeSingleton.getInstance().getDuplicateOperationsPrevention().putDeleted(iob_file.toPath());
 
         if (iob_file.isDirectory()) {
             for (File file : iob_file.listFiles()) {
@@ -349,7 +359,7 @@ public class TreeControl {
     }
 
     private void addAllMovedOrRenamed(File iob_file) {
-        TreeSingleton.getInstance().getDuplicateFilePrevention().putRenamedOrMove(iob_file.toPath());
+        TreeSingleton.getInstance().getDuplicateOperationsPrevention().putMoved(iob_file.toPath());
 
         if (iob_file.isDirectory()) {
             for (File file : iob_file.listFiles()) {
@@ -382,7 +392,7 @@ public class TreeControl {
             lob_parentItem.getChildren().addAll(lob_selectedItem.getChildren());
             lob_parentItem.getChildren().remove(lob_selectedItem);
 
-            TreeSingleton.getInstance().getDuplicateFilePrevention().putDeleted(lob_selectedFile.toPath());
+            TreeSingleton.getInstance().getDuplicateOperationsPrevention().putDeleted(lob_selectedFile.toPath());
             gob_restClient.deleteDirectoryOnly(lva_relativePath);
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -392,13 +402,13 @@ public class TreeControl {
     private void createNewDirectory() {
         File lob_newFile = buildNewFile("\\Neuer Ordner$");
         createFileOrDirectory(lob_newFile, true);
-        TreeSingleton.getInstance().getDuplicateFilePrevention().putCreated(lob_newFile.toPath());
+        TreeSingleton.getInstance().getDuplicateOperationsPrevention().putCreated(lob_newFile.toPath());
     }
 
     private void createNewFile() {
         File lob_newFile = buildNewFile("\\Neue Datei$.txt");
         createFileOrDirectory(lob_newFile, false);
-        TreeSingleton.getInstance().getDuplicateFilePrevention().putCreated(lob_newFile.toPath());
+        TreeSingleton.getInstance().getDuplicateOperationsPrevention().putCreated(lob_newFile.toPath());
 
     }
 

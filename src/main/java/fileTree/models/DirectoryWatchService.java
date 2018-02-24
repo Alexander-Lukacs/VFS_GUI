@@ -57,7 +57,7 @@ public class DirectoryWatchService implements Runnable{
         HashMap<Path, FileTime> lco_tmp;
         HashMap<Path, FileTime> lco_scanned;
         ArrayList<File> lli_delete = new ArrayList<>();
-        PreventFileDuplicates lob_duplicates = TreeSingleton.getInstance().getDuplicateFilePrevention();
+        PreventDuplicateOperation lob_duplicates = TreeSingleton.getInstance().getDuplicateOperationsPrevention();
         HashMap<File, File> lco_moved = new HashMap<>();
         HashMap<File, File> lco_renamed = new HashMap<>();
         //------------------------------------------------------------------
@@ -84,8 +84,8 @@ public class DirectoryWatchService implements Runnable{
                 if (lob_scannedEntry.getValue().toMillis() == lob_entry.getValue().toMillis()) {
 
                     //the file was already moved from the UI, just ignore it
-                    if (lob_duplicates.isFileRenamedOrRemoved(lob_entry.getKey())) {
-                        lob_duplicates.removeRenamedOrDeleted(lob_entry.getKey());
+                    if (lob_duplicates.wasFilesMoved(lob_entry.getKey())) {
+                        lob_duplicates.removeMoved(lob_entry.getKey());
                     } else {
                         //now we have 3 cases
 
@@ -125,8 +125,8 @@ public class DirectoryWatchService implements Runnable{
         }
         ArrayList<File> test = new ArrayList<>();
         lco_scanned.keySet().forEach(lob_key -> {
-            if (TreeSingleton.getInstance().getDuplicateFilePrevention().isFileCreated(lob_key)) {
-                TreeSingleton.getInstance().getDuplicateFilePrevention().removeCreated(lob_key);
+            if (TreeSingleton.getInstance().getDuplicateOperationsPrevention().wasFileCreated(lob_key)) {
+                TreeSingleton.getInstance().getDuplicateOperationsPrevention().removeCreated(lob_key);
                 try {
                     register(lob_key);
                 } catch (IOException ex) {
