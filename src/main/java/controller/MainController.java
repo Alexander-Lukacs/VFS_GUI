@@ -17,7 +17,10 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import tools.AlertWindows;
+import tools.Utils;
 
+import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 
 import static controller.constants.ApplicationConstants.GC_APPLICATION_ICON_PATH;
@@ -40,7 +43,7 @@ public class MainController {
 
     public void onClick(ActionEvent e) throws RuntimeException, IOException {
         RestClient lob_restClient;
-
+        DataCache lob_dataCache = DataCache.getDataCache();
         if (((Button) e.getSource()).getText().equals(GC_SETTINGS)) {
             FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("views/settings.fxml"));
             AnchorPane lob_pane = lob_loader.load();
@@ -60,6 +63,13 @@ public class MainController {
             gob_userCache.clearDataCache();
             LoginController ob_x = new LoginController();
             ob_x.start(stage);
+        } else if (((Button) e.getSource()).getText().equals("Show in explorer")) {
+            if (Desktop.isDesktopSupported()) {
+                Desktop desktop = Desktop.getDesktop();
+
+                desktop.open(new File(Utils.getUserBasePath() + "\\" + lob_dataCache.get(DataCache.GC_IP_KEY)
+                        + "_" + lob_dataCache.get(DataCache.GC_PORT_KEY)));
+            }
         }
     }
 

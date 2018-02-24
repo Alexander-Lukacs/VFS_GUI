@@ -1,10 +1,12 @@
 package fileTree.models;
 
 import builder.RestClientBuilder;
-import rest.RestClient;
 import fileTree.interfaces.FileChangeListener;
 import fileTree.interfaces.Tree;
 import javafx.scene.control.*;
+import javafx.scene.input.*;
+import javafx.util.Callback;
+import rest.RestClient;
 import tools.TreeTool;
 import tools.Utils;
 
@@ -16,7 +18,7 @@ import java.util.Collection;
 public class TreeControl {
 
 
-
+    private final DataFormat objectDataFormat = new DataFormat("application/x-java-serialized-object");
     private Tree gob_tree;
     private TreeView<String> gob_treeView;
     private ContextMenu gob_contextMenu;
@@ -111,6 +113,89 @@ public class TreeControl {
                     }
                 }
             });
+
+//            gob_treeView.setCellFactory(new Callback<TreeView<String>, TreeCell<String>>() {
+//                @Override
+//                public TreeCell<String> call(TreeView<String> siTreeView) {
+//                    TreeCell<String> cell = new TreeCell<String>() {
+//                        @Override
+//                        protected void updateItem(String item, boolean empty) {
+//                            super.updateItem(item, empty);
+//                            if (item != null) {
+//                                setGraphic(getTreeItem().getGraphic());
+//                                setText(item);
+//                            } else {
+//                                setText("");
+//                                setGraphic(null);
+//                            }
+//                        }
+//                    };
+//
+//                    cell.setOnDragDetected(event -> {
+//                        TreeItem<String> item = cell.getTreeItem();
+//
+//                        if (item != null && item.isLeaf()) {
+//                            Dragboard db = cell.startDragAndDrop(TransferMode.MOVE);
+//                            ClipboardContent content = new ClipboardContent();
+//                            content.putString(item.getValue());
+//                            db.setContent(content);
+//                        }
+//
+//                        event.consume();
+//                    });
+//
+//                    cell.setOnDragOver(event -> {
+//                        TreeItem<String> item = cell.getTreeItem();
+//                        Object cellDraggedValue;
+//                        Object cellHoveredValue;
+//
+//                        if (item != null && event.getGestureSource() != cell) {
+//
+//                            TreeCell cellDragged = (TreeCell) event.getGestureSource();
+//                            cellDraggedValue = cellDragged.getTreeItem().getParent().getValue();
+//                            cellHoveredValue = cell.getTreeItem().getValue();
+//
+//                            if (cellDraggedValue != cellHoveredValue) {
+//                                event.acceptTransferModes(TransferMode.MOVE);
+//                            }
+//                        }
+//
+//                        event.consume();
+//                    });
+//
+//                    cell.setOnDragEntered(event -> {
+//                        TreeItem<String> item = cell.getTreeItem();
+//                        Object cellDraggedValue;
+//                        Object cellHoveredValue;
+//
+//                        if (item != null && event.getGestureSource() != cell) {
+//
+//                            TreeCell cellDragged = (TreeCell) event.getGestureSource();
+//                            cellDraggedValue = cellDragged.getTreeItem().getParent().getValue();
+//                            cellHoveredValue = cell.getTreeItem().getValue();
+//
+//                            if (cellDraggedValue != cellHoveredValue) {
+//                                cell.setStyle("-fx-background-color: powderblue;");
+//                            }
+//                        }
+//
+//                        event.consume();
+//                    });
+//
+////                    cell.setOnDragDropped(event -> {
+////                        TreeItem<String> item = cell.getTreeItem();
+////                        event.consume();
+////                    });
+//
+//                    cell.setOnDragExited(event -> {
+//                        cell.setStyle("-fx-background-color: white");
+//                        event.consume();
+//                    });
+//
+//                    return cell;
+//                }
+//            });
+
             w.start();
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -163,7 +248,9 @@ public class TreeControl {
         gob_contextMenu = new ContextMenu();
         lob_deleteFile = new MenuItem("Delete");
         lob_deleteFile.setOnAction(event -> {
-            File lob_selectedFile = buildFileFromSelectedItem();
+            File lob_selectedFile = buildFileFromItem(
+                    gob_treeView.getSelectionModel().getSelectedItem()
+            );
             TreeItem<String> lob_selectedItem = gob_treeView.getSelectionModel().getSelectedItem();
             if (deleteFile(lob_selectedFile, lob_selectedItem)) {
                 addAllDeleted(lob_selectedFile);
@@ -172,22 +259,22 @@ public class TreeControl {
 
         lob_newDirectory = new MenuItem("New Directory");
         lob_newDirectory.setOnAction(event ->
-            createNewDirectory()
+                createNewDirectory()
         );
 
         lob_deleteDirectoryOnly = new MenuItem("Delete only Directory");
         lob_deleteDirectoryOnly.setOnAction(event ->
-            deleteDirectoryOnly()
+                deleteDirectoryOnly()
         );
 
         lob_renameFile = new MenuItem("Rename");
         lob_renameFile.setOnAction(event ->
-            renameFile()
+                renameFile()
         );
 
         lob_newFile = new MenuItem("New File");
         lob_newFile.setOnAction(event ->
-            createNewFile()
+                createNewFile()
         );
         gob_contextMenu.getItems().addAll(lob_deleteFile,
                 lob_newDirectory,
@@ -198,7 +285,9 @@ public class TreeControl {
 
     private void onContextMenuRequest() {
         //-------------------------------Variables----------------------------------------
-        File lob_selectedFile = buildFileFromSelectedItem();
+        File lob_selectedFile = buildFileFromItem(
+                gob_treeView.getSelectionModel().getSelectedItem()
+        );
         //--------------------------------------------------------------------------------
 
         if (gob_treeView.getSelectionModel().getSelectedItem() == null) {
@@ -226,7 +315,8 @@ public class TreeControl {
 
     /**
      * delete a file on the client, explorer and server
-     * @param iob_file file to delete
+     *
+     * @param iob_file         file to delete
      * @param iob_itemToDelete item to delete in the tree
      * @return true if all files were deleted, otherwise false
      */
@@ -270,7 +360,9 @@ public class TreeControl {
 
     private void deleteDirectoryOnly() {
         //-------------------------------Variables----------------------------------------
-        File lob_selectedFile = buildFileFromSelectedItem();
+        File lob_selectedFile = buildFileFromItem(
+                gob_treeView.getSelectionModel().getSelectedItem()
+        );
         String lva_relativePath;
         //--------------------------------------------------------------------------------
 
@@ -299,7 +391,7 @@ public class TreeControl {
 
     private void createNewDirectory() {
         File lob_newFile = buildNewFile("\\Neuer Ordner$");
-        createFileOrDirectory(lob_newFile,true);
+        createFileOrDirectory(lob_newFile, true);
         TreeSingleton.getInstance().getDuplicateFilePrevention().putCreated(lob_newFile.toPath());
     }
 
@@ -312,7 +404,9 @@ public class TreeControl {
 
     private File buildNewFile(String iva_name) {
         //-------------------------------Variables----------------------------
-        File lob_selectedFile = buildFileFromSelectedItem();
+        File lob_selectedFile = buildFileFromItem(
+                gob_treeView.getSelectionModel().getSelectedItem()
+        );
         File lob_newFile;
         int lva_counter = 1;
         String lva_newFilePath;
@@ -374,17 +468,18 @@ public class TreeControl {
         return true;
     }
 
-    private File buildFileFromSelectedItem() {
-        TreeItem<String> lob_treeItem = gob_treeView.getSelectionModel().getSelectedItem();
+    private File buildFileFromItem(TreeItem<String> iob_treeItem) {
         StringBuilder lob_path = new StringBuilder();
 
-        while (lob_treeItem != null) {
-            lob_path.insert(0, lob_treeItem.getValue());
+        while (iob_treeItem != null) {
+            lob_path.insert(0, iob_treeItem.getValue());
             lob_path.insert(0, "\\");
-            lob_treeItem = lob_treeItem.getParent();
+            iob_treeItem = iob_treeItem.getParent();
         }
         lob_path.insert(0, Utils.getUserBasePath());
+        gob_tree.getFile("hier_pfad");
         return gob_tree.getFile(lob_path.toString());
+
     }
 
 

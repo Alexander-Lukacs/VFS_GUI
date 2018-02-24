@@ -61,36 +61,12 @@ public class TreeTool {
     }
 
     public void removeFromTreeView(File iob_file) {
-//        try {
-//            boolean lva_childFound;
-//            String[] test = getRelativePath(iob_file.getCanonicalPath()).split("\\\\");
-//            int counter = 0;
-//            TreeItem<String> item = TreeSingleton.getInstance().getTreeView().getRoot();
-//
-//
-//            while (counter < test.length) {
-//                lva_childFound = false;
-//                for (TreeItem<String> lob_child : item.getChildren()) {
-//                    if (lob_child.getValue().equals(test[counter])) {
-//                        item = lob_child;
-//                        lva_childFound = true;
-//                        break;
-//                    }
-//                }
-//                if (!lva_childFound) {
-//                    return;
-//                }
-//                counter++;
-//            }
-            TreeItem<String> lob_item = searchTreeItem(iob_file);
-            if (lob_item == null) {
-                return;
-            }
-            TreeItem<String> lob_parent = lob_item.getParent();
-            lob_parent.getChildren().remove(lob_item);
-//        } catch (IOException ex) {
-//            ex.printStackTrace();
-//        }
+        TreeItem<String> lob_item = searchTreeItem(iob_file);
+        if (lob_item == null) {
+            return;
+        }
+        TreeItem<String> lob_parent = lob_item.getParent();
+        lob_parent.getChildren().remove(lob_item);
     }
 
     private TreeItem<String> searchTreeItem(File iob_file) {
