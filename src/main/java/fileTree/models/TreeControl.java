@@ -97,8 +97,18 @@ public class TreeControl {
 
                 @Override
                 public void fileRenamed(Path iob_path, String iva_newName) {
-                    System.out.println("RENAMED: " + iob_path + " TO: " + iva_newName);
-                    TreeSingleton.getInstance().getTree().renameFile(iob_path.toFile(), iva_newName);
+                    try {
+                        System.out.println("RENAMED: " + iob_path + " TO: " + iva_newName);
+                        TreeSingleton.getInstance().getTree().renameFile(iob_path.toFile(), iva_newName);
+                        TreeItem<String> lob_item = TreeTool.getInstance().getTreeItem(iob_path.toFile());
+                        lob_item.setValue(iva_newName);
+
+                        String lva_relativePath = TreeTool.getInstance().getRelativePath(iob_path.toString());
+
+                        gob_restClient.renameFile(lva_relativePath, iva_newName);
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
                 }
             });
             w.start();

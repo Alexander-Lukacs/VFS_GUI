@@ -154,13 +154,5 @@ public interface Tree {
      */
     TreeDifference compareTrees(Tree iob_tree);
 
-    /**
-     * replace the file of a node and move the node to the corresponding position in the tree
-     * @param iob_file the old file that is not needed or does not exist anymore
-     * @param iob_newFile the new file*
-     * @param iob_nodePointer use this only if you are sure that the node is in the correct position and just the file has
-     *                      to be replaced
-     */
-    boolean replaceFile(File iob_file, File iob_newFile, FileNode iob_nodePointer);
 }
 

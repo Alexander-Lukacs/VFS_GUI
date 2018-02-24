@@ -188,10 +188,20 @@ public class RestClient {
     }
 
 // ---------------------------------------------------------------------------------------------------------------------
-// Move or rename a file on the server
+// Move a file on the server
 // ---------------------------------------------------------------------------------------------------------------------
     public void moveFile(String iva_relativePath, String iva_newRelativePath) {
         Response lob_response = gob_webTarget.path("/auth/files/move").queryParam("path", iva_relativePath).request()
+                .post(Entity.entity(iva_newRelativePath, MediaType.TEXT_PLAIN));
+        System.out.println(lob_response.getStatus());
+    }
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Rename a file on the server
+// ---------------------------------------------------------------------------------------------------------------------
+    public void renameFile(String iva_relativePath, String iva_newRelativePath) {
+        Response lob_response = gob_webTarget.path("/auth/files/rename").queryParam("path", iva_relativePath).request()
                 .post(Entity.entity(iva_newRelativePath, MediaType.TEXT_PLAIN));
         System.out.println(lob_response.getStatus());
     }
