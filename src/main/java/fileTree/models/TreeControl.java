@@ -9,7 +9,6 @@ import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.util.Callback;
-import javafx.scene.input.*;
 import rest.RestClient;
 import tools.TreeTool;
 import tools.Utils;
@@ -373,7 +372,7 @@ public class TreeControl {
             String lva_oldRelativePath = TreeTool.getInstance().getRelativePath(iob_path.toString());
             String lva_newRelativePath = TreeTool.getInstance().getRelativePath(lva_destination + "\\");
             gob_restClient.moveFile(lva_oldRelativePath, lva_newRelativePath);
-        }catch (IOException ex) {
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
@@ -522,5 +521,22 @@ public class TreeControl {
 
     }
 
+    public String getPathOfSelectedItem() {
+        TreeItem<String> lob_treeItem = gob_treeView.getSelectionModel().getSelectedItem();
+        File lob_file;
 
+        if (lob_treeItem != null) {
+            lob_file = buildFileFromItem(lob_treeItem);
+
+            if (lob_file.isFile()) {
+                lob_treeItem = lob_treeItem.getParent();
+            }
+
+            lob_file = buildFileFromItem(lob_treeItem);
+
+            return lob_file.toPath().toString();
+        }
+
+        return null;
+    }
 }
