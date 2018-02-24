@@ -4,6 +4,11 @@ import builder.RestClientBuilder;
 import fileTree.interfaces.FileChangeListener;
 import fileTree.interfaces.Tree;
 import javafx.scene.control.*;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DataFormat;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
+import javafx.util.Callback;
 import javafx.scene.input.*;
 import rest.RestClient;
 import tools.TreeTool;
@@ -103,87 +108,112 @@ public class TreeControl {
                 }
             });
 
-//            gob_treeView.setCellFactory(new Callback<TreeView<String>, TreeCell<String>>() {
-//                @Override
-//                public TreeCell<String> call(TreeView<String> siTreeView) {
-//                    TreeCell<String> cell = new TreeCell<String>() {
-//                        @Override
-//                        protected void updateItem(String item, boolean empty) {
-//                            super.updateItem(item, empty);
-//                            if (item != null) {
-//                                setGraphic(getTreeItem().getGraphic());
-//                                setText(item);
-//                            } else {
-//                                setText("");
-//                                setGraphic(null);
-//                            }
-//                        }
-//                    };
-//
-//                    cell.setOnDragDetected(event -> {
-//                        TreeItem<String> item = cell.getTreeItem();
-//
-//                        if (item != null && item.isLeaf()) {
-//                            Dragboard db = cell.startDragAndDrop(TransferMode.MOVE);
-//                            ClipboardContent content = new ClipboardContent();
-//                            content.putString(item.getValue());
-//                            db.setContent(content);
-//                        }
-//
-//                        event.consume();
-//                    });
-//
-//                    cell.setOnDragOver(event -> {
-//                        TreeItem<String> item = cell.getTreeItem();
-//                        Object cellDraggedValue;
-//                        Object cellHoveredValue;
-//
-//                        if (item != null && event.getGestureSource() != cell) {
-//
-//                            TreeCell cellDragged = (TreeCell) event.getGestureSource();
-//                            cellDraggedValue = cellDragged.getTreeItem().getParent().getValue();
-//                            cellHoveredValue = cell.getTreeItem().getValue();
-//
-//                            if (cellDraggedValue != cellHoveredValue) {
-//                                event.acceptTransferModes(TransferMode.MOVE);
-//                            }
-//                        }
-//
-//                        event.consume();
-//                    });
-//
-//                    cell.setOnDragEntered(event -> {
-//                        TreeItem<String> item = cell.getTreeItem();
-//                        Object cellDraggedValue;
-//                        Object cellHoveredValue;
-//
-//                        if (item != null && event.getGestureSource() != cell) {
-//
-//                            TreeCell cellDragged = (TreeCell) event.getGestureSource();
-//                            cellDraggedValue = cellDragged.getTreeItem().getParent().getValue();
-//                            cellHoveredValue = cell.getTreeItem().getValue();
-//
-//                            if (cellDraggedValue != cellHoveredValue) {
-//                                cell.setStyle("-fx-background-color: powderblue;");
-//                            }
-//                        }
-//
-//                        event.consume();
-//                    });
-//
-////                    cell.setOnDragDropped(event -> {
-////                        TreeItem<String> item = cell.getTreeItem();
-////                        event.consume();
-////                    });
-//
-//                    cell.setOnDragExited(event -> {
-//                        cell.setStyle("-fx-background-color: white");
-//                        event.consume();
-//                    });
-//
-//                    return cell;
-//                }
-//            });
+            gob_treeView.setCellFactory(new Callback<TreeView<String>, TreeCell<String>>() {
+                @Override
+                public TreeCell<String> call(TreeView<String> siTreeView) {
+                    TreeCell<String> lob_cell = new TreeCell<String>() {
+                        @Override
+                        protected void updateItem(String iva_item, boolean iva_empty) {
+                            super.updateItem(iva_item, iva_empty);
+
+                            if (!iva_empty) {
+                                setGraphic(getTreeItem().getGraphic());
+                                setText(getItem() == null ? "" : getItem());
+                            } else {
+                                setText(null);
+                                setGraphic(null);
+                            }
+                        }
+                    };
+
+                    lob_cell.setOnDragDetected(event -> {
+                        TreeItem<String> lob_selectedItem = lob_cell.getTreeItem();
+                        Dragboard lob_dragBoard;
+                        ClipboardContent lob_content;
+
+                        if (lob_selectedItem != null && lob_selectedItem.isLeaf()) {
+                            lob_dragBoard = lob_cell.startDragAndDrop(TransferMode.MOVE);
+                            lob_content = new ClipboardContent();
+                            lob_content.putString(lob_selectedItem.getValue());
+                            lob_dragBoard.setContent(lob_content);
+                        }
+
+                        event.consume();
+                    });
+
+                    lob_cell.setOnDragDropped(event -> {
+                        TreeItem<String> treeItemHovered = lob_cell.getTreeItem();
+                        TreeCell b = (TreeCell) event.getGestureSource();
+                        TreeItem treeItemDragged = b.getTreeItem();
+
+                        System.out.println("cellHovered " + treeItemHovered.getValue());
+                        System.out.println("cellDragged " + treeItemDragged.getValue());
+
+                        File fileHovered = buildFileFromItem(treeItemHovered);
+                        File fileDragged = buildFileFromItem(treeItemDragged);
+                        moveFile(fileDragged.toPath(), fileHovered.toPath());
+                        TreeSingleton.getInstance().getDuplicateOperationsPrevention().putMoved(fileHovered.toPath());
+
+                        event.setDropCompleted(true);
+                        event.consume();
+                    });
+
+                    // -------------------------------------------------------------------------------------------------
+                    // Drag Animations
+                    // -------------------------------------------------------------------------------------------------
+
+                    lob_cell.setOnDragEntered(event -> {
+                        TreeItem<String> lob_selectedItem = lob_cell.getTreeItem();
+                        Object lva_cellDraggedValue;
+                        Object lva_cellHoveredValue;
+                        TreeCell lob_cellDragged;
+
+                        if (lob_selectedItem != null && !buildFileFromItem(lob_cell.getTreeItem()).isFile() &&
+                                event.getGestureSource() != lob_cell) {
+
+                            lob_cellDragged = (TreeCell) event.getGestureSource();
+                            lva_cellDraggedValue = lob_cellDragged.getTreeItem().getParent().getValue();
+                            lva_cellHoveredValue = lob_cell.getTreeItem().getValue();
+
+                            if (lva_cellDraggedValue != lva_cellHoveredValue) {
+                                lob_cell.setStyle("-fx-background-color: powderblue;");
+                            }
+                        }
+
+                        event.consume();
+                    });
+
+                    lob_cell.setOnDragOver(event -> {
+                        TreeItem<String> lob_selectedItem = lob_cell.getTreeItem();
+                        Object lva_cellDraggedValue;
+                        Object lva_cellHoveredValue;
+                        TreeCell lob_cellDragged;
+
+                        if (lob_selectedItem != null && event.getGestureSource() != lob_cell &&
+                                !buildFileFromItem(lob_cell.getTreeItem()).isFile()) {
+
+                            lob_cellDragged = (TreeCell) event.getGestureSource();
+                            lva_cellDraggedValue = lob_cellDragged.getTreeItem().getParent().getValue();
+                            lva_cellHoveredValue = lob_cell.getTreeItem().getValue();
+
+                            if (lva_cellDraggedValue != lva_cellHoveredValue) {
+                                event.acceptTransferModes(TransferMode.MOVE);
+                            }
+                        }
+
+                        event.consume();
+                    });
+
+                    lob_cell.setOnDragExited(event -> {
+                        lob_cell.setStyle("-fx-background-color: white");
+                        lob_cell.setStyle("-fx-focus-color: blue");
+
+                        event.consume();
+                    });
+
+                    return lob_cell;
+                }
+            });
 
             w.start();
         } catch (IOException ex) {
