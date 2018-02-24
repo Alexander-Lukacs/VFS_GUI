@@ -87,7 +87,7 @@ public class TreeControl {
                     if (TreeSingleton.getInstance().getDuplicateOperationsPrevention().wasFilesMoved(iob_oldPath)) {
                         TreeSingleton.getInstance().getDuplicateOperationsPrevention().removeMoved(iob_oldPath);
                     } else {
-                        moveFile(iob_oldPath, iob_newPath.getParent());
+                        moveFile(iob_oldPath, iob_newPath.getParent(), true);
                     }
                 }
 
@@ -151,8 +151,8 @@ public class TreeControl {
 
                         File fileHovered = buildFileFromItem(treeItemHovered);
                         File fileDragged = buildFileFromItem(treeItemDragged);
-                        moveFile(fileDragged.toPath(), fileHovered.toPath());
-                        TreeSingleton.getInstance().getDuplicateOperationsPrevention().putMoved(fileHovered.toPath());
+                        moveFile(fileDragged.toPath(), fileHovered.toPath(), false);
+                        TreeSingleton.getInstance().getDuplicateOperationsPrevention().putMoved(fileDragged.toPath());
 
                         event.setDropCompleted(true);
                         event.consume();
@@ -357,7 +357,7 @@ public class TreeControl {
         return false;
     }
 
-    private void moveFile(Path iob_path, Path iob_destination) {
+    private void moveFile(Path iob_path, Path iob_destination, boolean iva_moveJustInTree) {
         //-------------------------Variables------------------------------------
         TreeTool lob_tool = TreeTool.getInstance();
         TreeItem<String> lob_item = lob_tool.getTreeItem(iob_path.toFile());
@@ -368,7 +368,7 @@ public class TreeControl {
             lob_parent.getChildren().add(lob_item);
 
             String lva_destination = iob_destination.toString();
-            TreeSingleton.getInstance().getTree().moveFile(iob_path.toFile(), lva_destination, true);
+            TreeSingleton.getInstance().getTree().moveFile(iob_path.toFile(), lva_destination, iva_moveJustInTree);
 
             String lva_oldRelativePath = TreeTool.getInstance().getRelativePath(iob_path.toString());
             String lva_newRelativePath = TreeTool.getInstance().getRelativePath(lva_destination + "\\");

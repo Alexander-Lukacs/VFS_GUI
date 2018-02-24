@@ -84,9 +84,9 @@ public class DirectoryWatchService implements Runnable{
                 if (lob_scannedEntry.getValue().toMillis() == lob_entry.getValue().toMillis()) {
 
                     //the file was already moved from the UI, just ignore it
-                    if (lob_duplicates.wasFilesMoved(lob_entry.getKey())) {
-                        lob_duplicates.removeMoved(lob_entry.getKey());
-                    } else {
+//                    if (lob_duplicates.wasFilesMoved(lob_entry.getKey())) {
+//                        lob_duplicates.removeMoved(lob_entry.getKey());
+//                    } else {
                         //now we have 3 cases
 
                         //first case: the file was just renamed
@@ -103,7 +103,7 @@ public class DirectoryWatchService implements Runnable{
                         } else {
                             lco_moved.put(lob_entry.getKey().toFile(), lob_scannedEntry.getKey().toFile());
                         }
-                    }
+//                    }
                     wasFileRenamedOrMoved = true;
                     //remove the old file path from the registered items
                     gob_registerdPaths.remove(lob_entry.getKey());
@@ -143,9 +143,9 @@ public class DirectoryWatchService implements Runnable{
         }
 
 
-        ArrayList<File> lli_renamedOrMovedKeySet = new ArrayList<>(lco_moved.keySet());
-        lli_renamedOrMovedKeySet.sort(PathFileComparator.PATH_COMPARATOR);
-        filesMoved(lli_renamedOrMovedKeySet, lco_moved);
+        ArrayList<File> lli_moved = new ArrayList<>(lco_moved.keySet());
+        lli_moved.sort(PathFileComparator.PATH_COMPARATOR);
+        filesMoved(lli_moved, lco_moved);
 
         filesDeleted(lli_delete);
 
@@ -162,14 +162,14 @@ public class DirectoryWatchService implements Runnable{
     /**
      * call the fileMovedOrRenamed method of the listener for every file that was moved or renamed
      * @param ili_files contains all old file paths
-     * @param ico_renamedOrMoved contains all new file paths
+     * @param ico_moved contains all new file paths
      */
-    private void filesMoved(ArrayList<File> ili_files, HashMap<File, File> ico_renamedOrMoved) {
+    private void filesMoved(ArrayList<File> ili_files, HashMap<File, File> ico_moved) {
         filterChildren(ili_files);
         //ili_files.sort(PathFileComparator.PATH_COMPARATOR);
         for (File lob_file : ili_files) {
-            System.out.println("RENAMED: " + lob_file.toPath() + " TO " + ico_renamedOrMoved.get(lob_file).toPath());
-            gob_listender.fileMoved(lob_file.toPath(), ico_renamedOrMoved.get(lob_file).toPath());
+            System.out.println("MOVED: " + lob_file.toPath() + " TO " + ico_moved.get(lob_file).toPath());
+            gob_listender.fileMoved(lob_file.toPath(), ico_moved.get(lob_file).toPath());
         }
     }
 
