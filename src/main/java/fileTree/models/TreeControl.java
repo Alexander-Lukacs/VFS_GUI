@@ -131,7 +131,7 @@ public class TreeControl {
                         Dragboard lob_dragBoard;
                         ClipboardContent lob_content;
 
-                        if (lob_selectedItem != null && lob_selectedItem.isLeaf()) {
+                        if (lob_selectedItem != null) {
                             lob_dragBoard = lob_cell.startDragAndDrop(TransferMode.MOVE);
                             lob_content = new ClipboardContent();
                             lob_content.putString(lob_selectedItem.getValue());
@@ -206,7 +206,7 @@ public class TreeControl {
 
                     lob_cell.setOnDragExited(event -> {
                         lob_cell.setStyle("-fx-background-color: white");
-                        lob_cell.setStyle("-fx-focus-color: blue");
+                        lob_cell.setStyle("-fx-focus-color: black");
 
                         event.consume();
                     });
