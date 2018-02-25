@@ -19,9 +19,6 @@ import java.nio.file.Path;
 import java.util.Collection;
 
 public class TreeControl {
-
-
-    private final DataFormat objectDataFormat = new DataFormat("application/x-java-serialized-object");
     private Tree gob_tree;
     private TreeView<String> gob_treeView;
     private ContextMenu gob_contextMenu;
@@ -145,14 +142,12 @@ public class TreeControl {
                         TreeCell b = (TreeCell) event.getGestureSource();
                         TreeItem treeItemDragged = b.getTreeItem();
 
-                        System.out.println("cellHovered " + treeItemHovered.getValue());
-                        System.out.println("cellDragged " + treeItemDragged.getValue());
-
                         File fileHovered = buildFileFromItem(treeItemHovered);
                         File fileDragged = buildFileFromItem(treeItemDragged);
                         moveFile(fileDragged.toPath(), fileHovered.toPath(), false);
                         TreeSingleton.getInstance().getDuplicateOperationsPrevention().putMoved(fileDragged.toPath());
 
+                        gob_treeView.getSelectionModel().select(treeItemHovered);
                         event.setDropCompleted(true);
                         event.consume();
                     });
@@ -521,6 +516,12 @@ public class TreeControl {
 
     }
 
+    /**
+     * Returns the path of the current selected treeItem
+     * If the selected is a file, the parent directory path gets returned
+     * If nothing is selected return null
+     * @return path of selected treeItem
+     */
     public String getPathOfSelectedItem() {
         TreeItem<String> lob_treeItem = gob_treeView.getSelectionModel().getSelectedItem();
         File lob_file;
