@@ -5,7 +5,6 @@ import fileTree.interfaces.FileChangeListener;
 import fileTree.interfaces.Tree;
 import javafx.scene.control.*;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.util.Callback;
@@ -138,16 +137,24 @@ public class TreeControl {
                     });
 
                     lob_cell.setOnDragDropped(event -> {
-                        TreeItem<String> treeItemHovered = lob_cell.getTreeItem();
-                        TreeCell b = (TreeCell) event.getGestureSource();
-                        TreeItem treeItemDragged = b.getTreeItem();
+                        TreeItem<String> lob_treeItemHovered;
+                        TreeCell lob_cellDragged;
+                        TreeItem lob_treeItemDragged;
+                        File lob_fileHovered;
+                        File lob_fileDragged;
 
-                        File fileHovered = buildFileFromItem(treeItemHovered);
-                        File fileDragged = buildFileFromItem(treeItemDragged);
-                        moveFile(fileDragged.toPath(), fileHovered.toPath(), false);
-                        TreeSingleton.getInstance().getDuplicateOperationsPrevention().putMoved(fileDragged.toPath());
+                        lob_treeItemHovered = lob_cell.getTreeItem();
+                        lob_cellDragged = (TreeCell) event.getGestureSource();
+                        lob_treeItemDragged = lob_cellDragged.getTreeItem();
 
-                        gob_treeView.getSelectionModel().select(treeItemHovered);
+                        lob_fileHovered = buildFileFromItem(lob_treeItemHovered);
+                        lob_fileDragged = buildFileFromItem(lob_treeItemDragged);
+
+                        moveFile(lob_fileDragged.toPath(), lob_fileHovered.toPath(), false);
+                        TreeSingleton.getInstance().getDuplicateOperationsPrevention().putMoved(lob_fileDragged.toPath());
+
+                        gob_treeView.getSelectionModel().select(lob_treeItemHovered);
+
                         event.setDropCompleted(true);
                         event.consume();
                     });
@@ -502,7 +509,7 @@ public class TreeControl {
         return true;
     }
 
-    private File buildFileFromItem(TreeItem<String> iob_treeItem) {
+    private File buildFileFromItem(TreeItem iob_treeItem) {
         StringBuilder lob_path = new StringBuilder();
 
         while (iob_treeItem != null) {
@@ -520,6 +527,7 @@ public class TreeControl {
      * Returns the path of the current selected treeItem
      * If the selected is a file, the parent directory path gets returned
      * If nothing is selected return null
+     *
      * @return path of selected treeItem
      */
     public String getPathOfSelectedItem() {
