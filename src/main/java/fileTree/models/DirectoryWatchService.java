@@ -91,12 +91,25 @@ public class DirectoryWatchService implements Runnable{
 
                         //first case: the file was just renamed
                         if (!lob_entry.getKey().toFile().getName().equals(lob_scannedEntry.getKey().toFile().getName())) {
-                            String oldFileName = lob_entry.getKey().toString().replaceFirst("[^\\\\]*$", lob_entry.getKey().toFile().getName());
-                            lco_renamed.put(new File(oldFileName), lob_scannedEntry.getKey().toFile());
+//                            String oldFileName = lob_entry.getKey().toString().replaceFirst("[^\\\\]*$", lob_entry.getKey().toFile().getName());
+                            File lob_oldfilePath = lob_entry.getKey().toFile();
+//                            File lob_newFilePath = new File(
+//                                    lob_oldfilePath
+//                                            .toString()
+//                                            .replaceFirst("[^\\\\]*$", lob_scannedEntry.getKey().toFile().getName())
+//                            );
+                            lco_renamed.put(lob_oldfilePath, lob_scannedEntry.getKey().toFile());
+
+                            String lva_renamedFilePath = lob_entry.getKey().toString().replaceFirst("[^\\\\]*$", lob_scannedEntry.getKey().toFile().getName());
+                            lco_renamed.put(lob_oldfilePath, new File(lva_renamedFilePath));
 
                             //second case: the file was moved and renamed
-                            if (!lob_entry.getKey().startsWith(lob_scannedEntry.getKey().getParent())) {
-                                lco_moved.put(lob_entry.getKey().toFile(), new File(oldFileName));
+//                            if (!lob_entry.getKey().startsWith(lob_scannedEntry.getKey().getParent())) {
+//                                lco_moved.put(lob_entry.getKey().toFile(), lob_scannedEntry.getKey().toFile());
+//                            }
+                            if (!lob_entry.getKey().getParent().equals(lob_scannedEntry.getKey().getParent())) {
+                                //this path contains the old filepath, but with the new name
+                                lco_moved.put(new File(lva_renamedFilePath), lob_scannedEntry.getKey().toFile());
                             }
 
                         //third case: the file was just moved
@@ -137,15 +150,24 @@ public class DirectoryWatchService implements Runnable{
             }
         });
 
-        for (Map.Entry<File, File> entry : lco_renamed.entrySet()) {
-            System.out.println("OLD: " + entry.getKey() + " NEW: " + entry.getValue());
-            gob_listender.fileRenamed(entry.getKey().toPath(), entry.getValue().getName());
-        }
 
+        lco_moved.keySet().removeIf(lob_file -> {
+            for (File lob_renamedFile : lco_renamed.keySet()) {
+                if (lob_file.toPath().startsWith(lob_renamedFile.toPath())) {
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        ArrayList<File> lli_renamed = new ArrayList<>(lco_renamed.keySet());
+        //lli_renamed.sort(PathFileComparator.PATH_COMPARATOR);
+        filesRenamed(lli_renamed, lco_renamed);
 
         ArrayList<File> lli_moved = new ArrayList<>(lco_moved.keySet());
-        lli_moved.sort(PathFileComparator.PATH_COMPARATOR);
+        //lli_moved.sort(PathFileComparator.PATH_COMPARATOR);
         filesMoved(lli_moved, lco_moved);
+
 
         filesDeleted(lli_delete);
 
@@ -159,6 +181,15 @@ public class DirectoryWatchService implements Runnable{
         System.out.println("----------------------------------------------------------");
     }
 
+    private void filesRenamed(ArrayList<File> ili_files, HashMap<File, File> ico_renamed) {
+        filterChildren(ili_files);
+        for (File lob_file: ili_files) {
+            System.out.println("OLD: " + lob_file.getAbsolutePath() + " NEW: " + ico_renamed.get(lob_file));
+            gob_listender.fileRenamed(lob_file.toPath(), ico_renamed.get(lob_file).getName());
+        }
+    }
+
+
     /**
      * call the fileMovedOrRenamed method of the listener for every file that was moved or renamed
      * @param ili_files contains all old file paths
@@ -166,7 +197,6 @@ public class DirectoryWatchService implements Runnable{
      */
     private void filesMoved(ArrayList<File> ili_files, HashMap<File, File> ico_moved) {
         filterChildren(ili_files);
-        //ili_files.sort(PathFileComparator.PATH_COMPARATOR);
         for (File lob_file : ili_files) {
             System.out.println("MOVED: " + lob_file.toPath() + " TO " + ico_moved.get(lob_file).toPath());
             gob_listender.fileMoved(lob_file.toPath(), ico_moved.get(lob_file).toPath());
