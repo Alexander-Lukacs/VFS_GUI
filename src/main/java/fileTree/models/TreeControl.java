@@ -1,6 +1,7 @@
 package fileTree.models;
 
 import builder.RestClientBuilder;
+import cache.DataCache;
 import fileTree.interfaces.FileChangeListener;
 import fileTree.interfaces.Tree;
 import javafx.scene.control.*;
@@ -26,21 +27,21 @@ public class TreeControl {
     public TreeControl(String iva_ip, String iva_port) {
         File lob_rootDirectory = new File(Utils.getUserBasePath());
         File lob_serverDirectory = new File(Utils.getUserBasePath() + "\\" + iva_ip + "_" + iva_port);
+        File lob_userDirectory = new File(lob_serverDirectory.getAbsolutePath() + "\\" + DataCache.getDataCache().get(DataCache.GC_EMAIL_KEY));
 
         gob_restClient = RestClientBuilder.buildRestClientWithAuth();
 
         //create the root directory if it does not exist
-        if (!lob_rootDirectory.exists() || !lob_rootDirectory.isDirectory()) {
-            lob_rootDirectory.mkdir();
-        }
+        TreeTool.getInstance().createDirectory(lob_rootDirectory);
 
         //create the server directory if it does not exist
-        if (!lob_serverDirectory.exists() || !lob_serverDirectory.isDirectory()) {
-            lob_serverDirectory.mkdir();
-        }
+        TreeTool.getInstance().createDirectory(lob_serverDirectory);
+
+        //create the user directory if it does not exist
+        TreeTool.getInstance().createDirectory(lob_userDirectory);
 
         try {
-            TreeSingleton.setTreeRootPath(lob_serverDirectory.getCanonicalPath());
+            TreeSingleton.setTreeRootPath(lob_userDirectory.getCanonicalPath());
             gob_tree = TreeSingleton.getInstance().getTree();
             gob_treeView = TreeSingleton.getInstance().getTreeView();
 
@@ -372,7 +373,7 @@ public class TreeControl {
             TreeSingleton.getInstance().getTree().moveFile(iob_path.toFile(), lva_destination, iva_moveJustInTree);
 
             String lva_oldRelativePath = TreeTool.getInstance().getRelativePath(iob_path.toString());
-            String lva_newRelativePath = TreeTool.getInstance().getRelativePath(lva_destination + "\\");
+            String lva_newRelativePath = TreeTool.getInstance().getRelativePath(lva_destination);
             gob_restClient.moveFile(lva_oldRelativePath, lva_newRelativePath);
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -473,20 +474,9 @@ public class TreeControl {
 
     private boolean createFileOrDirectory(File iob_newFile, boolean isDirectory) {
         //-------------------------------Variables----------------------------
-        File lob_newFile;
-        String lva_newFilePath;
-        int lva_counter = 1;
         String lva_relativeFilePath;
         //--------------------------------------------------------------------
         try {
-//            if (iob_newFile.isDirectory()) {
-//                lva_newFilePath = iob_newFile.getCanonicalPath();
-//            } else {
-//                lva_newFilePath = iob_newFile.getParentFile().getCanonicalPath();
-//            }
-
-//            lva_newFilePath += iva_name;
-//            lob_newFile = new File(lva_newFilePath.replaceFirst("\\$", ""));
 
             lva_relativeFilePath = TreeTool.getInstance().getRelativePath(iob_newFile.getCanonicalPath());
 
@@ -502,7 +492,6 @@ public class TreeControl {
                 }
             }
 
-
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -517,8 +506,7 @@ public class TreeControl {
             lob_path.insert(0, "\\");
             iob_treeItem = iob_treeItem.getParent();
         }
-        lob_path.insert(0, Utils.getUserBasePath());
-        gob_tree.getFile("hier_pfad");
+        lob_path.insert(0, gob_tree.getRoot().getParent());
         return gob_tree.getFile(lob_path.toString());
 
     }

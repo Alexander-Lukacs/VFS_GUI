@@ -11,6 +11,7 @@ import javax.swing.filechooser.FileSystemView;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 public class TreeTool {
     private static TreeTool ourInstance = new TreeTool();
@@ -69,6 +70,24 @@ public class TreeTool {
         lob_parent.getChildren().remove(lob_item);
     }
 
+    public void createDirectory(File iob_directory) {
+        int lva_tries;
+        boolean lva_directoryCreated;
+        if (!iob_directory.exists() || !iob_directory.isDirectory()) {
+            lva_tries = 0;
+            do {
+                lva_directoryCreated = iob_directory.mkdir();
+                lva_tries++;
+            } while(lva_tries < 10 && !lva_directoryCreated);
+
+            if (!lva_directoryCreated) {
+                new AlertWindows().createErrorAlert("There was a problem to create the directory \"" +
+                        iob_directory.getName() + "\" under:\n" + iob_directory.getAbsolutePath());
+                System.exit(1);
+            }
+        }
+    }
+
     private TreeItem<String> searchTreeItem(File iob_file) {
         TreeItem<String> item = TreeSingleton.getInstance().getTreeView().getRoot();
         if (iob_file.equals(TreeSingleton.getInstance().getTree().getRoot())) {
@@ -102,8 +121,10 @@ public class TreeTool {
 
     public String getRelativePath(String iva_filePath) throws IOException {
         String lva_regex = TreeSingleton.getInstance().getTree().getRoot().getCanonicalPath();
+
         lva_regex = lva_regex.replaceAll("\\\\", "\\\\\\\\");
-        return iva_filePath.replaceFirst(lva_regex + "\\\\", "");
+        String rva_return = iva_filePath.replaceFirst(lva_regex, "");
+        return rva_return.replaceFirst("^\\\\", "");
     }
 
     public void addToTreeView(File iob_file) {
