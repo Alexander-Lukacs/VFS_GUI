@@ -4,7 +4,10 @@ import builder.RestClientBuilder;
 import cache.DataCache;
 import fileTree.interfaces.FileChangeListener;
 import fileTree.interfaces.Tree;
+import javafx.event.EventHandler;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.TextFieldTreeCell;
+import javafx.scene.control.cell.TextFieldTreeTableCell;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -90,20 +93,24 @@ public class TreeControl {
                 @Override
                 public void fileRenamed(Path iob_path, String iva_newName) {
                     try {
-                        System.out.println("RENAMED: " + iob_path + " TO: " + iva_newName);
-                        TreeSingleton.getInstance().getTree().renameFile(iob_path.toFile(), iva_newName);
-                        TreeItem<String> lob_item = TreeTool.getInstance().getTreeItem(iob_path.toFile());
-                        lob_item.setValue(iva_newName);
+                        if (TreeSingleton.getInstance().getDuplicateOperationsPrevention().wasFileRenamed(iob_path)) {
+                            TreeSingleton.getInstance().getDuplicateOperationsPrevention().removeRenamed(iob_path);
+                        } else {
+                            System.out.println("RENAMED: " + iob_path + " TO: " + iva_newName);
+                            TreeSingleton.getInstance().getTree().renameFile(iob_path.toFile(), iva_newName);
+                            TreeItem<String> lob_item = TreeTool.getInstance().getTreeItem(iob_path.toFile());
+                            lob_item.setValue(iva_newName);
 
-                        String lva_relativePath = TreeTool.getInstance().getRelativePath(iob_path.toString());
+                            String lva_relativePath = TreeTool.getInstance().getRelativePath(iob_path.toString());
 
-                        gob_restClient.renameFile(lva_relativePath, iva_newName);
+                            gob_restClient.renameFile(lva_relativePath, iva_newName);
+                        }
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
                 }
             });
-
+            gob_treeView.setEditable(true);
             gob_treeView.setCellFactory(new Callback<TreeView<String>, TreeCell<String>>() {
                 @Override
                 public TreeCell<String> call(TreeView<String> siTreeView) {
@@ -214,6 +221,22 @@ public class TreeControl {
                     });
 
                     return lob_cell;
+                }
+            });
+
+
+            gob_treeView.setCellFactory(TextFieldTreeCell.forTreeView());
+
+            gob_treeView.setOnEditCommit(event -> {
+                try {
+                    File lob_renamedFile = buildFileFromItem(event.getTreeItem());
+                    System.out.println(lob_renamedFile.toPath());
+                    gob_tree.renameFile(lob_renamedFile, event.getNewValue());
+                    TreeSingleton.getInstance().getDuplicateOperationsPrevention().putRenamed(lob_renamedFile.toPath());
+                    String lva_relativePath = TreeTool.getInstance().getRelativePath(lob_renamedFile.getCanonicalPath());
+                    gob_restClient.renameFile(lva_relativePath, event.getNewValue());
+                } catch (IOException ex) {
+                    ex.printStackTrace();
                 }
             });
 
@@ -331,7 +354,7 @@ public class TreeControl {
     }
 
     private void renameFile() {
-
+        gob_treeView.edit(gob_treeView.getSelectionModel().getSelectedItem());
     }
 
     /**
