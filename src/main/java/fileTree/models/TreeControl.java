@@ -114,21 +114,22 @@ public class TreeControl {
             gob_treeView.setCellFactory(new Callback<TreeView<String>, TreeCell<String>>() {
                 @Override
                 public TreeCell<String> call(TreeView<String> siTreeView) {
-                    TreeCell<String> lob_cell = new TreeCell<String>() {
-                        @Override
-                        protected void updateItem(String iva_item, boolean iva_empty) {
-                            super.updateItem(iva_item, iva_empty);
+//                    TreeCell<String> lob_cell = new TreeCell<String>() {
+//                        @Override
+//                        protected void updateItem(String iva_item, boolean iva_empty) {
+//                            super.updateItem(iva_item, iva_empty);
+//
+//                            if (!iva_empty) {
+//                                setGraphic(getTreeItem().getGraphic());
+//                                setText(getItem() == null ? "" : getItem());
+//                            } else {
+//                                setText(null);
+//                                setGraphic(null);
+//                            }
+//                        }
+//                    };
 
-                            if (!iva_empty) {
-                                setGraphic(getTreeItem().getGraphic());
-                                setText(getItem() == null ? "" : getItem());
-                            } else {
-                                setText(null);
-                                setGraphic(null);
-                            }
-                        }
-                    };
-
+                    TreeCellImpl lob_cell = new TreeCellImpl();
                     lob_cell.setOnDragDetected(event -> {
                         TreeItem<String> lob_selectedItem = lob_cell.getTreeItem();
                         Dragboard lob_dragBoard;
@@ -223,9 +224,6 @@ public class TreeControl {
                     return lob_cell;
                 }
             });
-
-
-            gob_treeView.setCellFactory(TextFieldTreeCell.forTreeView());
 
             gob_treeView.setOnEditCommit(event -> {
                 try {
