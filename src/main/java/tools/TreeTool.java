@@ -164,22 +164,78 @@ public class TreeTool {
         return iob_tree.getFile(lob_path.toString());
     }
 
+    public static boolean createFileOrDirectory(File iob_newFile, boolean isDirectory, RestClient iob_restClient) {
+        //-------------------------------Variables----------------------------
+        String lva_relativeFilePath;
+        //--------------------------------------------------------------------
+        try {
+
+            lva_relativeFilePath = TreeTool.getInstance().getRelativePath(iob_newFile.getCanonicalPath());
+
+            if (isDirectory) {
+                if (!iob_restClient.createDirectoryOnServer(lva_relativeFilePath)) {
+                    return false;
+                }
+            } else {
+                if (!iob_restClient.uploadFilesToServer(iob_newFile, lva_relativeFilePath)) {
+                    return false;
+                }
+            }
+            TreeSingleton.getInstance().getTree().addFile(iob_newFile, isDirectory);
+            TreeTool.getInstance().addToTreeView(iob_newFile);
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return true;
+    }
+
+    /**
+     * delete a file on the client, explorer and server
+     *
+     * @param iob_file         file to delete
+     * @param iob_itemToDelete item to delete in the tree
+     * @return true if all files were deleted, otherwise false
+     */
+    public static boolean deleteFile(File iob_file, TreeItem<String> iob_itemToDelete, RestClient iob_restClient) {
+        //-------------------------------Variables----------------------------------------
+        String lva_relativePath;
+        //--------------------------------------------------------------------------------
+        try {
+            lva_relativePath = TreeTool.getInstance().getRelativePath(iob_file.getCanonicalPath());
+            if (!iob_restClient.deleteOnServer(lva_relativePath)) {
+                //return false;
+            }
+            iob_itemToDelete.getParent().getChildren().remove(iob_itemToDelete);
+            return TreeSingleton.getInstance().getTree().deleteFile(iob_file);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
 
     public static void moveFile(Path iob_path, Path iob_destination, boolean iva_moveJustInTree, RestClient iob_restClient) {
         //-------------------------Variables------------------------------------
         TreeTool lob_tool = TreeTool.getInstance();
         TreeItem<String> lob_item = lob_tool.getTreeItem(iob_path.toFile());
         TreeItem<String> lob_parent = TreeTool.getInstance().getTreeItem(iob_destination.toFile());
+        String lva_destination = iob_destination.toString();
+        String lva_oldRelativePath;
+        String lva_newRelativePath;
         //----------------------------------------------------------------------
         try {
+            if (!TreeSingleton.getInstance().getTree().moveFile(iob_path.toFile(), lva_destination, iva_moveJustInTree)) {
+                new AlertWindows().createErrorAlert("Fiie could not be moved. There is a File with the same name");
+                return;
+            }
+
             lob_tool.removeFromTreeView(iob_path.toFile());
             lob_parent.getChildren().add(lob_item);
 
-            String lva_destination = iob_destination.toString();
-            TreeSingleton.getInstance().getTree().moveFile(iob_path.toFile(), lva_destination, iva_moveJustInTree);
 
-            String lva_oldRelativePath = TreeTool.getInstance().getRelativePath(iob_path.toString());
-            String lva_newRelativePath = TreeTool.getInstance().getRelativePath(lva_destination);
+
+            lva_oldRelativePath = TreeTool.getInstance().getRelativePath(iob_path.toString());
+            lva_newRelativePath = TreeTool.getInstance().getRelativePath(lva_destination);
             iob_restClient.moveFile(lva_oldRelativePath, lva_newRelativePath);
         } catch (IOException ex) {
             ex.printStackTrace();

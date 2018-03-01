@@ -396,7 +396,7 @@ public class TreeImpl implements Tree {
             updateFilePath(lob_fileNode.getParent().getFile().toPath(), lob_fileNode);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
             return false;
         }
     }
