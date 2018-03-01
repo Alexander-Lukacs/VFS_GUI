@@ -69,8 +69,8 @@ public class SharedDirectoryController {
     }
 
     private void addNewSharedDirectory() {
-        AlertWindows lob_alertWindow = new AlertWindows();
         SharedDirectory lob_sharedDirectory = new SharedDirectory();
+
         try {
             if (gob_tf_directory_name.getText().trim().isEmpty()) {
                 throw new IllegalArgumentException(GC_SHARED_DIRECTORY_NAME_EMPTY);
@@ -79,7 +79,7 @@ public class SharedDirectoryController {
             lob_sharedDirectory.setDirectoryName(gob_tf_directory_name.getText());
 
         } catch (IllegalArgumentException ex) {
-            lob_alertWindow.createWarningAlert(ex.getMessage());
+            new AlertWindows().createWarningAlert(ex.getMessage());
         }
     }
 
@@ -90,11 +90,10 @@ public class SharedDirectoryController {
     public void onClickAddMember() {
         RestClient lob_restClient;
         List<User> lob_userList;
-        AlertWindows lob_alertWindows = new AlertWindows();
         DataCache lob_dataCache = DataCache.getDataCache();
         String lva_email;
         boolean lva_userNotExists = true;
-        boolean lva_valid = false;
+        boolean lva_valid;
 
         lob_restClient = RestClientBuilder.buildRestClientWithAuth();
         lob_userList = lob_restClient.getAllUser();
@@ -102,34 +101,36 @@ public class SharedDirectoryController {
         lva_email = gob_tf_email.getText().trim();
         lva_valid = Validation.isEmailValid(lva_email);
 
-        if (!lva_email.isEmpty() && lva_valid) {
-            if (!lva_email.equals(lob_dataCache.get(DataCache.GC_EMAIL_KEY))) {
-                for (User lob_user : lob_userList) {
-                    if (lob_user.getEmail().equals(gob_tf_email.getText())) {
-                        if (!member.contains(lob_user.getEmail())) {
-                            member.add(lob_user.getEmail());
-                            gob_list_member.setItems(member);
-                        } else {
-                            gob_tf_email.setText("");
-                            lob_alertWindows.createWarningAlert(GC_USER_IS_ALREADY_ADDED);
-                        }
-
-                        lva_userNotExists = false;
-                    }
-                }
-
-                if (lva_userNotExists) {
-                    lob_alertWindows.createWarningAlert(GC_NOT_VALID_USER);
-                    gob_tf_email.setText("");
-                }
-            } else {
-                gob_tf_email.setText("");
-                lob_alertWindows.createWarningAlert(GC_USER_CANT_ADD_HIMSELF);
+        try {
+            if (lva_email.isEmpty() || !lva_valid) {
+                throw new IllegalArgumentException(GC_NO_CORRECT_EMAIL);
             }
 
-        } else {
-            gob_tf_email.setText("");
-            lob_alertWindows.createWarningAlert(GC_NO_CORRECT_EMAIL);
+            if (lva_email.equals(lob_dataCache.get(DataCache.GC_EMAIL_KEY))) {
+                gob_tf_email.setText("");
+                throw new IllegalArgumentException(GC_USER_CANT_ADD_HIMSELF);
+            }
+
+            for (User lob_user : lob_userList) {
+                if (lob_user.getEmail().equals(gob_tf_email.getText())) {
+                    if (!member.contains(lob_user.getEmail())) {
+                        member.add(lob_user.getEmail());
+                        gob_list_member.setItems(member);
+                    } else {
+                        gob_tf_email.setText("");
+                        throw new IllegalArgumentException(GC_USER_IS_ALREADY_ADDED);
+                    }
+
+                    lva_userNotExists = false;
+                }
+            }
+
+            if (lva_userNotExists) {
+                throw new IllegalArgumentException(GC_NOT_VALID_USER);
+            }
+
+        } catch (IllegalArgumentException ex) {
+            new AlertWindows().createWarningAlert(ex.getMessage());
         }
     }
 

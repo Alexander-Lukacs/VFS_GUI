@@ -7,14 +7,13 @@ import fileTree.interfaces.FileChangeListener;
 import fileTree.interfaces.Tree;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.TransferMode;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import rest.RestClient;
 import tools.TreeTool;
 import tools.Utils;
@@ -25,8 +24,8 @@ import java.nio.file.Path;
 import java.util.Collection;
 
 import static controller.constants.ApplicationConstants.GC_APPLICATION_ICON_PATH;
-
-import static tools.TreeTool.*;
+import static tools.TreeTool.buildFileFromItem;
+import static tools.TreeTool.moveFile;
 
 public class TreeControl {
     private Tree gob_tree;
@@ -133,7 +132,7 @@ public class TreeControl {
             gob_treeView.setEditable(true);
 
             gob_treeView.setCellFactory(siTreeView ->
-                new TreeCellImpl(this.gob_tree, this.gob_restClient)
+                    new TreeCellImpl(this.gob_tree, this.gob_restClient)
             );
 
             gob_treeView.setOnEditCommit(event -> {
@@ -233,9 +232,9 @@ public class TreeControl {
                 createNewFile()
         );
 
-        lob_sharedDirectory = new MenuItem("Test");
+        lob_sharedDirectory = new MenuItem("Properties");
         lob_sharedDirectory.setOnAction(event ->
-            sharedDirectoryScene(gob_treeView.getSelectionModel().getSelectedItem())
+                sharedDirectoryScene(gob_treeView.getSelectionModel().getSelectedItem())
         );
 
         gob_contextMenu.getItems().addAll(lob_deleteFile,
@@ -266,6 +265,14 @@ public class TreeControl {
                 lob_item.setDisable(true);
             } else if (gob_tree.getRoot().equals(lob_selectedFile) && lob_item.getText().equals("Delete only Directory")) {
                 lob_item.setDisable(true);
+            } else if (lob_item.getText().equals("New shared directory") || lob_item.getText().equals("Properties")) {
+                if (lob_selectedFile.getName().equals("Shared")) {
+                    lob_item.setText("New shared directory");
+                } else if (lob_selectedFile.getParentFile().getName().equals("Shared")){
+                    lob_item.setText("Properties");
+                } else {
+                    lob_item.setDisable(true);
+                }
             } else {
                 lob_item.setDisable(false);
             }
