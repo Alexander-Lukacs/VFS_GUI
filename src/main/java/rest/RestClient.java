@@ -10,6 +10,7 @@ import com.sun.jersey.multipart.impl.MultiPartWriter;
 import com.thoughtworks.xstream.XStream;
 import fileTree.interfaces.FileNode;
 import fileTree.interfaces.Tree;
+import fileTree.interfaces.TreeDifference;
 import fileTree.models.FileNodeImpl;
 import fileTree.models.TreeDifferenceImpl;
 import fileTree.models.TreeImpl;
@@ -18,6 +19,7 @@ import models.classes.SharedDirectory;
 import models.classes.User;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
+import org.glassfish.jersey.client.internal.HttpUrlConnector;
 import tools.AlertWindows;
 
 import javax.ws.rs.ProcessingException;
@@ -224,6 +226,7 @@ public class RestClient {
             String xml = xStream.toXML(iob_tree);
             Response lob_response = gob_webTarget.path("/auth/files/compare").request()
                     .post(Entity.entity(xml, MediaType.APPLICATION_XML));
+
             System.out.println(lob_response.getStatus() + "," + lob_response.getStatusInfo());
         } catch (Exception ex) {
             ex.printStackTrace();
