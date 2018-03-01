@@ -4,14 +4,8 @@ import builder.RestClientBuilder;
 import cache.DataCache;
 import fileTree.interfaces.FileChangeListener;
 import fileTree.interfaces.Tree;
-import javafx.event.EventHandler;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.TextFieldTreeCell;
-import javafx.scene.control.cell.TextFieldTreeTableCell;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
-import javafx.util.Callback;
 import rest.RestClient;
 import tools.TreeTool;
 import tools.Utils;
@@ -20,6 +14,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
+
+import static tools.TreeTool.*;
 
 public class TreeControl {
     private Tree gob_tree;
@@ -31,6 +27,9 @@ public class TreeControl {
         File lob_rootDirectory = new File(Utils.getUserBasePath());
         File lob_serverDirectory = new File(Utils.getUserBasePath() + "\\" + iva_ip + "_" + iva_port);
         File lob_userDirectory = new File(lob_serverDirectory.getAbsolutePath() + "\\" + DataCache.getDataCache().get(DataCache.GC_EMAIL_KEY));
+        File lob_publicDirectory = new File(lob_userDirectory.getAbsolutePath() + "\\Public");
+        File lob_privateDirectory = new File(lob_userDirectory.getAbsolutePath() + "\\Private");
+        File lob_sharedDirectories = new File(lob_userDirectory.getAbsolutePath() + "\\Shared");
 
         gob_restClient = RestClientBuilder.buildRestClientWithAuth();
 
@@ -43,10 +42,20 @@ public class TreeControl {
         //create the user directory if it does not exist
         TreeTool.getInstance().createDirectory(lob_userDirectory);
 
+        //create the public directory
+        TreeTool.getInstance().createDirectory(lob_publicDirectory);
+
+        //create the private directory
+        TreeTool.getInstance().createDirectory(lob_privateDirectory);
+
+        //create the shared directory
+        TreeTool.getInstance().createDirectory(lob_sharedDirectories);
+
         try {
             TreeSingleton.setTreeRootPath(lob_userDirectory.getCanonicalPath());
             gob_tree = TreeSingleton.getInstance().getTree();
             gob_treeView = TreeSingleton.getInstance().getTreeView();
+            gob_treeView.setShowRoot(false);
 
             TreeItem<String> lob_root = new TreeItem<>(gob_tree.getRoot().getName());
             lob_root.setGraphic(TreeTool.getInstance().getTreeIcon(gob_tree.getRoot().getCanonicalPath()));
@@ -73,6 +82,8 @@ public class TreeControl {
 
                 @Override
                 public void fileDeleted(Path iob_path) {
+                    TreeSingleton t = TreeSingleton.getInstance();
+
                     if (TreeSingleton.getInstance().getDuplicateOperationsPrevention().wasFileDeted(iob_path)) {
                         TreeSingleton.getInstance().getDuplicateOperationsPrevention().removeDeleted(iob_path);
                     } else {
@@ -86,7 +97,7 @@ public class TreeControl {
                     if (TreeSingleton.getInstance().getDuplicateOperationsPrevention().wasFilesMoved(iob_oldPath)) {
                         TreeSingleton.getInstance().getDuplicateOperationsPrevention().removeMoved(iob_oldPath);
                     } else {
-                        moveFile(iob_oldPath, iob_newPath.getParent(), true);
+                        moveFile(iob_oldPath, iob_newPath.getParent(), true, gob_restClient);
                     }
                 }
 
@@ -111,123 +122,14 @@ public class TreeControl {
                 }
             });
             gob_treeView.setEditable(true);
-            gob_treeView.setCellFactory(new Callback<TreeView<String>, TreeCell<String>>() {
-                @Override
-                public TreeCell<String> call(TreeView<String> siTreeView) {
-//                    TreeCell<String> lob_cell = new TreeCell<String>() {
-//                        @Override
-//                        protected void updateItem(String iva_item, boolean iva_empty) {
-//                            super.updateItem(iva_item, iva_empty);
-//
-//                            if (!iva_empty) {
-//                                setGraphic(getTreeItem().getGraphic());
-//                                setText(getItem() == null ? "" : getItem());
-//                            } else {
-//                                setText(null);
-//                                setGraphic(null);
-//                            }
-//                        }
-//                    };
 
-                    TreeCellImpl lob_cell = new TreeCellImpl();
-                    lob_cell.setOnDragDetected(event -> {
-                        TreeItem<String> lob_selectedItem = lob_cell.getTreeItem();
-                        Dragboard lob_dragBoard;
-                        ClipboardContent lob_content;
-
-                        if (lob_selectedItem != null) {
-                            lob_dragBoard = lob_cell.startDragAndDrop(TransferMode.MOVE);
-                            lob_content = new ClipboardContent();
-                            lob_content.putString(lob_selectedItem.getValue());
-                            lob_dragBoard.setContent(lob_content);
-                        }
-
-                        event.consume();
-                    });
-
-                    lob_cell.setOnDragDropped(event -> {
-                        TreeItem<String> lob_treeItemHovered;
-                        TreeCell lob_cellDragged;
-                        TreeItem lob_treeItemDragged;
-                        File lob_fileHovered;
-                        File lob_fileDragged;
-
-                        lob_treeItemHovered = lob_cell.getTreeItem();
-                        lob_cellDragged = (TreeCell) event.getGestureSource();
-                        lob_treeItemDragged = lob_cellDragged.getTreeItem();
-
-                        lob_fileHovered = buildFileFromItem(lob_treeItemHovered);
-                        lob_fileDragged = buildFileFromItem(lob_treeItemDragged);
-
-                        moveFile(lob_fileDragged.toPath(), lob_fileHovered.toPath(), false);
-                        TreeSingleton.getInstance().getDuplicateOperationsPrevention().putMoved(lob_fileDragged.toPath());
-
-                        gob_treeView.getSelectionModel().select(lob_treeItemHovered);
-
-                        event.setDropCompleted(true);
-                        event.consume();
-                    });
-
-                    // -------------------------------------------------------------------------------------------------
-                    // Drag Animations
-                    // -------------------------------------------------------------------------------------------------
-
-                    lob_cell.setOnDragEntered(event -> {
-                        TreeItem<String> lob_selectedItem = lob_cell.getTreeItem();
-                        Object lva_cellDraggedValue;
-                        Object lva_cellHoveredValue;
-                        TreeCell lob_cellDragged;
-
-                        if (lob_selectedItem != null && !buildFileFromItem(lob_cell.getTreeItem()).isFile() &&
-                                event.getGestureSource() != lob_cell) {
-
-                            lob_cellDragged = (TreeCell) event.getGestureSource();
-                            lva_cellDraggedValue = lob_cellDragged.getTreeItem().getParent().getValue();
-                            lva_cellHoveredValue = lob_cell.getTreeItem().getValue();
-
-                            if (lva_cellDraggedValue != lva_cellHoveredValue) {
-                                lob_cell.setStyle("-fx-background-color: powderblue;");
-                            }
-                        }
-
-                        event.consume();
-                    });
-
-                    lob_cell.setOnDragOver(event -> {
-                        TreeItem<String> lob_selectedItem = lob_cell.getTreeItem();
-                        Object lva_cellDraggedValue;
-                        Object lva_cellHoveredValue;
-                        TreeCell lob_cellDragged;
-
-                        if (lob_selectedItem != null && event.getGestureSource() != lob_cell &&
-                                !buildFileFromItem(lob_cell.getTreeItem()).isFile()) {
-
-                            lob_cellDragged = (TreeCell) event.getGestureSource();
-                            lva_cellDraggedValue = lob_cellDragged.getTreeItem().getParent().getValue();
-                            lva_cellHoveredValue = lob_cell.getTreeItem().getValue();
-
-                            if (lva_cellDraggedValue != lva_cellHoveredValue) {
-                                event.acceptTransferModes(TransferMode.MOVE);
-                            }
-                        }
-
-                        event.consume();
-                    });
-
-                    lob_cell.setOnDragExited(event -> {
-                        lob_cell.setStyle("-fx-background-color: white");
-                        lob_cell.setStyle("-fx-focus-color: black");
-
-                        event.consume();
-                    });
-
-                    return lob_cell;
-                }
-            });
+            gob_treeView.setCellFactory(siTreeView ->
+                new TreeCellImpl(this.gob_tree, this.gob_restClient)
+            );
 
             gob_treeView.setOnEditCommit(event -> {
                 try {
-                    File lob_renamedFile = buildFileFromItem(event.getTreeItem());
+                    File lob_renamedFile = buildFileFromItem(event.getTreeItem(), gob_tree);
                     System.out.println(lob_renamedFile.toPath());
                     gob_tree.renameFile(lob_renamedFile, event.getNewValue());
                     TreeSingleton.getInstance().getDuplicateOperationsPrevention().putRenamed(lob_renamedFile.toPath());
@@ -242,6 +144,7 @@ public class TreeControl {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+        gob_restClient.compareClientAndServerTree(TreeSingleton.getInstance().getTree());
     }
 
     private void addFilesToTree(File iob_file, TreeItem<String> iob_treeItem) {
@@ -291,10 +194,11 @@ public class TreeControl {
         lob_deleteFile = new MenuItem("Delete");
         lob_deleteFile.setOnAction(event -> {
             File lob_selectedFile = buildFileFromItem(
-                    gob_treeView.getSelectionModel().getSelectedItem()
+                    gob_treeView.getSelectionModel().getSelectedItem(), gob_tree
             );
             TreeItem<String> lob_selectedItem = gob_treeView.getSelectionModel().getSelectedItem();
             if (deleteFile(lob_selectedFile, lob_selectedItem)) {
+                System.out.println("GELÖSCHT");
                 addAllDeleted(lob_selectedFile);
             }
         });
@@ -328,7 +232,7 @@ public class TreeControl {
     private void onContextMenuRequest() {
         //-------------------------------Variables----------------------------------------
         File lob_selectedFile = buildFileFromItem(
-                gob_treeView.getSelectionModel().getSelectedItem()
+                gob_treeView.getSelectionModel().getSelectedItem(), gob_tree
         );
         //--------------------------------------------------------------------------------
 
@@ -369,7 +273,7 @@ public class TreeControl {
         try {
             lva_relativePath = TreeTool.getInstance().getRelativePath(iob_file.getCanonicalPath());
             if (!gob_restClient.deleteOnServer(lva_relativePath)) {
-                return false;
+                //return false;
             }
 
             iob_itemToDelete.getParent().getChildren().remove(iob_itemToDelete);
@@ -378,27 +282,6 @@ public class TreeControl {
             ex.printStackTrace();
         }
         return false;
-    }
-
-    private void moveFile(Path iob_path, Path iob_destination, boolean iva_moveJustInTree) {
-        //-------------------------Variables------------------------------------
-        TreeTool lob_tool = TreeTool.getInstance();
-        TreeItem<String> lob_item = lob_tool.getTreeItem(iob_path.toFile());
-        TreeItem<String> lob_parent = TreeTool.getInstance().getTreeItem(iob_destination.toFile());
-        //----------------------------------------------------------------------
-        try {
-            lob_tool.removeFromTreeView(iob_path.toFile());
-            lob_parent.getChildren().add(lob_item);
-
-            String lva_destination = iob_destination.toString();
-            TreeSingleton.getInstance().getTree().moveFile(iob_path.toFile(), lva_destination, iva_moveJustInTree);
-
-            String lva_oldRelativePath = TreeTool.getInstance().getRelativePath(iob_path.toString());
-            String lva_newRelativePath = TreeTool.getInstance().getRelativePath(lva_destination);
-            gob_restClient.moveFile(lva_oldRelativePath, lva_newRelativePath);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
     }
 
     private void addAllDeleted(File iob_file) {
@@ -424,7 +307,7 @@ public class TreeControl {
     private void deleteDirectoryOnly() {
         //-------------------------------Variables----------------------------------------
         File lob_selectedFile = buildFileFromItem(
-                gob_treeView.getSelectionModel().getSelectedItem()
+                gob_treeView.getSelectionModel().getSelectedItem(), gob_tree
         );
         String lva_relativePath;
         //--------------------------------------------------------------------------------
@@ -468,7 +351,7 @@ public class TreeControl {
     private File buildNewFile(String iva_name) {
         //-------------------------------Variables----------------------------
         File lob_selectedFile = buildFileFromItem(
-                gob_treeView.getSelectionModel().getSelectedItem()
+                gob_treeView.getSelectionModel().getSelectedItem(), gob_tree
         );
         File lob_newFile;
         int lva_counter = 1;
@@ -519,19 +402,6 @@ public class TreeControl {
         return true;
     }
 
-    private File buildFileFromItem(TreeItem iob_treeItem) {
-        StringBuilder lob_path = new StringBuilder();
-
-        while (iob_treeItem != null) {
-            lob_path.insert(0, iob_treeItem.getValue());
-            lob_path.insert(0, "\\");
-            iob_treeItem = iob_treeItem.getParent();
-        }
-        lob_path.insert(0, gob_tree.getRoot().getParent());
-        return gob_tree.getFile(lob_path.toString());
-
-    }
-
     /**
      * Returns the path of the current selected treeItem
      * If the selected is a file, the parent directory path gets returned
@@ -544,13 +414,13 @@ public class TreeControl {
         File lob_file;
 
         if (lob_treeItem != null) {
-            lob_file = buildFileFromItem(lob_treeItem);
+            lob_file = buildFileFromItem(lob_treeItem, gob_tree);
 
             if (lob_file.isFile()) {
                 lob_treeItem = lob_treeItem.getParent();
             }
 
-            lob_file = buildFileFromItem(lob_treeItem);
+            lob_file = buildFileFromItem(lob_treeItem, gob_tree);
 
             return lob_file.toPath().toString();
         }

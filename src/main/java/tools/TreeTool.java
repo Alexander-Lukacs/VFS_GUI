@@ -1,11 +1,13 @@
 package tools;
 
+import fileTree.interfaces.Tree;
 import fileTree.models.TreeSingleton;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import rest.RestClient;
 
 import javax.swing.filechooser.FileSystemView;
 import java.awt.image.BufferedImage;
@@ -146,6 +148,40 @@ public class TreeTool {
             addTreeItem(lob_pointer, iob_file);
 
         } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public static File buildFileFromItem(TreeItem iob_treeItem, Tree iob_tree) {
+        StringBuilder lob_path = new StringBuilder();
+
+        while (iob_treeItem != null) {
+            lob_path.insert(0, iob_treeItem.getValue());
+            lob_path.insert(0, "\\");
+            iob_treeItem = iob_treeItem.getParent();
+        }
+        lob_path.insert(0, iob_tree.getRoot().getParent());
+        return iob_tree.getFile(lob_path.toString());
+    }
+
+
+    public static void moveFile(Path iob_path, Path iob_destination, boolean iva_moveJustInTree, RestClient iob_restClient) {
+        //-------------------------Variables------------------------------------
+        TreeTool lob_tool = TreeTool.getInstance();
+        TreeItem<String> lob_item = lob_tool.getTreeItem(iob_path.toFile());
+        TreeItem<String> lob_parent = TreeTool.getInstance().getTreeItem(iob_destination.toFile());
+        //----------------------------------------------------------------------
+        try {
+            lob_tool.removeFromTreeView(iob_path.toFile());
+            lob_parent.getChildren().add(lob_item);
+
+            String lva_destination = iob_destination.toString();
+            TreeSingleton.getInstance().getTree().moveFile(iob_path.toFile(), lva_destination, iva_moveJustInTree);
+
+            String lva_oldRelativePath = TreeTool.getInstance().getRelativePath(iob_path.toString());
+            String lva_newRelativePath = TreeTool.getInstance().getRelativePath(lva_destination);
+            iob_restClient.moveFile(lva_oldRelativePath, lva_newRelativePath);
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
     }

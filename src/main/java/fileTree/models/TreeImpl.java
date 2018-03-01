@@ -15,7 +15,7 @@ public class TreeImpl implements Tree {
 
     private String gva_basePath;
     private String gva_rootDirectory;
-    private FileNodeImpl gob_rootNode;
+    private FileNode gob_rootNode;
 
     public TreeImpl(String iva_rootDirectory) throws IOException{
         this.gob_rootNode = new FileNodeImpl(new File(iva_rootDirectory));
@@ -139,6 +139,7 @@ public class TreeImpl implements Tree {
     public File getRoot() {
         return this.gob_rootNode.getFile();
     }
+
 
     /**
      * Get children from the root

@@ -1,11 +1,18 @@
 package rest;
 
 import cache.DataCache;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.MultiPart;
 import com.sun.jersey.multipart.file.FileDataBodyPart;
 import com.sun.jersey.multipart.impl.MultiPartWriter;
+import com.thoughtworks.xstream.XStream;
+import fileTree.interfaces.FileNode;
+import fileTree.interfaces.Tree;
+import fileTree.models.FileNodeImpl;
+import fileTree.models.TreeDifferenceImpl;
+import fileTree.models.TreeImpl;
 import models.classes.RestResponse;
 import models.classes.SharedDirectory;
 import models.classes.User;
@@ -21,6 +28,8 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -204,6 +213,22 @@ public class RestClient {
         Response lob_response = gob_webTarget.path("/auth/files/rename").queryParam("path", iva_relativePath).request()
                 .post(Entity.entity(iva_newRelativePath, MediaType.TEXT_PLAIN));
         System.out.println(lob_response.getStatus());
+    }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Rename a file on the server
+// ---------------------------------------------------------------------------------------------------------------------
+    public TreeDifferenceImpl compareClientAndServerTree(Tree iob_tree) {
+        try {
+            XStream xStream = new XStream();
+            String xml = xStream.toXML(iob_tree);
+            Response lob_response = gob_webTarget.path("/auth/files/compare").request()
+                    .post(Entity.entity(xml, MediaType.APPLICATION_XML));
+            System.out.println(lob_response.getStatus() + "," + lob_response.getStatusInfo());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
     }
 
 //----------------------------------------------------------------------------------------------------------------------
