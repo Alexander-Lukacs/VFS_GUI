@@ -2,8 +2,6 @@ package controller;
 
 import builder.RestClientBuilder;
 import cache.DataCache;
-import rest.RestClient;
-import models.classes.RestResponse;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -14,7 +12,9 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import models.classes.RestResponse;
 import models.classes.User;
+import rest.RestClient;
 import tools.AlertWindows;
 import tools.Utils;
 import tools.Validation;
@@ -25,9 +25,9 @@ import java.io.IOException;
 import java.util.Objects;
 
 import static cache.DataCache.*;
-import static rest.constants.HttpStatusCodes.GC_HTTP_OK;
 import static controller.constants.ApplicationConstants.GC_APPLICATION_ICON_PATH;
 import static controller.constants.SettingsConstants.GC_VFS;
+import static rest.constants.HttpStatusCodes.GC_HTTP_OK;
 import static tools.constants.AlertConstants.*;
 
 public class LoginController {

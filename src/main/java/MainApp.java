@@ -1,10 +1,10 @@
 import builder.RestClientBuilder;
 import cache.DataCache;
-import services.NotifyServerThread;
-import rest.RestClient;
 import controller.LoginController;
 import javafx.application.Application;
 import javafx.stage.Stage;
+import rest.RestClient;
+import services.NotifyServerThread;
 import tools.AlertWindows;
 
 import static cache.DataCache.GC_EMAIL_KEY;
@@ -40,9 +40,13 @@ public class MainApp extends Application {
         DataCache lob_dataCache = DataCache.getDataCache();
         RestClient lob_restClient;
 
-        if (lob_dataCache.get(GC_EMAIL_KEY) != null) {
-            lob_restClient = RestClientBuilder.buildRestClientWithAuth();
-            lob_restClient.unregisterClient();
+        try {
+            if (lob_dataCache.get(GC_EMAIL_KEY) != null) {
+                lob_restClient = RestClientBuilder.buildRestClientWithAuth();
+                lob_restClient.unregisterClient();
+            }
+        } catch (Exception ex) {
+            new AlertWindows().createExceptionAlert(ex.getMessage(), ex);
         }
 
         // Stops the NotifyServerThread

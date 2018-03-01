@@ -30,6 +30,7 @@ public class AddAdminController {
     private ListView<String> gob_lvUser;
     private List<User> gob_userList;
 
+    @FXML
     public void initialize() {
         RestClient lob_restClient;
         lob_restClient = RestClientBuilder.buildRestClientWithAuth();
@@ -37,7 +38,7 @@ public class AddAdminController {
         gob_userList = lob_restClient.getAllUser();
 
         if (gob_userList == null) {
-            // TODO stage schließen
+
         } else {
             listView.loadSettingsList(gob_lvOptions);
             listView.loadUserList(gob_lvUser, gob_userList);
