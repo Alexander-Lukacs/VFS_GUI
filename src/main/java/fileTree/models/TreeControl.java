@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 import rest.RestClient;
 import tools.TreeTool;
 import tools.Utils;
+import tools.xmlTools.DirectoryNameMapper;
 
 import java.io.File;
 import java.io.IOException;
