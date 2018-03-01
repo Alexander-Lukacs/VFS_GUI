@@ -268,12 +268,16 @@ public class TreeControl {
                 lob_item.setDisable(true);
             } else if (lob_item.getText().equals("New shared directory") || lob_item.getText().equals("Properties")) {
                 if (lob_selectedFile.getName().equals("Shared")) {
+                    lob_item.setDisable(false);
                     lob_item.setText("New shared directory");
                 } else if (lob_selectedFile.getParentFile().getName().equals("Shared")){
+                    lob_item.setDisable(false);
                     lob_item.setText("Properties");
                 } else {
                     lob_item.setDisable(true);
                 }
+
+
             } else {
                 lob_item.setDisable(false);
             }
