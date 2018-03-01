@@ -10,6 +10,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.TransferMode;
 import rest.RestClient;
 import tools.TreeTool;
+import tools.xmlTools.DirectoryNameMapper;
 
 import java.io.File;
 
@@ -79,7 +80,7 @@ public class TreeCellImpl extends TreeCell<String> {
             Dragboard lob_dragBoard;
             ClipboardContent lob_content;
 
-            if (lob_selectedItem != null) {
+            if (lob_selectedItem != null && !isRootChildElement(lob_selectedItem)) {
                 lob_dragBoard = this.startDragAndDrop(TransferMode.MOVE);
                 lob_content = new ClipboardContent();
                 lob_content.putString(lob_selectedItem.getValue());
@@ -141,7 +142,7 @@ public class TreeCellImpl extends TreeCell<String> {
             TreeCell lob_cellDragged;
 
             if (lob_selectedItem != null && event.getGestureSource() != this &&
-                    !buildFileFromItem(this.getTreeItem(), gob_tree).isFile()) {
+                    !buildFileFromItem(this.getTreeItem(), gob_tree).isFile() && !lob_selectedItem.getValue().equals("Shared")) {
 
                 lob_cellDragged = (TreeCell) event.getGestureSource();
                 lva_cellDraggedValue = lob_cellDragged.getTreeItem().getParent().getValue();
@@ -161,5 +162,11 @@ public class TreeCellImpl extends TreeCell<String> {
 
             event.consume();
         });
+    }
+
+    private boolean isRootChildElement(TreeItem iob_selectedItem) {
+        return iob_selectedItem.getValue().equals(DirectoryNameMapper.getPrivateDirectoryName()) ||
+                iob_selectedItem.getValue().equals(DirectoryNameMapper.getPublicDirectoryName()) ||
+                iob_selectedItem.getValue().equals("Shared");
     }
 }
