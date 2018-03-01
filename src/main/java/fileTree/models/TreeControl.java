@@ -2,10 +2,19 @@ package fileTree.models;
 
 import builder.RestClientBuilder;
 import cache.DataCache;
+import controller.SharedDirectoryController;
 import fileTree.interfaces.FileChangeListener;
 import fileTree.interfaces.Tree;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
+import javafx.util.Callback;
 import rest.RestClient;
 import tools.TreeTool;
 import tools.Utils;
@@ -14,6 +23,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
+
+import static controller.constants.ApplicationConstants.GC_APPLICATION_ICON_PATH;
 
 import static tools.TreeTool.*;
 
@@ -82,8 +93,6 @@ public class TreeControl {
 
                 @Override
                 public void fileDeleted(Path iob_path) {
-                    TreeSingleton t = TreeSingleton.getInstance();
-
                     if (TreeSingleton.getInstance().getDuplicateOperationsPrevention().wasFileDeted(iob_path)) {
                         TreeSingleton.getInstance().getDuplicateOperationsPrevention().removeDeleted(iob_path);
                     } else {
@@ -188,6 +197,7 @@ public class TreeControl {
         MenuItem lob_newFile;
         MenuItem lob_deleteDirectoryOnly;
         MenuItem lob_renameFile;
+        MenuItem lob_sharedDirectory;
         //-----------------------------------------------------------------
 
         gob_contextMenu = new ContextMenu();
@@ -222,11 +232,18 @@ public class TreeControl {
         lob_newFile.setOnAction(event ->
                 createNewFile()
         );
+
+        lob_sharedDirectory = new MenuItem("Test");
+        lob_sharedDirectory.setOnAction(event ->
+            sharedDirectoryScene(gob_treeView.getSelectionModel().getSelectedItem())
+        );
+
         gob_contextMenu.getItems().addAll(lob_deleteFile,
                 lob_newDirectory,
                 lob_newFile,
                 lob_deleteDirectoryOnly,
-                lob_renameFile);
+                lob_renameFile,
+                lob_sharedDirectory);
     }
 
     private void onContextMenuRequest() {
@@ -400,6 +417,27 @@ public class TreeControl {
             ex.printStackTrace();
         }
         return true;
+    }
+
+    private void sharedDirectoryScene(TreeItem iob_treeItem) {
+        FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("views/sharedDirectoryScreen.fxml"));
+        GridPane lob_pane = null;
+        try {
+            lob_pane = lob_loader.load();
+            Scene lob_scene = new Scene(lob_pane);
+            Stage lob_stage = new Stage();
+            lob_stage.setTitle("Shared Directory");
+            lob_stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream(GC_APPLICATION_ICON_PATH)));
+            lob_stage.setResizable(false);
+            lob_stage.setScene(lob_scene);
+            SharedDirectoryController lob_controller = lob_loader.getController();
+
+            // TODO shared Directory übergeben
+            lob_controller.initData(null);
+            lob_stage.show();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     /**

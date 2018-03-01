@@ -10,7 +10,8 @@ import tools.AlertWindows;
 import tools.Validation;
 import tools.xmlTools.LastSessionStorage;
 
-import static cache.DataCache.*;
+import static cache.DataCache.GC_IP_KEY;
+import static cache.DataCache.GC_PORT_KEY;
 import static controller.constants.SettingsConstants.GC_ADMIN_ADD;
 import static controller.constants.SettingsConstants.GC_CHANGE_PW;
 import static tools.constants.AlertConstants.GC_WARNING_IP_PORT;
@@ -54,7 +55,8 @@ public class ChangeIpPortController {
                 gob_rootPane.getChildren().setAll(lob_pane);
             }
             // TODO schauen ob es eine besser Methode gibt, als ein leerer catch block
-        } catch (Exception ignore) {}
+        } catch (Exception ignore) {
+        }
     }
 
     public void onClick() {

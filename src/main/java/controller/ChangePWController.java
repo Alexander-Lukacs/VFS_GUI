@@ -2,6 +2,8 @@ package controller;
 
 import builder.RestClientBuilder;
 import cache.DataCache;
+import javafx.scene.control.Button;
+import javafx.stage.Stage;
 import rest.RestClient;
 import models.classes.RestResponse;
 import javafx.fxml.FXML;
@@ -35,6 +37,8 @@ public class ChangePWController {
     @FXML
     private AnchorPane gob_rootPane;
     private DataCache gob_dataCache;
+    @FXML
+    private Button gob_btnSave;
 
 
     /**
@@ -68,6 +72,7 @@ public class ChangePWController {
     }
 
     public void onClickChangePassword() {
+        Stage lob_stage;
         RestResponse lob_restResponse;
         RestClient lob_restClient;
         User lob_user;
@@ -94,7 +99,8 @@ public class ChangePWController {
                 if (lob_restResponse.getHttpStatus() == GC_HTTP_OK) {
                     LastSessionStorage.setPassword(lva_newPassword);
                     gob_dataCache.replaceData(GC_PASSWORD_KEY, lva_newPassword);
-                    // TODO close stage
+                    lob_stage = (Stage) gob_btnSave.getScene().getWindow();
+                    lob_stage.close();
                 }
             }
         }
