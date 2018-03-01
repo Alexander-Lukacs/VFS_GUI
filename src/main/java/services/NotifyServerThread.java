@@ -53,9 +53,7 @@ public class NotifyServerThread extends Thread {
                         //TODO rename file
                     }
 
-                } catch (InterruptedIOException ex) {
-                    ex.printStackTrace();
-                }
+                } catch (InterruptedIOException ignore) {}
 
                 if (lob_client != null) {
                     lob_client.close();

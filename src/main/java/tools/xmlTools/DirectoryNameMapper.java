@@ -268,4 +268,8 @@ public class DirectoryNameMapper {
 
         throw new IllegalArgumentException(GC_SHARED_DIRECTORY_NOT_FOUND);
     }
+
+    public static void main(String[] args) {
+        addNewSharedDirectory(1, "bla");
+    }
 }

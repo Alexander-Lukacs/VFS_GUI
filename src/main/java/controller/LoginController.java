@@ -20,6 +20,7 @@ import tools.Utils;
 import tools.Validation;
 import tools.xmlTools.LastSessionStorage;
 
+import javax.ws.rs.ProcessingException;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -116,7 +117,7 @@ public class LoginController {
                     mainController.start(gob_stage);
                     close();
                 }
-            } catch (IllegalArgumentException ex) {
+            } catch (IllegalArgumentException | ProcessingException ex) {
                 new AlertWindows().createExceptionAlert(ex.getMessage(), ex);
             }
         }
