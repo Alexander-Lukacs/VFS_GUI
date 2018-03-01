@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 
 import static controller.constants.ApplicationConstants.GC_APPLICATION_ICON_PATH;
+import static fileTree.constants.TreeControlConstants.*;
 import static tools.TreeTool.buildFileFromItem;
 import static tools.TreeTool.moveFile;
 
@@ -248,9 +249,8 @@ public class TreeControl {
 
     private void onContextMenuRequest() {
         //-------------------------------Variables----------------------------------------
-        File lob_selectedFile = buildFileFromItem(
-                gob_treeView.getSelectionModel().getSelectedItem(), gob_tree
-        );
+        TreeItem lob_treeItem = gob_treeView.getSelectionModel().getSelectedItem();
+        File lob_selectedFile = buildFileFromItem(lob_treeItem, gob_tree);
         //--------------------------------------------------------------------------------
 
         if (gob_treeView.getSelectionModel().getSelectedItem() == null) {
@@ -258,28 +258,75 @@ public class TreeControl {
         }
 
         for (MenuItem lob_item : gob_contextMenu.getItems()) {
-            if (!lob_selectedFile.isDirectory() && lob_item.getText().equals("Delete only Directory")) {
-                lob_item.setDisable(true);
-            } else if (gob_tree.getRoot().equals(lob_selectedFile) && lob_item.getText().equals("Delete")) {
-                lob_item.setDisable(true);
-            } else if (gob_tree.getRoot().equals(lob_selectedFile) && lob_item.getText().equals("Rename")) {
-                lob_item.setDisable(true);
-            } else if (gob_tree.getRoot().equals(lob_selectedFile) && lob_item.getText().equals("Delete only Directory")) {
-                lob_item.setDisable(true);
-            } else if (lob_item.getText().equals("New shared directory") || lob_item.getText().equals("Properties")) {
-                if (lob_selectedFile.getName().equals("Shared")) {
-                    lob_item.setDisable(false);
-                    lob_item.setText("New shared directory");
-                } else if (lob_selectedFile.getParentFile().getName().equals("Shared")){
-                    lob_item.setDisable(false);
-                    lob_item.setText("Properties");
-                } else {
-                    lob_item.setDisable(true);
-                }
+            switch (lob_item.getText()) {
+                case GC_MENU_ITEM_DELETE_ONLY_DIR:
+                    if (!lob_selectedFile.isDirectory() || isRootChildElement(lob_treeItem)) {
+                        lob_item.setDisable(true);
+                    } else {
+                        lob_item.setDisable(false);
+                    }
+                    break;
 
+                case GC_MENU_ITEM_DELETE:
+                    if (isRootChildElement(lob_treeItem)) {
+                        lob_item.setDisable(true);
+                    } else {
+                        lob_item.setDisable(false);
+                    }
 
-            } else {
-                lob_item.setDisable(false);
+                    break;
+
+                case GC_MENU_ITEM_RENAME:
+                    if (lob_treeItem.getValue().equals(GC_DIR_NAME)) {
+                        lob_item.setDisable(true);
+                    } else {
+                        lob_item.setDisable(false);
+                    }
+                    break;
+
+                case GC_MENU_ITEM_NEW_FILE:
+                    if (lob_selectedFile.getName().equals(GC_DIR_NAME)) {
+                        lob_item.setDisable(true);
+                    } else {
+                        lob_item.setDisable(false);
+                    }
+
+                    break;
+
+                case GC_MENU_ITEM_NEW_DIR:
+                    if (lob_selectedFile.getName().equals(GC_DIR_NAME)) {
+                        lob_item.setDisable(true);
+                    } else {
+                        lob_item.setDisable(false);
+                    }
+
+                    break;
+
+                case GC_MENU_ITEM_NEW_SHARED_DIR:
+                    if (lob_selectedFile.getName().equals("Shared")) {
+                        lob_item.setDisable(false);
+                        lob_item.setText("New shared directory");
+                    } else if (lob_selectedFile.getParentFile().getName().equals("Shared")) {
+                        lob_item.setDisable(false);
+                        lob_item.setText("Properties");
+                    } else {
+                        lob_item.setDisable(true);
+                    }
+
+                    break;
+
+                case GC_MENU_ITEM_PROPERTIES:
+                    if (lob_selectedFile.getName().equals("Shared")) {
+                        lob_item.setDisable(false);
+                        lob_item.setText("New shared directory");
+                    } else if (lob_selectedFile.getParentFile().getName().equals("Shared")) {
+                        lob_item.setDisable(false);
+                        lob_item.setText("Properties");
+                    } else {
+                        lob_item.setDisable(true);
+                    }
+
+                    break;
             }
         }
     }
@@ -476,5 +523,11 @@ public class TreeControl {
         }
 
         return null;
+    }
+
+    private boolean isRootChildElement(TreeItem iob_selectedItem) {
+        return iob_selectedItem.getValue().equals(DirectoryNameMapper.getPrivateDirectoryName()) ||
+                iob_selectedItem.getValue().equals(DirectoryNameMapper.getPublicDirectoryName()) ||
+                iob_selectedItem.getValue().equals("Shared");
     }
 }
