@@ -8,12 +8,16 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import models.classes.RestResponse;
 import models.classes.SharedDirectory;
 import models.classes.User;
 import rest.RestClient;
 import tools.AlertWindows;
+import tools.Utils;
 import tools.Validation;
+import tools.xmlTools.DirectoryNameMapper;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +36,7 @@ public class SharedDirectoryController {
     private TextField gob_tf_email;
     @FXML
     private ListView<String> gob_list_member;
+
     private SharedDirectory gob_sharedDirectory;
     private Stage gob_stage;
 
@@ -71,6 +76,7 @@ public class SharedDirectoryController {
         User lob_member;
         List<User> lli_memberList = new ArrayList<>();
         RestClient lob_restClient;
+        RestResponse lob_restResponse;
         DataCache lob_dataCache = DataCache.getDataCache();
 
         try {
@@ -89,11 +95,11 @@ public class SharedDirectoryController {
             }
 
             lob_sharedDirectory.setMembers(lli_memberList);
-
+            // TODO überprüfen, ob Directory bereits existiert
             lob_restClient = RestClientBuilder.buildRestClientWithAuth();
-            lob_restClient.addNewSharedDirectory(lob_sharedDirectory);
-
-            // TODO create Directory
+            lob_restResponse = lob_restClient.addNewSharedDirectory(lob_sharedDirectory);
+            lob_sharedDirectory.setId(Integer.parseInt(lob_restResponse.getResponseMessage()));
+            createSharedDirectory(lob_sharedDirectory);
         } catch (IllegalArgumentException ex) {
             new AlertWindows().createWarningAlert(ex.getMessage());
         }
@@ -104,7 +110,7 @@ public class SharedDirectoryController {
         boolean lva_found;
 
         if (!gob_sharedDirectory.getDirectoryName().equals(gob_tf_directory_name.getText())) {
-            //TODO Directory Name Mapper
+            DirectoryNameMapper.addNewSharedDirectory(gob_sharedDirectory.getId(), gob_tf_directory_name.getText());
         }
 
         lli_oldMemberList = gob_sharedDirectory.getMembers();
@@ -112,7 +118,7 @@ public class SharedDirectoryController {
         // check if member was removed
         for (User lob_user : lli_oldMemberList) {
             if (!gob_member.contains(lob_user.getEmail())) {
-                // Delete Member
+                //TODO Delete Member
             }
         }
 
@@ -126,7 +132,7 @@ public class SharedDirectoryController {
             }
 
             if (!lva_found) {
-                // Add new Member
+                //TODO Add new Member
             }
         }
     }
@@ -190,5 +196,29 @@ public class SharedDirectoryController {
 
     private void closeWindow() {
         gob_stage.close();
+    }
+
+    private void createSharedDirectory(SharedDirectory iob_sharedDirectory) {
+        DataCache lob_dataCache = DataCache.getDataCache();
+        File lob_file;
+        int lva_counter = 1;
+        String lva_filePath;
+
+        lva_filePath = Utils.getUserBasePath() + "\\" + lob_dataCache.get(DataCache.GC_IP_KEY) + "_" +
+                lob_dataCache.get(DataCache.GC_PORT_KEY) + "\\" + lob_dataCache.get(DataCache.GC_EMAIL_KEY) + "\\" +"Shared" + "\\" +
+                iob_sharedDirectory.getDirectoryName() + "$";
+
+        lob_file = new File(lva_filePath.replace("$", ""));
+
+        if (lob_file.exists()) {
+            do {
+                lob_file = new File(lva_filePath.replace("$", "(" + lva_counter + ")"));
+                lva_counter++;
+            } while (lob_file.exists());
+
+            DirectoryNameMapper.addNewSharedDirectory(iob_sharedDirectory.getId(), lob_file.getName());
+        }
+
+        lob_file.mkdir();
     }
 }
