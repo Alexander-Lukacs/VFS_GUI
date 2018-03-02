@@ -27,6 +27,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -249,7 +250,19 @@ public class RestClient {
 // ---------------------------------------------------------------------------------------------------------------------
 
     public RestResponse addNewSharedDirectory(SharedDirectory iob_sharedDirectory) {
-        return createPostRequest(GC_REST_ADD_NEW_SHARED_DIRECTORY, iob_sharedDirectory);
+        RestResponse lob_restResponse = new RestResponse();
+
+        try {
+            Response response = gob_webTarget.path("sharedDirectory/auth/addNewSharedDirectory").request()
+                    .post(Entity.entity(iob_sharedDirectory, MediaType.APPLICATION_JSON));
+
+            lob_restResponse.setResponseMessage(response.readEntity(String.class));
+            lob_restResponse.setHttpStatus(response.getStatus());
+        } catch (Exception ex) {
+            new AlertWindows().createExceptionAlert(ex.getMessage(), ex);
+        }
+
+        return lob_restResponse;
     }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -276,6 +289,23 @@ public class RestClient {
     public RestResponse removeMemberFromSharedDirectory(SharedDirectory iob_sharedDirectory, User iob_member) {
         int lva_id = iob_sharedDirectory.getId();
         return createPutRequest(GC_REST_REMOVE_MEMBER_FROM_SHARED_DIR + lva_id, iob_member);
+    }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Get all shared directories of user
+// ---------------------------------------------------------------------------------------------------------------------
+
+    public List<SharedDirectory> getAllSharedDirectoriesOfUser() {
+        List<SharedDirectory> lli_userSharedDirectory = null;
+
+        try {
+            lli_userSharedDirectory = gob_webTarget.path("/getAllSharedDirectories").request()
+                    .get(new GenericType<List<SharedDirectory>>(){});
+        } catch (Exception ex) {
+            new AlertWindows().createExceptionAlert(ex.getMessage(), ex);
+        }
+
+        return lli_userSharedDirectory;
     }
 
 //----------------------------------------------------------------------------------------------------------------------

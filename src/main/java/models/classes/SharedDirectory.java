@@ -1,7 +1,9 @@
 package models.classes;
 
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
+@XmlRootElement
 public class SharedDirectory {
     private User owner;
     private List<User> members;
@@ -51,7 +53,7 @@ public class SharedDirectory {
 
     @Override
     public String toString() {
-        return "SharedDirectoryImpl{" +
+        return "SharedDirectory{" +
                 "owner=" + owner +
                 ", members=" + members +
                 ", directoryName='" + directoryName + '\'' +

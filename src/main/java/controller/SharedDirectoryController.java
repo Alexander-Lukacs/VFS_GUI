@@ -15,6 +15,7 @@ import rest.RestClient;
 import tools.AlertWindows;
 import tools.Validation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static controller.constants.SharedDirectoryConstants.*;
@@ -70,6 +71,11 @@ public class SharedDirectoryController {
 
     private void addNewSharedDirectory() {
         SharedDirectory lob_sharedDirectory = new SharedDirectory();
+        User lob_owner = new User();
+        User lob_member;
+        List<User> lli_memberList = new ArrayList<>();
+        RestClient lob_restClient;
+        DataCache lob_dataCache = DataCache.getDataCache();
 
         try {
             if (gob_tf_directory_name.getText().trim().isEmpty()) {
@@ -77,6 +83,19 @@ public class SharedDirectoryController {
             }
 
             lob_sharedDirectory.setDirectoryName(gob_tf_directory_name.getText());
+            lob_owner.setEmail(lob_dataCache.get(DataCache.GC_EMAIL_KEY));
+            lob_sharedDirectory.setOwner(lob_owner);
+
+            for (String lob_email : gob_list_member.getItems()) {
+                lob_member = new User();
+                lob_member.setEmail(lob_email);
+                lli_memberList.add(lob_member);
+            }
+
+            lob_sharedDirectory.setMembers(lli_memberList);
+
+            lob_restClient = RestClientBuilder.buildRestClientWithAuth();
+            lob_restClient.addNewSharedDirectory(lob_sharedDirectory);
 
         } catch (IllegalArgumentException ex) {
             new AlertWindows().createWarningAlert(ex.getMessage());
