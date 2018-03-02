@@ -35,7 +35,9 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static rest.constants.HttpStatusCodes.GC_HTTP_OK;
 import static rest.constants.RestResourcesPaths.*;
@@ -153,6 +155,11 @@ public class RestClient {
                 lob_dataCache.get(DataCache.GC_PASSWORD_KEY)
 
         );
+
+        if (iva_relativeFilePath.startsWith("Private\\")) {
+           iva_relativeFilePath = iva_relativeFilePath.replaceFirst("^Private\\\\", "");
+        }
+
         ClientConfig lob_config = new ClientConfig(lob_authDetails);
         Client lob_client = ClientBuilder.newClient(lob_config);
         lob_client.register(lob_authDetails);
@@ -174,6 +181,11 @@ public class RestClient {
 // ---------------------------------------------------------------------------------------------------------------------
 
     public boolean createDirectoryOnServer(String iva_relativeDirectoryPath) {
+        if (iva_relativeDirectoryPath.startsWith("Private\\")) {
+            iva_relativeDirectoryPath = iva_relativeDirectoryPath.replaceFirst("^Private\\\\", "");
+        }
+
+
         Response lob_response = gob_webTarget.path("/auth/files/createDirectory").request()
                 .post(Entity.entity(iva_relativeDirectoryPath, MediaType.TEXT_PLAIN));
         return lob_response.getStatus() == 200;
@@ -221,18 +233,46 @@ public class RestClient {
 // ---------------------------------------------------------------------------------------------------------------------
 // Rename a file on the server
 // ---------------------------------------------------------------------------------------------------------------------
-    public TreeDifferenceImpl compareClientAndServerTree(Tree iob_tree) {
+    public TreeDifference compareClientAndServerTree(Tree iob_tree) {
         try {
-            XStream xStream = new XStream();
-            String xml = xStream.toXML(iob_tree);
+            XStream lob_xStream = new XStream();
+            XStream.setupDefaultSecurity(lob_xStream); // to be removed after 1.5
+
+            Class[] lar_allowedClasses = {TreeDifference.class, TreeDifferenceImpl.class};
+            lob_xStream.allowTypes(lar_allowedClasses);
+
+            Tree lob_privateTree = new TreeImpl(iob_tree.getRoot() + "\\Private");
+
+            File lob_privateRootFile = new File(iob_tree.getRoot() + "\\Private");
+            FileNode lob_privateNode = iob_tree.getRootNode().getChild(lob_privateRootFile);
+            lob_privateTree.addFiles(getNodeSubFiles(new HashMap<>(), lob_privateNode));
+
+
+            String xml = lob_xStream.toXML(lob_privateTree);
             Response lob_response = gob_webTarget.path("/auth/files/compare").request()
                     .post(Entity.entity(xml, MediaType.APPLICATION_XML));
 
+            String lva_xmlDifferenceString = lob_response.readEntity(String.class);
+            System.out.println(lva_xmlDifferenceString);
+            TreeDifference rob_difference = (TreeDifference) lob_xStream.fromXML(lva_xmlDifferenceString);
             System.out.println(lob_response.getStatus() + "," + lob_response.getStatusInfo());
+
+            return rob_difference;
         } catch (Exception ex) {
             ex.printStackTrace();
         }
         return null;
+    }
+
+    private Map<File, Boolean> getNodeSubFiles(Map<File, Boolean> iob_map, FileNode iob_treeNodePinter) {
+        boolean lva_isDirectory = iob_treeNodePinter.getFile().isDirectory();
+        iob_map.put(iob_treeNodePinter.getFile(), lva_isDirectory);
+
+        for (FileNode lob_child: iob_treeNodePinter.getChildren()) {
+            getNodeSubFiles(iob_map, lob_child);
+        }
+
+        return iob_map;
     }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -252,10 +292,16 @@ public class RestClient {
     public RestResponse addNewSharedDirectory(SharedDirectory iob_sharedDirectory) {
         RestResponse lob_restResponse = new RestResponse();
 
+        XStream lob_xmlParse = new XStream();
+        XStream.setupDefaultSecurity(lob_xmlParse);
+
+        String lva_sharedDirectoryXmlString = lob_xmlParse.toXML(iob_sharedDirectory);
+
         try {
             Response response = gob_webTarget.path("sharedDirectory/auth/addNewSharedDirectory").request()
-                    .post(Entity.entity(iob_sharedDirectory, MediaType.APPLICATION_JSON));
+                    .post(Entity.entity(lva_sharedDirectoryXmlString, MediaType.APPLICATION_XML));
 
+            System.out.println(response.getStatus() +" SHARED");
             lob_restResponse.setResponseMessage(response.readEntity(String.class));
             lob_restResponse.setHttpStatus(response.getStatus());
         } catch (Exception ex) {

@@ -50,7 +50,7 @@ public class MainDirectoryWatcher {
     }
 
     private void addFile(Path iob_path) {
-        if (filterRootFiles(iob_path)){
+        if (TreeTool.filterRootFiles(iob_path)){
             System.out.println("GEFILTERT:" + iob_path);
             return;
         }
@@ -94,14 +94,5 @@ public class MainDirectoryWatcher {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-    }
-
-    /**
-     * filter all new files on the same level as public, shared and private
-     * @return return true if the file is on the same level, otherwise false
-     */
-    private boolean filterRootFiles(Path iob_path) {
-        File root_file = TreeSingleton.getInstance().getTree().getRoot();
-        return root_file.equals(iob_path.getParent().toFile());
     }
 }

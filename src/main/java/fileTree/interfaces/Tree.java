@@ -38,6 +38,11 @@ public interface Tree {
     File getRoot();
 
     /**
+     * @return the root of the node
+     */
+    FileNode getRootNode();
+
+    /**
      * Get children from the root
      * @return all children from the root
      */

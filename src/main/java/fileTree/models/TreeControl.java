@@ -24,8 +24,6 @@ import java.util.Collection;
 
 import static controller.constants.ApplicationConstants.GC_APPLICATION_ICON_PATH;
 import static fileTree.constants.TreeControlConstants.*;
-import static tools.TreeTool.buildFileFromItem;
-import static tools.TreeTool.moveFile;
 import static tools.TreeTool.*;
 
 public class TreeControl {
@@ -102,11 +100,10 @@ public class TreeControl {
                 }
             });
 
-//            w.start();
+            gob_restClient.compareClientAndServerTree(TreeSingleton.getInstance().getTree());
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-        gob_restClient.compareClientAndServerTree(TreeSingleton.getInstance().getTree());
     }
 
     private void addFilesToTree(File iob_file, TreeItem<String> iob_treeItem) {
@@ -115,7 +112,9 @@ public class TreeControl {
         //we have to add the child nodes of the file if the file is a direcotry
         if (iob_file.isDirectory()) {
             //add the directory itself
-            addFile(iob_file, true);
+            if (!addFile(iob_file, true)) {
+                return;
+            }
 
             File[] lob_fileList = iob_file.listFiles();
             if (lob_fileList != null) {
@@ -139,8 +138,12 @@ public class TreeControl {
         }
     }
 
-    private void addFile(File iob_file, boolean iva_isDirectory) {
+    private boolean addFile(File iob_file, boolean iva_isDirectory) {
+        if (TreeTool.filterRootFiles(iob_file.toPath())) {
+            return false;
+        }
         this.gob_tree.addFile(iob_file, iva_isDirectory);
+        return true;
     }
 
     private void buildContextMenu() {

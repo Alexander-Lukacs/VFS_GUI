@@ -172,17 +172,18 @@ public class TreeTool {
 
             lva_relativeFilePath = TreeTool.getInstance().getRelativePath(iob_newFile.getCanonicalPath());
 
+            TreeSingleton.getInstance().getTree().addFile(iob_newFile, isDirectory);
+            TreeTool.getInstance().addToTreeView(iob_newFile);
+
             if (isDirectory) {
                 if (!iob_restClient.createDirectoryOnServer(lva_relativeFilePath)) {
-                    return false;
+                    //return false;
                 }
             } else {
                 if (!iob_restClient.uploadFilesToServer(iob_newFile, lva_relativeFilePath)) {
-                    return false;
+                    //return false;
                 }
             }
-            TreeSingleton.getInstance().getTree().addFile(iob_newFile, isDirectory);
-            TreeTool.getInstance().addToTreeView(iob_newFile);
 
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -212,6 +213,26 @@ public class TreeTool {
             ex.printStackTrace();
         }
         return false;
+    }
+    /**
+     * filter all new files on the same level as public, shared and private
+     * @return return true if the file is on the same level, otherwise false
+     */
+    public static boolean filterRootFiles(Path iob_path) {
+        if (iob_path.endsWith("Private")) {
+            return false;
+        }
+
+        if (iob_path.endsWith("Public")) {
+            return false;
+        }
+
+        if (iob_path.endsWith("Shared")) {
+            return false;
+        }
+
+        File root_file = TreeSingleton.getInstance().getTree().getRoot();
+        return root_file.equals(iob_path.getParent().toFile());
     }
 
     public static void moveFile(Path iob_path, Path iob_destination, boolean iva_moveJustInTree, RestClient iob_restClient) {

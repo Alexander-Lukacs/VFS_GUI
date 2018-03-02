@@ -57,7 +57,6 @@ public class DirectoryWatchService implements Runnable{
         HashMap<Path, FileTime> lco_tmp;
         HashMap<Path, FileTime> lco_scanned;
         ArrayList<File> lli_delete = new ArrayList<>();
-        PreventDuplicateOperation lob_duplicates = TreeSingleton.getInstance().getDuplicateOperationsPrevention();
         HashMap<File, File> lco_moved = new HashMap<>();
         HashMap<File, File> lco_renamed = new HashMap<>();
         //------------------------------------------------------------------
@@ -82,41 +81,25 @@ public class DirectoryWatchService implements Runnable{
 
                 //the file was moved if the creation time of the file that was "added" is the same as the one that was "deleted"
                 if (lob_scannedEntry.getValue().toMillis() == lob_entry.getValue().toMillis()) {
+                    //now we have 3 cases
+                    //first case: the file was just renamed
+                    if (!lob_entry.getKey().toFile().getName().equals(lob_scannedEntry.getKey().toFile().getName())) {
+                        File lob_oldfilePath = lob_entry.getKey().toFile();
+                        lco_renamed.put(lob_oldfilePath, lob_scannedEntry.getKey().toFile());
 
-                    //the file was already moved from the UI, just ignore it
-//                    if (lob_duplicates.wasFilesMoved(lob_entry.getKey())) {
-//                        lob_duplicates.removeMoved(lob_entry.getKey());
-//                    } else {
-                        //now we have 3 cases
+                        String lva_renamedFilePath = lob_entry.getKey().toString().replaceFirst("[^\\\\]*$", lob_scannedEntry.getKey().toFile().getName());
+                        lco_renamed.put(lob_oldfilePath, new File(lva_renamedFilePath));
 
-                        //first case: the file was just renamed
-                        if (!lob_entry.getKey().toFile().getName().equals(lob_scannedEntry.getKey().toFile().getName())) {
-//                            String oldFileName = lob_entry.getKey().toString().replaceFirst("[^\\\\]*$", lob_entry.getKey().toFile().getName());
-                            File lob_oldfilePath = lob_entry.getKey().toFile();
-//                            File lob_newFilePath = new File(
-//                                    lob_oldfilePath
-//                                            .toString()
-//                                            .replaceFirst("[^\\\\]*$", lob_scannedEntry.getKey().toFile().getName())
-//                            );
-                            lco_renamed.put(lob_oldfilePath, lob_scannedEntry.getKey().toFile());
-
-                            String lva_renamedFilePath = lob_entry.getKey().toString().replaceFirst("[^\\\\]*$", lob_scannedEntry.getKey().toFile().getName());
-                            lco_renamed.put(lob_oldfilePath, new File(lva_renamedFilePath));
-
-                            //second case: the file was moved and renamed
-//                            if (!lob_entry.getKey().startsWith(lob_scannedEntry.getKey().getParent())) {
-//                                lco_moved.put(lob_entry.getKey().toFile(), lob_scannedEntry.getKey().toFile());
-//                            }
-                            if (!lob_entry.getKey().getParent().equals(lob_scannedEntry.getKey().getParent())) {
-                                //this path contains the old filepath, but with the new name
-                                lco_moved.put(new File(lva_renamedFilePath), lob_scannedEntry.getKey().toFile());
-                            }
-
-                        //third case: the file was just moved
-                        } else {
-                            lco_moved.put(lob_entry.getKey().toFile(), lob_scannedEntry.getKey().toFile());
+                        //second case: the file was moved and renamed
+                        if (!lob_entry.getKey().getParent().equals(lob_scannedEntry.getKey().getParent())) {
+                            //this path contains the old filepath, but with the new name
+                            lco_moved.put(new File(lva_renamedFilePath), lob_scannedEntry.getKey().toFile());
                         }
-//                    }
+
+                    //third case: the file was just moved
+                    } else {
+                        lco_moved.put(lob_entry.getKey().toFile(), lob_scannedEntry.getKey().toFile());
+                    }
                     wasFileRenamedOrMoved = true;
                     //remove the old file path from the registered items
                     gob_registerdPaths.remove(lob_entry.getKey());
