@@ -45,37 +45,42 @@ public class MainController {
     public void onClick(ActionEvent e) throws RuntimeException, IOException {
         RestClient lob_restClient;
         DataCache lob_dataCache = DataCache.getDataCache();
-        if (((Button) e.getSource()).getText().equals(GC_SETTINGS)) {
-            FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("views/settings.fxml"));
-            AnchorPane lob_pane = lob_loader.load();
-            Scene lob_scene = new Scene(lob_pane);
-            Stage lob_stage = new Stage();
-            lob_stage.setTitle(GC_SETTINGS);
-            lob_stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream(GC_APPLICATION_ICON_PATH)));
-            lob_stage.setResizable(false);
-            lob_stage.setScene(lob_scene);
-            lob_stage.show();
 
-        } else if (((Button) e.getSource()).getText().equals(GC_LOGOUT)) {
-            lob_restClient = RestClientBuilder.buildRestClientWithAuth();
-            lob_restClient.unregisterClient();
-            Stage stage = ((Stage) gob_btnSettings.getScene().getWindow());
-            stage.close();
-            gob_userCache.clearDataCache();
-            LoginController ob_x = new LoginController();
-            ob_x.start(stage);
-        } else if (((Button) e.getSource()).getText().equals("Show in explorer")) {
-            if (Desktop.isDesktopSupported()) {
-                Desktop desktop = Desktop.getDesktop();
+        switch (((Button) e.getSource()).getText()) {
+            case GC_SETTINGS:
+                FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("views/settings.fxml"));
+                AnchorPane lob_pane = lob_loader.load();
+                Scene lob_scene = new Scene(lob_pane);
+                Stage lob_stage = new Stage();
+                lob_stage.setTitle(GC_SETTINGS);
+                lob_stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream(GC_APPLICATION_ICON_PATH)));
+                lob_stage.setResizable(false);
+                lob_stage.setScene(lob_scene);
+                lob_stage.show();
 
-                if (gob_treeControl.getPathOfSelectedItem() != null) {
-                    desktop.open(new File(gob_treeControl.getPathOfSelectedItem()));
-                } else {
-                    desktop.open(new File(Utils.getUserBasePath() + "\\" +
-                            lob_dataCache.get(DataCache.GC_IP_KEY) + "_" + lob_dataCache.get(DataCache.GC_PORT_KEY)));
+                break;
+            case GC_LOGOUT:
+                lob_restClient = RestClientBuilder.buildRestClientWithAuth();
+                lob_restClient.unregisterClient();
+                Stage stage = ((Stage) gob_btnSettings.getScene().getWindow());
+                stage.close();
+                gob_userCache.clearDataCache();
+                LoginController ob_x = new LoginController();
+                ob_x.start(stage);
+                break;
+            case "Show in explorer":
+                if (Desktop.isDesktopSupported()) {
+                    Desktop desktop = Desktop.getDesktop();
+
+                    if (gob_treeControl.getPathOfSelectedItem() != null) {
+                        desktop.open(new File(gob_treeControl.getPathOfSelectedItem()));
+                    } else {
+                        desktop.open(new File(Utils.getUserBasePath() + "\\" +
+                                lob_dataCache.get(DataCache.GC_IP_KEY) + "_" + lob_dataCache.get(DataCache.GC_PORT_KEY)));
+                    }
+
                 }
-
-            }
+                break;
         }
     }
 

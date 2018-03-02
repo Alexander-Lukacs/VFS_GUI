@@ -5,7 +5,6 @@ import cache.DataCache;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -26,21 +25,19 @@ import static controller.constants.SharedDirectoryConstants.*;
  * SharedDirectory Scene
  */
 public class SharedDirectoryController {
+    private final ObservableList<String> gob_member = FXCollections.observableArrayList();
     @FXML
     private TextField gob_tf_directory_name;
     @FXML
     private TextField gob_tf_email;
     @FXML
     private ListView<String> gob_list_member;
-    @FXML
-    private Button gob_btn_cancel;
     private SharedDirectory gob_sharedDirectory;
+    private Stage gob_stage;
 
-
-    private final ObservableList<String> member = FXCollections.observableArrayList();
-
-    public void initData(SharedDirectory iob_sharedDirectory) {
+    public void initData(SharedDirectory iob_sharedDirectory, Stage iob_stage) {
         gob_sharedDirectory = iob_sharedDirectory;
+        gob_stage = iob_stage;
         initScene();
     }
 
@@ -49,16 +46,15 @@ public class SharedDirectoryController {
             gob_tf_directory_name.setText(gob_sharedDirectory.getDirectoryName());
 
             for (User lob_user : gob_sharedDirectory.getMembers()) {
-                member.add(lob_user.getEmail());
+                gob_member.add(lob_user.getEmail());
             }
 
-            gob_list_member.setItems(member);
+            gob_list_member.setItems(gob_member);
         }
     }
 
     public void onClickCancel() {
-        Stage lob_stage = (Stage) gob_btn_cancel.getScene().getWindow();
-        lob_stage.close();
+        closeWindow();
     }
 
     public void onClickSave() {
@@ -97,13 +93,42 @@ public class SharedDirectoryController {
             lob_restClient = RestClientBuilder.buildRestClientWithAuth();
             lob_restClient.addNewSharedDirectory(lob_sharedDirectory);
 
+            // TODO create Directory
         } catch (IllegalArgumentException ex) {
             new AlertWindows().createWarningAlert(ex.getMessage());
         }
     }
 
     private void changeSharedDirectory() {
-        // TODO implement
+        List<User> lli_oldMemberList;
+        boolean lva_found;
+
+        if (!gob_sharedDirectory.getDirectoryName().equals(gob_tf_directory_name.getText())) {
+            //TODO Directory Name Mapper
+        }
+
+        lli_oldMemberList = gob_sharedDirectory.getMembers();
+
+        // check if member was removed
+        for (User lob_user : lli_oldMemberList) {
+            if (!gob_member.contains(lob_user.getEmail())) {
+                // Delete Member
+            }
+        }
+
+        // check if member was added
+        for (String lob_userMail : gob_member) {
+            lva_found = false;
+            for (User lob_user : lli_oldMemberList) {
+                if (lob_user.getEmail().equals(lob_userMail)) {
+                    lva_found = true;
+                }
+            }
+
+            if (!lva_found) {
+                // Add new Member
+            }
+        }
     }
 
     public void onClickAddMember() {
@@ -132,14 +157,14 @@ public class SharedDirectoryController {
 
             for (User lob_user : lob_userList) {
                 if (lob_user.getEmail().equals(gob_tf_email.getText())) {
-                    if (!member.contains(lob_user.getEmail())) {
-                        member.add(lob_user.getEmail());
-                        gob_list_member.setItems(member);
+                    if (!gob_member.contains(lob_user.getEmail())) {
+                        gob_member.add(lob_user.getEmail());
+                        gob_list_member.setItems(gob_member);
                     } else {
-                        gob_tf_email.setText("");
                         throw new IllegalArgumentException(GC_USER_IS_ALREADY_ADDED);
                     }
 
+                    gob_tf_email.setText("");
                     lva_userNotExists = false;
                 }
             }
@@ -157,9 +182,13 @@ public class SharedDirectoryController {
         String lva_email;
         if (gob_list_member.getSelectionModel().getSelectedItem() != null) {
             lva_email = gob_list_member.getSelectionModel().getSelectedItem();
-            member.remove(lva_email);
+            gob_member.remove(lva_email);
 
-            gob_list_member.setItems(member);
+            gob_list_member.setItems(gob_member);
         }
+    }
+
+    private void closeWindow() {
+        gob_stage.close();
     }
 }

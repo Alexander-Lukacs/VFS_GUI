@@ -402,9 +402,16 @@ public class TreeControl {
             lob_stage.setScene(lob_scene);
             SharedDirectoryController lob_controller = lob_loader.getController();
 
-            // TODO shared Directory übergeben
-            lob_controller.initData(null);
+            if (iob_treeItem.getValue().equals("Shared")) {
+                lob_controller.initData(null, lob_stage);
+
+            } else {
+                // TODO shared Directory übergeben
+                //lob_controller.initData(null, lob_stage);
+            }
+
             lob_stage.show();
+
         } catch (IOException ex) {
             ex.printStackTrace();
         }
