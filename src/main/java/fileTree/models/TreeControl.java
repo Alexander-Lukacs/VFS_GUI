@@ -215,6 +215,10 @@ public class TreeControl {
             return;
         }
 
+        if (!lob_selectedFile.exists()) {
+            return;
+        }
+
         for (MenuItem lob_item : gob_contextMenu.getItems()) {
             switch (lob_item.getText()) {
                 case GC_MENU_ITEM_DELETE_ONLY_DIR:

@@ -29,14 +29,19 @@ public class TreeCellImpl extends TreeCell<String> {
 
     @Override
     public void startEdit() {
-        super.startEdit();
+        TreeItem<String> lob_item = getTreeItem();
+        File lob_file = TreeTool.buildFileFromItem(lob_item, TreeSingleton.getInstance().getTree());
 
-        if (gob_textField == null) {
-            createTextField();
+        if (lob_file.exists()) {
+            super.startEdit();
+
+            if (gob_textField == null) {
+                createTextField();
+            }
+            setText(null);
+            setGraphic(gob_textField);
+            gob_textField.selectAll();
         }
-        setText(null);
-        setGraphic(gob_textField);
-        gob_textField.selectAll();
     }
 
     @Override
