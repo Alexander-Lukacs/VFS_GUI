@@ -122,19 +122,22 @@ public class TreeControl {
                 for (File lob_directoryChildFile : lob_fileList) {
                     //if the directory contains another directory, do the same for it
                     if (lob_directoryChildFile.isDirectory()) {
-                        lob_newItem = TreeTool.getInstance().addTreeItem(iob_treeItem, lob_directoryChildFile);
-
-                        addFilesToTree(lob_directoryChildFile, lob_newItem);
+                        if (!TreeTool.filterRootFiles(lob_directoryChildFile.toPath())) {
+                            lob_newItem = TreeTool.getInstance().addTreeItem(iob_treeItem, lob_directoryChildFile);
+                            addFilesToTree(lob_directoryChildFile, lob_newItem);
+                        }
                     } else {
                         //add normal file
-                        addFile(lob_directoryChildFile, false);
-                        TreeTool.getInstance().addTreeItem(iob_treeItem, lob_directoryChildFile);
+                        if(addFile(lob_directoryChildFile, false)) {
+                            TreeTool.getInstance().addTreeItem(iob_treeItem, lob_directoryChildFile);
+                        }
                     }
                 }
             }
         } else {
-            addFile(iob_file, false);
-            TreeTool.getInstance().addTreeItem(iob_treeItem, iob_file);
+            if (addFile(iob_file, false)) {
+                TreeTool.getInstance().addTreeItem(iob_treeItem, iob_file);
+            }
         }
     }
 
