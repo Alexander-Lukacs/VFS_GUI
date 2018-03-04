@@ -37,7 +37,7 @@ public class TreeTool {
         return rob_child;
     }
 
-    public TreeItem<String> getTreeItem(File iob_file) {
+    public static TreeItem<String> getTreeItem(File iob_file) {
         return searchTreeItem(iob_file);
     }
 
@@ -63,7 +63,7 @@ public class TreeTool {
         return new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("images/fileIcons/ICON_FILE.png")));
     }
 
-    public void removeFromTreeView(File iob_file) {
+    public static void removeFromTreeView(File iob_file) {
         TreeItem<String> lob_item = searchTreeItem(iob_file);
         if (lob_item == null) {
             return;
@@ -90,7 +90,7 @@ public class TreeTool {
         }
     }
 
-    private TreeItem<String> searchTreeItem(File iob_file) {
+    private static TreeItem<String> searchTreeItem(File iob_file) {
         TreeItem<String> item = TreeSingleton.getInstance().getTreeView().getRoot();
         if (iob_file.equals(TreeSingleton.getInstance().getTree().getRoot())) {
             return item;
@@ -121,7 +121,7 @@ public class TreeTool {
         return item;
     }
 
-    public String getRelativePath(String iva_filePath) throws IOException {
+    public static String getRelativePath(String iva_filePath) throws IOException {
         String lva_regex = TreeSingleton.getInstance().getTree().getRoot().getCanonicalPath();
 
         lva_regex = lva_regex.replaceAll("\\\\", "\\\\\\\\");
@@ -170,19 +170,15 @@ public class TreeTool {
         //--------------------------------------------------------------------
         try {
 
-            lva_relativeFilePath = TreeTool.getInstance().getRelativePath(iob_newFile.getCanonicalPath());
+            lva_relativeFilePath = getRelativePath(iob_newFile.getCanonicalPath());
 
             TreeSingleton.getInstance().getTree().addFile(iob_newFile, isDirectory);
             TreeTool.getInstance().addToTreeView(iob_newFile);
 
             if (isDirectory) {
-                if (!iob_restClient.createDirectoryOnServer(lva_relativeFilePath)) {
-                    //return false;
-                }
+                iob_restClient.createDirectoryOnServer(lva_relativeFilePath);
             } else {
-                if (!iob_restClient.uploadFilesToServer(iob_newFile, lva_relativeFilePath)) {
-                    //return false;
-                }
+                iob_restClient.uploadFilesToServer(iob_newFile, lva_relativeFilePath);
             }
 
         } catch (IOException ex) {
@@ -203,10 +199,9 @@ public class TreeTool {
         String lva_relativePath;
         //--------------------------------------------------------------------------------
         try {
-            lva_relativePath = TreeTool.getInstance().getRelativePath(iob_file.getCanonicalPath());
-            if (!iob_restClient.deleteOnServer(lva_relativePath)) {
-                //return false;
-            }
+            lva_relativePath = getRelativePath(iob_file.getCanonicalPath());
+            iob_restClient.deleteOnServer(lva_relativePath);
+
             iob_itemToDelete.getParent().getChildren().remove(iob_itemToDelete);
             return TreeSingleton.getInstance().getTree().deleteFile(iob_file);
         } catch (IOException ex) {
@@ -237,9 +232,8 @@ public class TreeTool {
 
     public static void moveFile(Path iob_path, Path iob_destination, boolean iva_moveJustInTree, RestClient iob_restClient) {
         //-------------------------Variables------------------------------------
-        TreeTool lob_tool = TreeTool.getInstance();
-        TreeItem<String> lob_item = lob_tool.getTreeItem(iob_path.toFile());
-        TreeItem<String> lob_parent = TreeTool.getInstance().getTreeItem(iob_destination.toFile());
+        TreeItem<String> lob_item = getTreeItem(iob_path.toFile());
+        TreeItem<String> lob_parent = getTreeItem(iob_destination.toFile());
         String lva_destination = iob_destination.toString();
         String lva_oldRelativePath;
         String lva_newRelativePath;
@@ -250,13 +244,11 @@ public class TreeTool {
                 return;
             }
 
-            lob_tool.removeFromTreeView(iob_path.toFile());
+            removeFromTreeView(iob_path.toFile());
             lob_parent.getChildren().add(lob_item);
 
-
-
-            lva_oldRelativePath = TreeTool.getInstance().getRelativePath(iob_path.toString());
-            lva_newRelativePath = TreeTool.getInstance().getRelativePath(lva_destination);
+            lva_oldRelativePath = getRelativePath(iob_path.toString());
+            lva_newRelativePath = getRelativePath(lva_destination);
             iob_restClient.moveFile(lva_oldRelativePath, lva_newRelativePath);
         } catch (IOException ex) {
             ex.printStackTrace();

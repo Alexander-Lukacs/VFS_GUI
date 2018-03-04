@@ -4,6 +4,7 @@ import builder.RestClientBuilder;
 import cache.DataCache;
 import controller.SharedDirectoryController;
 import fileTree.interfaces.Tree;
+import fileTree.interfaces.TreeDifference;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
@@ -70,6 +71,30 @@ public class TreeControl {
             lob_root.setGraphic(TreeTool.getInstance().getTreeIcon(gob_tree.getRoot().getCanonicalPath()));
             gob_treeView.setRoot(lob_root);
             addFilesToTree(gob_tree.getRoot(), gob_treeView.getRoot());
+            Collection<TreeDifference> lco_differences = gob_restClient.compareClientAndServerTree(gob_tree);
+            for (TreeDifference lob_difference : lco_differences) {
+                for (String lva_addFile : lob_difference.getFilesToInsert()) {
+                    File lob_newFile = gob_restClient.downloadFile(lva_addFile);
+                    if (lob_newFile != null) {
+                        TreeTool.getInstance().addToTreeView(lob_newFile);
+                        gob_tree.addFile(lob_newFile, lob_newFile.isDirectory());
+                    }
+                }
+
+                for (String lva_deleteFile : lob_difference.getFilesToDelete()) {
+                    int lva_directoryId = RestClient.getDirectoryIdFromRelativePath(lva_deleteFile);
+
+                    if (lva_directoryId < 0) {
+                        lva_deleteFile = gob_tree.getRoot().getAbsolutePath() + "\\Private" + lva_deleteFile;
+                    }
+
+                    File lob_file = new File(lva_deleteFile);
+                    gob_tree.deleteFile(lva_deleteFile);
+                    TreeItem<String> lob_item = TreeTool.getTreeItem(lob_file);
+                    lob_item.getParent().getChildren().remove(lob_item);
+                }
+            }
+
             buildContextMenu();
             gob_treeView.setContextMenu(gob_contextMenu);
             gob_treeView.setOnContextMenuRequested(event ->
@@ -93,14 +118,12 @@ public class TreeControl {
                     System.out.println(lob_renamedFile.toPath());
                     gob_tree.renameFile(lob_renamedFile, event.getNewValue());
                     TreeSingleton.getInstance().getDuplicateOperationsPrevention().putRenamed(lob_renamedFile.toPath());
-                    String lva_relativePath = TreeTool.getInstance().getRelativePath(lob_renamedFile.getCanonicalPath());
+                    String lva_relativePath = TreeTool.getRelativePath(lob_renamedFile.getCanonicalPath());
                     gob_restClient.renameFile(lva_relativePath, event.getNewValue());
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
             });
-
-            gob_restClient.compareClientAndServerTree(TreeSingleton.getInstance().getTree());
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -265,31 +288,25 @@ public class TreeControl {
                     break;
 
                 case GC_MENU_ITEM_NEW_SHARED_DIR:
-                    if (lob_selectedFile.getName().equals("Shared")) {
-                        lob_item.setDisable(false);
-                        lob_item.setText("New shared directory");
-                    } else if (lob_selectedFile.getParentFile().getName().equals("Shared")) {
-                        lob_item.setDisable(false);
-                        lob_item.setText("Properties");
-                    } else {
-                        lob_item.setDisable(true);
-                    }
-
+                    isFileSharedDirectory(lob_selectedFile, lob_item);
                     break;
 
                 case GC_MENU_ITEM_PROPERTIES:
-                    if (lob_selectedFile.getName().equals("Shared")) {
-                        lob_item.setDisable(false);
-                        lob_item.setText("New shared directory");
-                    } else if (lob_selectedFile.getParentFile().getName().equals("Shared")) {
-                        lob_item.setDisable(false);
-                        lob_item.setText("Properties");
-                    } else {
-                        lob_item.setDisable(true);
-                    }
-
+                    isFileSharedDirectory(lob_selectedFile, lob_item);
                     break;
             }
+        }
+    }
+
+    private void isFileSharedDirectory(File lob_selectedFile, MenuItem lob_item) {
+        if (lob_selectedFile.getName().equals("Shared")) {
+            lob_item.setDisable(false);
+            lob_item.setText("New shared directory");
+        } else if (lob_selectedFile.getParentFile().getName().equals("Shared")) {
+            lob_item.setDisable(false);
+            lob_item.setText("Properties");
+        } else {
+            lob_item.setDisable(true);
         }
     }
 
@@ -327,7 +344,7 @@ public class TreeControl {
 
         try {
             TreeItem<String> lob_selectedItem = gob_treeView.getSelectionModel().getSelectedItem();
-            lva_relativePath = TreeTool.getInstance().getRelativePath(lob_selectedFile.getCanonicalPath());
+            lva_relativePath = getRelativePath(lob_selectedFile.getCanonicalPath());
 
             for (File lob_child : lob_selectedFile.listFiles()) {
                 addAllMovedOrRenamed(lob_child);

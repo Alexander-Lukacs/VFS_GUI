@@ -21,6 +21,8 @@ import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.glassfish.jersey.client.internal.HttpUrlConnector;
 import tools.AlertWindows;
+import tools.Utils;
+import tools.xmlTools.XmlTools;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
@@ -38,9 +40,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static rest.constants.HttpStatusCodes.GC_HTTP_OK;
 import static rest.constants.RestResourcesPaths.*;
@@ -251,7 +251,9 @@ public class RestClient {
 // ---------------------------------------------------------------------------------------------------------------------
 // Rename a file on the server
 // ---------------------------------------------------------------------------------------------------------------------
-    public TreeDifference compareClientAndServerTree(Tree iob_tree) {
+    public Collection<TreeDifference> compareClientAndServerTree(Tree iob_tree) {
+        Collection<TreeDifference> lco_differences = new ArrayList<>();
+
         try {
             XStream lob_xmlParser = new XStream();
             XStream.setupDefaultSecurity(lob_xmlParser); // to be removed after 1.5
@@ -281,33 +283,57 @@ public class RestClient {
                     .post(Entity.entity(lva_publicTreeXmlString, MediaType.APPLICATION_XML));
 
 
-            String lva_xmlprivateDifferenceString = lob_privateResponse.readEntity(String.class);
-            String lva_xmlpublicDifferenceString = lob_publicResponse.readEntity(String.class);
+            String lva_xmlPrivateDifferenceString = lob_privateResponse.readEntity(String.class);
+            String lva_xmlPublicDifferenceString = lob_publicResponse.readEntity(String.class);
 
-            System.out.println(lva_xmlprivateDifferenceString);
-            TreeDifference rob_privateDifference = (TreeDifference) lob_xmlParser.fromXML(lva_xmlprivateDifferenceString);
+            System.out.println(lva_xmlPrivateDifferenceString);
+            TreeDifference lob_privateDifference = (TreeDifference) lob_xmlParser.fromXML(lva_xmlPrivateDifferenceString);
 
-            System.out.println(lva_xmlpublicDifferenceString);
-            TreeDifference rob_publicDifference = (TreeDifference) lob_xmlParser.fromXML(lva_xmlprivateDifferenceString);
+            System.out.println(lva_xmlPublicDifferenceString);
+            TreeDifference lob_publicDifference = (TreeDifference) lob_xmlParser.fromXML(lva_xmlPublicDifferenceString);
 
-            System.out.println(lob_privateResponse.getStatus() + "," + lob_privateResponse.getStatusInfo());
+            lco_differences.add(lob_privateDifference);
+            lco_differences.add(lob_publicDifference);
 
-            downloadFile("Private\\test.txt");
-            return rob_privateDifference;
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        return null;
+
+        return lco_differences;
     }
 
-    public void downloadFile(String iva_filePath) {
+    public File downloadFile(String iva_filePath) {
+        int lva_directoryId = getDirectoryIdFromRelativePath(iva_filePath);
+
         Response lob_response = gob_webTarget.path("/auth/files/download")
-                .queryParam("directoryId", -1)
+                .queryParam("directoryId", lva_directoryId)
                 .queryParam("path", iva_filePath).request().get();
 
-        InputStream o = lob_response.readEntity(InputStream.class);
         try {
-            FileOutputStream os = new FileOutputStream("C:\\Users\\Cedric\\Documents\\FileSystem\\test.txt");
+            String lva_newFilePath = Utils.getUserBasePath() + "\\" +
+                    DataCache.getDataCache().get(DataCache.GC_IP_KEY) +
+                    "_" +
+                    DataCache.getDataCache().get(DataCache.GC_PORT_KEY) +
+                    "\\" +
+                    DataCache.getDataCache().get(DataCache.GC_EMAIL_KEY) +
+                    "\\";
+
+            if (lva_directoryId < 0) {
+                lva_newFilePath += "Private";
+            } else if (lva_directoryId > 0) {
+                lva_newFilePath += "Shared";
+            }
+
+            lva_newFilePath += iva_filePath;
+
+            if (lob_response.getStatus() == 204) {
+                File lob_newDirectory = new File(lva_newFilePath);
+                lob_newDirectory.mkdir();
+                return lob_newDirectory;
+            }
+
+            InputStream o = lob_response.readEntity(InputStream.class);
+            FileOutputStream os = new FileOutputStream(lva_newFilePath);
             int bytesRead;
             byte[] buffer = new byte[4096];
             while ((bytesRead = o.read(buffer)) != -1) {
@@ -316,9 +342,12 @@ public class RestClient {
 
             os.close();
             o.close();
+
+            return new File(lva_newFilePath);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        return null;
     }
 
     private Map<File, Boolean> getNodeSubFiles(Map<File, Boolean> iob_map, FileNode iob_treeNodePinter) {
@@ -445,7 +474,7 @@ public class RestClient {
         return lob_restResponse;
     }
 
-    private int getDirectoryIdFromRelativePath(String iva_path) {
+    public static int getDirectoryIdFromRelativePath(String iva_path) {
         if (iva_path.startsWith("Shared")) {
             return 1;
         }
