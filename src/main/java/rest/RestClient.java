@@ -27,14 +27,17 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -149,6 +152,7 @@ public class RestClient {
 
     public boolean uploadFilesToServer(File iob_filesToUpload, String iva_relativeFilePath) {
         DataCache lob_dataCache = DataCache.getDataCache();
+        int lva_directoryId = getDirectoryIdFromRelativePath(iva_relativeFilePath);
 
         HttpAuthenticationFeature lob_authDetails = HttpAuthenticationFeature.basic(
                 lob_dataCache.get(DataCache.GC_EMAIL_KEY),
@@ -156,15 +160,14 @@ public class RestClient {
 
         );
 
-        if (iva_relativeFilePath.startsWith("Private\\")) {
-           iva_relativeFilePath = iva_relativeFilePath.replaceFirst("^Private\\\\", "");
-        }
-
         ClientConfig lob_config = new ClientConfig(lob_authDetails);
         Client lob_client = ClientBuilder.newClient(lob_config);
         lob_client.register(lob_authDetails);
 
-        WebTarget lob_target = lob_client.target("http://" + lob_dataCache.get(DataCache.GC_IP_KEY) + ":" + lob_dataCache.get(DataCache.GC_PORT_KEY) + "/api/auth/files/upload").queryParam("path", iva_relativeFilePath);
+        WebTarget lob_target = lob_client.target("http://" + lob_dataCache.get(DataCache.GC_IP_KEY) + ":" +
+                lob_dataCache.get(DataCache.GC_PORT_KEY) + "/api/auth/files/upload")
+                .queryParam("path", iva_relativeFilePath)
+                .queryParam("directoryId", lva_directoryId);
         lob_target.register(MultiPartWriter.class);
 
         final FileDataBodyPart lob_filePart = new FileDataBodyPart("attachment", iob_filesToUpload);
@@ -181,12 +184,11 @@ public class RestClient {
 // ---------------------------------------------------------------------------------------------------------------------
 
     public boolean createDirectoryOnServer(String iva_relativeDirectoryPath) {
-        if (iva_relativeDirectoryPath.startsWith("Private\\")) {
-            iva_relativeDirectoryPath = iva_relativeDirectoryPath.replaceFirst("^Private\\\\", "");
-        }
+        int lva_directoryId = getDirectoryIdFromRelativePath(iva_relativeDirectoryPath);
 
-
-        Response lob_response = gob_webTarget.path("/auth/files/createDirectory").request()
+        Response lob_response = gob_webTarget.path("/auth/files/createDirectory")
+                .queryParam("directoryId", lva_directoryId)
+                .request()
                 .post(Entity.entity(iva_relativeDirectoryPath, MediaType.TEXT_PLAIN));
         return lob_response.getStatus() == 200;
     }
@@ -196,7 +198,9 @@ public class RestClient {
 // ---------------------------------------------------------------------------------------------------------------------
 
     public boolean deleteOnServer(String iva_relativePath) {
-        Response lob_response = gob_webTarget.path("/auth/files/delete").request()
+        Response lob_response = gob_webTarget.path("/auth/files/delete")
+                .queryParam("directoryId", getDirectoryIdFromRelativePath(iva_relativePath))
+                .request()
                 .post(Entity.entity(iva_relativePath, MediaType.TEXT_PLAIN));
         return lob_response.getStatus() == 200;
     }
@@ -206,7 +210,9 @@ public class RestClient {
 // ---------------------------------------------------------------------------------------------------------------------
 
     public void deleteDirectoryOnly(String iva_relativePath) {
-        Response lob_response = gob_webTarget.path("/auth/files/removeDirectoryOnly").request()
+        Response lob_response = gob_webTarget.path("/auth/files/removeDirectoryOnly")
+                .queryParam("directoryId", getDirectoryIdFromRelativePath(iva_relativePath))
+                .request()
                 .post(Entity.entity(iva_relativePath, MediaType.TEXT_PLAIN));
         System.out.println(lob_response.getStatus());
     }
@@ -215,7 +221,14 @@ public class RestClient {
 // Move a file on the server
 // ---------------------------------------------------------------------------------------------------------------------
     public void moveFile(String iva_relativePath, String iva_newRelativePath) {
-        Response lob_response = gob_webTarget.path("/auth/files/move").queryParam("path", iva_relativePath).request()
+        int lva_sourceDirectoryId = getDirectoryIdFromRelativePath(iva_relativePath);
+        int lva_destinationDirectoryId = getDirectoryIdFromRelativePath(iva_newRelativePath);
+
+        Response lob_response = gob_webTarget.path("/auth/files/move")
+                .queryParam("path", iva_relativePath)
+                .queryParam("sourceDirectoryId", lva_sourceDirectoryId)
+                .queryParam("destinationDirectoryId", lva_destinationDirectoryId)
+                .request()
                 .post(Entity.entity(iva_newRelativePath, MediaType.TEXT_PLAIN));
         System.out.println(lob_response.getStatus());
     }
@@ -225,7 +238,12 @@ public class RestClient {
 // Rename a file on the server
 // ---------------------------------------------------------------------------------------------------------------------
     public void renameFile(String iva_relativePath, String iva_newRelativePath) {
-        Response lob_response = gob_webTarget.path("/auth/files/rename").queryParam("path", iva_relativePath).request()
+        int lva_directoryId = getDirectoryIdFromRelativePath(iva_relativePath);
+
+        Response lob_response = gob_webTarget.path("/auth/files/rename")
+                .queryParam("path", iva_relativePath)
+                .queryParam("directoryId", lva_directoryId)
+                .request()
                 .post(Entity.entity(iva_newRelativePath, MediaType.TEXT_PLAIN));
         System.out.println(lob_response.getStatus());
     }
@@ -235,33 +253,72 @@ public class RestClient {
 // ---------------------------------------------------------------------------------------------------------------------
     public TreeDifference compareClientAndServerTree(Tree iob_tree) {
         try {
-            XStream lob_xStream = new XStream();
-            XStream.setupDefaultSecurity(lob_xStream); // to be removed after 1.5
+            XStream lob_xmlParser = new XStream();
+            XStream.setupDefaultSecurity(lob_xmlParser); // to be removed after 1.5
 
             Class[] lar_allowedClasses = {TreeDifference.class, TreeDifferenceImpl.class};
-            lob_xStream.allowTypes(lar_allowedClasses);
+            lob_xmlParser.allowTypes(lar_allowedClasses);
 
             Tree lob_privateTree = new TreeImpl(iob_tree.getRoot() + "\\Private");
+            Tree lob_publicTree = new TreeImpl(iob_tree.getRoot() + "\\Public");
 
             File lob_privateRootFile = new File(iob_tree.getRoot() + "\\Private");
+            File lob_publicRootFile = new File(iob_tree.getRoot() + "\\Public");
+            
             FileNode lob_privateNode = iob_tree.getRootNode().getChild(lob_privateRootFile);
+            FileNode lob_publicNode = iob_tree.getRootNode().getChild(lob_publicRootFile);
+            
             lob_privateTree.addFiles(getNodeSubFiles(new HashMap<>(), lob_privateNode));
+            lob_publicTree.addFiles(getNodeSubFiles(new HashMap<>(), lob_publicNode));
+            
+            String lva_privateTreeXmlString = lob_xmlParser.toXML(lob_privateTree);
+            String lva_publicTreeXmlString = lob_xmlParser.toXML(lob_publicTree);
+
+            Response lob_privateResponse = gob_webTarget.path("/auth/files/compare").queryParam("DirectoryId", -1).request()
+                    .post(Entity.entity(lva_privateTreeXmlString, MediaType.APPLICATION_XML));
+
+            Response lob_publicResponse = gob_webTarget.path("/auth/files/compare").queryParam("DirectoryId", 0).request()
+                    .post(Entity.entity(lva_publicTreeXmlString, MediaType.APPLICATION_XML));
 
 
-            String xml = lob_xStream.toXML(lob_privateTree);
-            Response lob_response = gob_webTarget.path("/auth/files/compare").request()
-                    .post(Entity.entity(xml, MediaType.APPLICATION_XML));
+            String lva_xmlprivateDifferenceString = lob_privateResponse.readEntity(String.class);
+            String lva_xmlpublicDifferenceString = lob_publicResponse.readEntity(String.class);
 
-            String lva_xmlDifferenceString = lob_response.readEntity(String.class);
-            System.out.println(lva_xmlDifferenceString);
-            TreeDifference rob_difference = (TreeDifference) lob_xStream.fromXML(lva_xmlDifferenceString);
-            System.out.println(lob_response.getStatus() + "," + lob_response.getStatusInfo());
+            System.out.println(lva_xmlprivateDifferenceString);
+            TreeDifference rob_privateDifference = (TreeDifference) lob_xmlParser.fromXML(lva_xmlprivateDifferenceString);
 
-            return rob_difference;
+            System.out.println(lva_xmlpublicDifferenceString);
+            TreeDifference rob_publicDifference = (TreeDifference) lob_xmlParser.fromXML(lva_xmlprivateDifferenceString);
+
+            System.out.println(lob_privateResponse.getStatus() + "," + lob_privateResponse.getStatusInfo());
+
+            downloadFile("Private\\test.txt");
+            return rob_privateDifference;
         } catch (Exception ex) {
             ex.printStackTrace();
         }
         return null;
+    }
+
+    public void downloadFile(String iva_filePath) {
+        Response lob_response = gob_webTarget.path("/auth/files/download")
+                .queryParam("directoryId", -1)
+                .queryParam("path", iva_filePath).request().get();
+
+        InputStream o = lob_response.readEntity(InputStream.class);
+        try {
+            FileOutputStream os = new FileOutputStream("C:\\Users\\Cedric\\Documents\\FileSystem\\test.txt");
+            int bytesRead;
+            byte[] buffer = new byte[4096];
+            while ((bytesRead = o.read(buffer)) != -1) {
+                os.write(buffer, 0, bytesRead);
+            }
+
+            os.close();
+            o.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     private Map<File, Boolean> getNodeSubFiles(Map<File, Boolean> iob_map, FileNode iob_treeNodePinter) {
@@ -301,7 +358,7 @@ public class RestClient {
             Response response = gob_webTarget.path("sharedDirectory/auth/addNewSharedDirectory").request()
                     .post(Entity.entity(lva_sharedDirectoryXmlString, MediaType.APPLICATION_XML));
 
-            System.out.println(response.getStatus() +" SHARED");
+            System.out.println(response.getStatus() + " SHARED");
             lob_restResponse.setResponseMessage(response.readEntity(String.class));
             lob_restResponse.setHttpStatus(response.getStatus());
         } catch (Exception ex) {
@@ -386,5 +443,17 @@ public class RestClient {
         }
 
         return lob_restResponse;
+    }
+
+    private int getDirectoryIdFromRelativePath(String iva_path) {
+        if (iva_path.startsWith("Shared")) {
+            return 1;
+        }
+
+        if (iva_path.startsWith("Public")) {
+            return 0;
+        }
+
+        return -1;
     }
 }

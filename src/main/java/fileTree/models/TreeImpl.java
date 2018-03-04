@@ -305,6 +305,10 @@ public class TreeImpl implements Tree {
     @Override
     public boolean deleteDirectoryOnly(File iob_directory) {
         try {
+            if (!iob_directory.isDirectory()) {
+                return false;
+            }
+
             return deleteDirectoryOnly(iob_directory.getCanonicalPath());
         } catch (IOException e) {
             e.printStackTrace();
@@ -324,6 +328,7 @@ public class TreeImpl implements Tree {
         //----------------------Variables-----------------------
         FileNode lob_parent;
         FileNode lob_node;
+        FileNode lob_child;
         //------------------------------------------------------
 
         try {
@@ -340,18 +345,13 @@ public class TreeImpl implements Tree {
             }
 
             if (lob_parent != null) {
-                for (FileNode lob_child : lob_node.getChildren()) {
-//                    if(!moveFile(lob_child.getFile(), lob_parent.getFile().getCanonicalPath())){
-//                        return false;
-//                    }
-
-                    lob_node.removeChild(lob_node.getFile());
-                    lob_child.setParent(lob_parent);
-                    lob_parent.addChild(lob_child);
+                for (Object lob_object : lob_node.getChildren().toArray()) {
+                    lob_child = (FileNode) lob_object;
+                    if (!moveFile(lob_child.getFile(), lob_parent.getFile().getCanonicalPath(), false)) {
+                        return false;
+                    }
                 }
                 lob_parent.removeChild(lob_node.getFile());
-                refreshTreeParentNodes(gob_rootNode, "");
-
                 lob_node.getFile().delete();
             }
         } catch (IOException e) {
