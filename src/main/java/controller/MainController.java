@@ -68,7 +68,7 @@ public class MainController {
                 LoginController ob_x = new LoginController();
                 ob_x.start(stage);
                 break;
-            case "Show in explorer":
+            case GC_SHOW_IN_EXPLORER:
                 if (Desktop.isDesktopSupported()) {
                     Desktop desktop = Desktop.getDesktop();
 

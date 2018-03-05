@@ -1,11 +1,16 @@
 package controller;
 
+import builder.RestClientBuilder;
 import cache.DataCache;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
+import rest.RestClient;
 import tools.AlertWindows;
 import tools.Validation;
 import tools.xmlTools.LastSessionStorage;
@@ -14,6 +19,7 @@ import static cache.DataCache.GC_IP_KEY;
 import static cache.DataCache.GC_PORT_KEY;
 import static controller.constants.SettingsConstants.GC_ADMIN_ADD;
 import static controller.constants.SettingsConstants.GC_CHANGE_PW;
+import static controller.constants.SettingsConstants.GC_LOGOUT;
 import static tools.constants.AlertConstants.GC_WARNING_IP_PORT;
 import static tools.constants.AlertConstants.GC_WARNING_PORT;
 
@@ -33,7 +39,15 @@ public class ChangeIpPortController {
     @FXML
     private TextField gob_tfPort;
 
+    @FXML
+    private Button gob_btn_connect;
+
+    @FXML
+    private Button gob_btnSettings;
+
+
     private final controller.ListView listView = new controller.ListView();
+    private DataCache gob_userCache;
 
     public void initialize() {
         listView.loadSettingsList(gob_lvOptions);
@@ -60,6 +74,7 @@ public class ChangeIpPortController {
     }
 
     public void onClick() {
+        RestClient lob_restClient;
         DataCache lob_dataCache = DataCache.getDataCache();
 
         String lva_ip = gob_tfServerIp.getText();
@@ -72,6 +87,19 @@ public class ChangeIpPortController {
                 lob_dataCache.replaceData(GC_PORT_KEY, lva_port);
                 LastSessionStorage.setIp(lva_ip);
                 LastSessionStorage.setPort(lva_port);
+
+
+                Stage stage = ((Stage) gob_btn_connect.getScene().getWindow());
+                stage.close();
+
+
+                try {
+                    lob_restClient = RestClientBuilder.buildRestClientWithAuth();
+                    lob_restClient.unregisterClient();
+                    Platform.exit();
+                }catch (Exception ex){
+                    new AlertWindows().createWarningAlert("hoppla");
+                }
 
             } else {
                 new AlertWindows().createWarningAlert(GC_WARNING_PORT);
