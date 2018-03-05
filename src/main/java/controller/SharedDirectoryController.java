@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static controller.constants.SharedDirectoryConstants.*;
+import static rest.constants.HttpStatusCodes.GC_HTTP_OK;
 
 
 /**
@@ -40,6 +41,7 @@ public class SharedDirectoryController {
 
     private SharedDirectory gob_sharedDirectory;
     private Stage gob_stage;
+    private List<User> gob_userList;
 
     public void initData(SharedDirectory iob_sharedDirectory, Stage iob_stage) {
         gob_sharedDirectory = iob_sharedDirectory;
@@ -96,11 +98,16 @@ public class SharedDirectoryController {
             }
 
             lob_sharedDirectory.setMembers(lli_memberList);
-            // TODO überprüfen, ob Directory bereits existiert
+
             lob_restClient = RestClientBuilder.buildRestClientWithAuth();
             lob_restResponse = lob_restClient.addNewSharedDirectory(lob_sharedDirectory);
-            lob_sharedDirectory.setId(Integer.parseInt(lob_restResponse.getResponseMessage()));
-            createSharedDirectory(lob_sharedDirectory);
+            Utils.printResponseMessage(lob_restResponse);
+
+            if (lob_restResponse.getHttpStatus() == GC_HTTP_OK) {
+                lob_sharedDirectory.setId(Integer.parseInt(lob_restResponse.getResponseMessage()));
+                createSharedDirectory(lob_sharedDirectory);
+            }
+
         } catch (IllegalArgumentException ex) {
             new AlertWindows().createWarningAlert(ex.getMessage());
         }
@@ -109,6 +116,9 @@ public class SharedDirectoryController {
     private void changeSharedDirectory() {
         List<User> lli_oldMemberList;
         boolean lva_found;
+        RestClient lob_restClient;
+        RestResponse lob_restResponse;
+        lob_restClient = RestClientBuilder.buildRestClientWithAuth();
 
         if (!gob_sharedDirectory.getDirectoryName().equals(gob_tf_directory_name.getText())) {
             DirectoryNameMapper.addNewSharedDirectory(gob_sharedDirectory.getId(), gob_tf_directory_name.getText());
@@ -119,7 +129,8 @@ public class SharedDirectoryController {
         // check if member was removed
         for (User lob_user : lli_oldMemberList) {
             if (!gob_member.contains(lob_user.getEmail())) {
-                //TODO Delete Member
+                lob_restResponse = lob_restClient.removeMemberFromSharedDirectory(gob_sharedDirectory, lob_user);
+                Utils.printResponseMessage(lob_restResponse);
             }
         }
 
@@ -133,21 +144,25 @@ public class SharedDirectoryController {
             }
 
             if (!lva_found) {
-                //TODO Add new Member
+                for (User tmpUser : gob_userList) {
+                    if (tmpUser.getEmail().equals(lob_userMail)) {
+                        lob_restResponse = lob_restClient.addNewMemberToSharedDirectory(gob_sharedDirectory, tmpUser);
+                        Utils.printResponseMessage(lob_restResponse);
+                    }
+                }
             }
         }
     }
 
     public void onClickAddMember() {
         RestClient lob_restClient;
-        List<User> lob_userList;
         DataCache lob_dataCache = DataCache.getDataCache();
         String lva_email;
         boolean lva_userNotExists = true;
         boolean lva_valid;
 
         lob_restClient = RestClientBuilder.buildRestClientWithAuth();
-        lob_userList = lob_restClient.getAllUser();
+        gob_userList = lob_restClient.getAllUser();
 
         lva_email = gob_tf_email.getText().trim();
         lva_valid = Validation.isEmailValid(lva_email);
@@ -162,7 +177,7 @@ public class SharedDirectoryController {
                 throw new IllegalArgumentException(GC_USER_CANT_ADD_HIMSELF);
             }
 
-            for (User lob_user : lob_userList) {
+            for (User lob_user : gob_userList) {
                 if (lob_user.getEmail().equals(gob_tf_email.getText())) {
                     if (!gob_member.contains(lob_user.getEmail())) {
                         gob_member.add(lob_user.getEmail());

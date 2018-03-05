@@ -448,12 +448,12 @@ public class RestClient {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-    private RestResponse createPutRequest(String iva_requestPath, Object iob_user) {
+    private RestResponse createPutRequest(String iva_requestPath, Object iob_object) {
         RestResponse lob_restResponse = new RestResponse();
 
         try {
             Response response = gob_webTarget.path(iva_requestPath).request()
-                    .put(Entity.entity(iob_user, MediaType.APPLICATION_JSON));
+                    .put(Entity.entity(iob_object, MediaType.APPLICATION_JSON));
 
             lob_restResponse.setResponseMessage(response.readEntity(String.class));
             lob_restResponse.setHttpStatus(response.getStatus());
