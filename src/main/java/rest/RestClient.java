@@ -129,8 +129,7 @@ public class RestClient {
 
         try {
             lli_userList = gob_webTarget.path(GC_REST_GET_ALL_USERS_PATH).request()
-                    .get(new GenericType<List<User>>() {
-                    });
+                    .get(new GenericType<List<User>>() {});
         } catch (Exception ex) {
             new AlertWindows().createExceptionAlert(ex.getMessage(), ex);
         }
@@ -418,10 +417,17 @@ public class RestClient {
 
     public List<SharedDirectory> getAllSharedDirectoriesOfUser() {
         List<SharedDirectory> lli_userSharedDirectory = null;
+        XStream lob_xmlParser = new XStream();
+        XStream.setupDefaultSecurity(lob_xmlParser); // to be removed after 1.5
+
+        Class[] lar_allowedClasses = {SharedDirectory.class, User.class};
+        lob_xmlParser.allowTypes(lar_allowedClasses);
+        String lva_sharedDirectoryXmlString;
 
         try {
-            lli_userSharedDirectory = gob_webTarget.path("/getAllSharedDirectories").request()
-                    .get(new GenericType<List<SharedDirectory>>(){});
+            Response response = gob_webTarget.path("sharedDirectory/auth/getAllSharedDirectories").request().get();
+            lva_sharedDirectoryXmlString  = response.readEntity(String.class);
+            lli_userSharedDirectory = (List<SharedDirectory>) lob_xmlParser.fromXML(lva_sharedDirectoryXmlString);
         } catch (Exception ex) {
             new AlertWindows().createExceptionAlert(ex.getMessage(), ex);
         }

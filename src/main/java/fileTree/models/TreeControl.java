@@ -2,6 +2,7 @@ package fileTree.models;
 
 import builder.RestClientBuilder;
 import cache.DataCache;
+import cache.SharedDirectoryCache;
 import controller.MainController;
 import controller.SharedDirectoryController;
 import fileTree.interfaces.Tree;
@@ -15,6 +16,7 @@ import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import models.classes.SharedDirectory;
 import rest.RestClient;
 import threads.interfaces.Thread;
 import threads.models.ThreadManager;
@@ -25,6 +27,7 @@ import tools.xmlTools.DirectoryNameMapper;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 import static controller.constants.ApplicationConstants.GC_APPLICATION_ICON_PATH;
 import static fileTree.constants.TreeControlConstants.*;
@@ -147,8 +150,10 @@ public class TreeControl {
 
         gob_treeView.getSelectionModel().selectedItemProperty()
                 .addListener((observable, old_val, new_val) ->
-                    gob_mainController.setTypeLabel(buildFileFromItem(new_val, gob_tree))
+                        gob_mainController.setTypeLabel(buildFileFromItem(new_val, gob_tree))
                 );
+
+        initSharedDirectoryCache();
     }
 
     private void addFilesToTree(File iob_file, TreeItem<String> iob_treeItem) {
@@ -431,6 +436,13 @@ public class TreeControl {
     private void sharedDirectoryScene(TreeItem iob_treeItem) {
         FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("views/sharedDirectoryScreen.fxml"));
         GridPane lob_pane;
+        int lva_sharedDirectoryId;
+        String lva_selectedItemName;
+        SharedDirectoryCache lob_sharedDirectoryCache = SharedDirectoryCache.getInstance();
+        SharedDirectory lob_sharedDirectory;
+
+        lva_selectedItemName = gob_treeView.getSelectionModel().getSelectedItem().getValue();
+
         try {
             lob_pane = lob_loader.load();
             Scene lob_scene = new Scene(lob_pane);
@@ -445,8 +457,10 @@ public class TreeControl {
                 lob_controller.initData(null, lob_stage);
 
             } else {
-                // TODO shared Directory übergeben
-                //lob_controller.initData(null, lob_stage);
+                lva_sharedDirectoryId = DirectoryNameMapper.getIdOfSharedDirectory(lva_selectedItemName);
+                lob_sharedDirectory = lob_sharedDirectoryCache.get(lva_sharedDirectoryId);
+
+                lob_controller.initData(lob_sharedDirectory, lob_stage);
             }
 
             lob_stage.show();
@@ -486,5 +500,18 @@ public class TreeControl {
         return iob_selectedItem.getValue().equals(DirectoryNameMapper.getPrivateDirectoryName()) ||
                 iob_selectedItem.getValue().equals(DirectoryNameMapper.getPublicDirectoryName()) ||
                 iob_selectedItem.getValue().equals("Shared");
+    }
+
+    private void initSharedDirectoryCache() {
+        SharedDirectoryCache lob_sharedDirectoryCache = SharedDirectoryCache.getInstance();
+        RestClient lob_restClient = RestClientBuilder.buildRestClientWithAuth();
+        List<SharedDirectory> lli_sharedDirectories;
+
+        lli_sharedDirectories = lob_restClient.getAllSharedDirectoriesOfUser();
+
+        for (SharedDirectory lob_sharedDirectory : lli_sharedDirectories) {
+            lob_sharedDirectoryCache.put(lob_sharedDirectory.getId(), lob_sharedDirectory);
+            System.out.println(lob_sharedDirectory.toString());
+        }
     }
 }
