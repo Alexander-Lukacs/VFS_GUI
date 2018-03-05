@@ -42,7 +42,7 @@
             </GridPane.margin>
         </Label>
         <TextField fx:id="gob_tf_email" alignment="CENTER" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="3" />
-        <ListView fx:id="gob_list_member" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="5" GridPane.rowSpan="2">
+        <ListView fx:id="gob_memberListView" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="5" GridPane.rowSpan="2">
             <GridPane.margin>
                 <Insets />
             </GridPane.margin>

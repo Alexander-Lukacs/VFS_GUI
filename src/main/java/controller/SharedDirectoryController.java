@@ -25,46 +25,61 @@ import java.util.List;
 import static controller.constants.SharedDirectoryConstants.*;
 import static rest.constants.HttpStatusCodes.GC_HTTP_OK;
 
-
 /**
  * Created by Mesut on 01.03.2018.
  * SharedDirectory Scene
  */
 public class SharedDirectoryController {
-    private final ObservableList<String> gob_member = FXCollections.observableArrayList();
     @FXML
     private TextField gob_tf_directory_name;
     @FXML
     private TextField gob_tf_email;
     @FXML
-    private ListView<String> gob_list_member;
+    private ListView<String> gob_memberListView;
+
+    private final ObservableList<String> gli_memberList = FXCollections.observableArrayList();
 
     private SharedDirectory gob_sharedDirectory;
     private Stage gob_stage;
-    private List<User> gob_userList;
+    private List<User> gli_userList;
 
+    /**
+     * Initialise the sharedDirectory currently selected in the treeView
+     * @param iob_sharedDirectory currently selected sharedDirectory
+     * @param iob_stage the current stage
+     */
     public void initData(SharedDirectory iob_sharedDirectory, Stage iob_stage) {
         gob_sharedDirectory = iob_sharedDirectory;
         gob_stage = iob_stage;
+
         initScene();
     }
 
+    /**
+     * Initialise the scene
+     */
     private void initScene() {
         if (gob_sharedDirectory != null) {
             gob_tf_directory_name.setText(gob_sharedDirectory.getDirectoryName());
 
             for (User lob_user : gob_sharedDirectory.getMembers()) {
-                gob_member.add(lob_user.getEmail());
+                gli_memberList.add(lob_user.getEmail());
             }
 
-            gob_list_member.setItems(gob_member);
+            gob_memberListView.setItems(gli_memberList);
         }
     }
 
+    /**
+     * Cancel button listener
+     */
     public void onClickCancel() {
         closeWindow();
     }
 
+    /**
+     * Save button listener
+     */
     public void onClickSave() {
         if (gob_sharedDirectory == null) {
             addNewSharedDirectory();
@@ -73,87 +88,9 @@ public class SharedDirectoryController {
         }
     }
 
-    private void addNewSharedDirectory() {
-        SharedDirectory lob_sharedDirectory = new SharedDirectory();
-        User lob_owner = new User();
-        User lob_member;
-        List<User> lli_memberList = new ArrayList<>();
-        RestClient lob_restClient;
-        RestResponse lob_restResponse;
-        DataCache lob_dataCache = DataCache.getDataCache();
-
-        try {
-            if (gob_tf_directory_name.getText().trim().isEmpty()) {
-                throw new IllegalArgumentException(GC_SHARED_DIRECTORY_NAME_EMPTY);
-            }
-
-            lob_sharedDirectory.setDirectoryName(gob_tf_directory_name.getText());
-            lob_owner.setEmail(lob_dataCache.get(DataCache.GC_EMAIL_KEY));
-            lob_sharedDirectory.setOwner(lob_owner);
-
-            for (String lob_email : gob_list_member.getItems()) {
-                lob_member = new User();
-                lob_member.setEmail(lob_email);
-                lli_memberList.add(lob_member);
-            }
-
-            lob_sharedDirectory.setMembers(lli_memberList);
-
-            lob_restClient = RestClientBuilder.buildRestClientWithAuth();
-            lob_restResponse = lob_restClient.addNewSharedDirectory(lob_sharedDirectory);
-            Utils.printResponseMessage(lob_restResponse);
-
-            if (lob_restResponse.getHttpStatus() == GC_HTTP_OK) {
-                lob_sharedDirectory.setId(Integer.parseInt(lob_restResponse.getResponseMessage()));
-                createSharedDirectory(lob_sharedDirectory);
-            }
-
-        } catch (IllegalArgumentException ex) {
-            new AlertWindows().createWarningAlert(ex.getMessage());
-        }
-    }
-
-    private void changeSharedDirectory() {
-        List<User> lli_oldMemberList;
-        boolean lva_found;
-        RestClient lob_restClient;
-        RestResponse lob_restResponse;
-        lob_restClient = RestClientBuilder.buildRestClientWithAuth();
-
-        if (!gob_sharedDirectory.getDirectoryName().equals(gob_tf_directory_name.getText())) {
-            DirectoryNameMapper.addNewSharedDirectory(gob_sharedDirectory.getId(), gob_tf_directory_name.getText());
-        }
-
-        lli_oldMemberList = gob_sharedDirectory.getMembers();
-
-        // check if member was removed
-        for (User lob_user : lli_oldMemberList) {
-            if (!gob_member.contains(lob_user.getEmail())) {
-                lob_restResponse = lob_restClient.removeMemberFromSharedDirectory(gob_sharedDirectory, lob_user);
-                Utils.printResponseMessage(lob_restResponse);
-            }
-        }
-
-        // check if member was added
-        for (String lob_userMail : gob_member) {
-            lva_found = false;
-            for (User lob_user : lli_oldMemberList) {
-                if (lob_user.getEmail().equals(lob_userMail)) {
-                    lva_found = true;
-                }
-            }
-
-            if (!lva_found) {
-                for (User tmpUser : gob_userList) {
-                    if (tmpUser.getEmail().equals(lob_userMail)) {
-                        lob_restResponse = lob_restClient.addNewMemberToSharedDirectory(gob_sharedDirectory, tmpUser);
-                        Utils.printResponseMessage(lob_restResponse);
-                    }
-                }
-            }
-        }
-    }
-
+    /**
+     * Add member button listener
+     */
     public void onClickAddMember() {
         RestClient lob_restClient;
         DataCache lob_dataCache = DataCache.getDataCache();
@@ -162,7 +99,7 @@ public class SharedDirectoryController {
         boolean lva_valid;
 
         lob_restClient = RestClientBuilder.buildRestClientWithAuth();
-        gob_userList = lob_restClient.getAllUser();
+        gli_userList = lob_restClient.getAllUser();
 
         lva_email = gob_tf_email.getText().trim();
         lva_valid = Validation.isEmailValid(lva_email);
@@ -177,11 +114,11 @@ public class SharedDirectoryController {
                 throw new IllegalArgumentException(GC_USER_CANT_ADD_HIMSELF);
             }
 
-            for (User lob_user : gob_userList) {
+            for (User lob_user : gli_userList) {
                 if (lob_user.getEmail().equals(gob_tf_email.getText())) {
-                    if (!gob_member.contains(lob_user.getEmail())) {
-                        gob_member.add(lob_user.getEmail());
-                        gob_list_member.setItems(gob_member);
+                    if (!gli_memberList.contains(lob_user.getEmail())) {
+                        gli_memberList.add(lob_user.getEmail());
+                        gob_memberListView.setItems(gli_memberList);
                     } else {
                         throw new IllegalArgumentException(GC_USER_IS_ALREADY_ADDED);
                     }
@@ -200,20 +137,69 @@ public class SharedDirectoryController {
         }
     }
 
+    /**
+     * Remove member button listener
+     */
     public void onClickRemoveMember() {
         String lva_email;
-        if (gob_list_member.getSelectionModel().getSelectedItem() != null) {
-            lva_email = gob_list_member.getSelectionModel().getSelectedItem();
-            gob_member.remove(lva_email);
+        if (gob_memberListView.getSelectionModel().getSelectedItem() != null) {
+            lva_email = gob_memberListView.getSelectionModel().getSelectedItem();
+            gli_memberList.remove(lva_email);
 
-            gob_list_member.setItems(gob_member);
+            gob_memberListView.setItems(gli_memberList);
         }
     }
 
-    private void closeWindow() {
-        gob_stage.close();
+    /**
+     * Adds a new shared directory to the explorer and to the server
+     */
+    private void addNewSharedDirectory() {
+        SharedDirectory lob_sharedDirectory = new SharedDirectory();
+        User lob_owner = new User();
+        User lob_member;
+        List<User> lli_memberList = new ArrayList<>();
+        RestClient lob_restClient;
+        RestResponse lob_restResponse;
+        DataCache lob_dataCache = DataCache.getDataCache();
+
+        try {
+            if (gob_tf_directory_name.getText().trim().isEmpty()) {
+                throw new IllegalArgumentException(GC_SHARED_DIRECTORY_NAME_EMPTY);
+            }
+
+            lob_sharedDirectory.setDirectoryName(gob_tf_directory_name.getText());
+            lob_owner.setEmail(lob_dataCache.get(DataCache.GC_EMAIL_KEY));
+            lob_sharedDirectory.setOwner(lob_owner);
+
+            for (String lob_email : gob_memberListView.getItems()) {
+                lob_member = new User();
+                lob_member.setEmail(lob_email);
+                lli_memberList.add(lob_member);
+            }
+
+            lob_sharedDirectory.setMembers(lli_memberList);
+
+            // Adds the shared directory to the server
+            lob_restClient = RestClientBuilder.buildRestClientWithAuth();
+            lob_restResponse = lob_restClient.addNewSharedDirectory(lob_sharedDirectory);
+            Utils.printResponseMessage(lob_restResponse);
+
+            // If the shared directory was successfully to the server, add the shared directory
+            // to the tree view and to the explorer
+            if (lob_restResponse.getHttpStatus() == GC_HTTP_OK) {
+                lob_sharedDirectory.setId(Integer.parseInt(lob_restResponse.getResponseMessage()));
+                createSharedDirectory(lob_sharedDirectory);
+            }
+
+        } catch (IllegalArgumentException ex) {
+            new AlertWindows().createWarningAlert(ex.getMessage());
+        }
     }
 
+    /**
+     * Create a shared directory in the explorer and tree view
+     * @param iob_sharedDirectory the shared directory
+     */
     private void createSharedDirectory(SharedDirectory iob_sharedDirectory) {
         DataCache lob_dataCache = DataCache.getDataCache();
         SharedDirectoryCache lob_sharedDirectoryCache = SharedDirectoryCache.getInstance();
@@ -222,7 +208,7 @@ public class SharedDirectoryController {
         String lva_filePath;
 
         lva_filePath = Utils.getUserBasePath() + "\\" + lob_dataCache.get(DataCache.GC_IP_KEY) + "_" +
-                lob_dataCache.get(DataCache.GC_PORT_KEY) + "\\" + lob_dataCache.get(DataCache.GC_EMAIL_KEY) + "\\" +"Shared" + "\\" +
+                lob_dataCache.get(DataCache.GC_PORT_KEY) + "\\" + lob_dataCache.get(DataCache.GC_EMAIL_KEY) + "\\" + "Shared" + "\\" +
                 iob_sharedDirectory.getDirectoryName() + "$";
 
         lob_file = new File(lva_filePath.replace("$", ""));
@@ -240,5 +226,57 @@ public class SharedDirectoryController {
         if (!lob_file.mkdir()) {
             new AlertWindows().createWarningAlert(GC_COULD_NOT_CREATE_DIR);
         }
+    }
+
+    /**
+     * Change the shared directory
+     */
+    private void changeSharedDirectory() {
+        List<User> lli_oldMemberList;
+        boolean lva_found;
+        RestClient lob_restClient;
+        RestResponse lob_restResponse;
+
+        lob_restClient = RestClientBuilder.buildRestClientWithAuth();
+
+        if (!gob_sharedDirectory.getDirectoryName().equals(gob_tf_directory_name.getText())) {
+            DirectoryNameMapper.addNewSharedDirectory(gob_sharedDirectory.getId(), gob_tf_directory_name.getText());
+        }
+
+        lli_oldMemberList = gob_sharedDirectory.getMembers();
+
+        // check if member was removed
+        for (User lob_user : lli_oldMemberList) {
+            if (!gli_memberList.contains(lob_user.getEmail())) {
+                lob_restResponse = lob_restClient.removeMemberFromSharedDirectory(gob_sharedDirectory, lob_user);
+                Utils.printResponseMessage(lob_restResponse);
+            }
+        }
+
+        // check if member was added
+        for (String lob_userMail : gli_memberList) {
+            lva_found = false;
+            for (User lob_user : lli_oldMemberList) {
+                if (lob_user.getEmail().equals(lob_userMail)) {
+                    lva_found = true;
+                }
+            }
+
+            if (!lva_found) {
+                for (User tmpUser : gli_userList) {
+                    if (tmpUser.getEmail().equals(lob_userMail)) {
+                        lob_restResponse = lob_restClient.addNewMemberToSharedDirectory(gob_sharedDirectory, tmpUser);
+                        Utils.printResponseMessage(lob_restResponse);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Close the current window
+     */
+    private void closeWindow() {
+        gob_stage.close();
     }
 }
