@@ -92,11 +92,15 @@ public class SharedDirectoryController {
      * Add member button listener
      */
     public void onClickAddMember() {
+    // Declaration block -----------------------------------------------------------------------------------------------
+
         RestClient lob_restClient;
         DataCache lob_dataCache = DataCache.getDataCache();
         String lva_email;
         boolean lva_userNotExists = true;
         boolean lva_valid;
+
+    // -----------------------------------------------------------------------------------------------------------------
 
         lob_restClient = RestClientBuilder.buildRestClientWithAuth();
         gli_userList = lob_restClient.getAllUser();
@@ -154,6 +158,8 @@ public class SharedDirectoryController {
      * Adds a new shared directory to the explorer and to the server
      */
     private void addNewSharedDirectory() {
+    // Declaration block -----------------------------------------------------------------------------------------------
+
         SharedDirectory lob_sharedDirectory = new SharedDirectory();
         User lob_owner = new User();
         User lob_member;
@@ -161,6 +167,8 @@ public class SharedDirectoryController {
         RestClient lob_restClient;
         RestResponse lob_restResponse;
         DataCache lob_dataCache = DataCache.getDataCache();
+
+    // -----------------------------------------------------------------------------------------------------------------
 
         try {
             if (gob_tf_directory_name.getText().trim().isEmpty()) {
@@ -201,18 +209,21 @@ public class SharedDirectoryController {
      * @param iob_sharedDirectory the shared directory
      */
     private void createSharedDirectory(SharedDirectory iob_sharedDirectory) {
-        DataCache lob_dataCache = DataCache.getDataCache();
+    // Declaration block -----------------------------------------------------------------------------------------------
+
         SharedDirectoryCache lob_sharedDirectoryCache = SharedDirectoryCache.getInstance();
         File lob_file;
         int lva_counter = 1;
         String lva_filePath;
 
-        lva_filePath = Utils.getUserBasePath() + "\\" + lob_dataCache.get(DataCache.GC_IP_KEY) + "_" +
-                lob_dataCache.get(DataCache.GC_PORT_KEY) + "\\" + lob_dataCache.get(DataCache.GC_EMAIL_KEY) + "\\" + "Shared" + "\\" +
-                iob_sharedDirectory.getDirectoryName() + "$";
+    // -----------------------------------------------------------------------------------------------------------------
+
+        lva_filePath = buildPathToSharedDirectory(iob_sharedDirectory);
 
         lob_file = new File(lva_filePath.replace("$", ""));
 
+        // if the directory already exists extend the dir name with (x).
+        // x = autoincrement integer
         if (lob_file.exists()) {
             do {
                 lob_file = new File(lva_filePath.replace("$", "(" + lva_counter + ")"));
@@ -232,10 +243,14 @@ public class SharedDirectoryController {
      * Change the shared directory
      */
     private void changeSharedDirectory() {
+    // Declaration block -----------------------------------------------------------------------------------------------
+
         List<User> lli_oldMemberList;
         boolean lva_found;
         RestClient lob_restClient;
         RestResponse lob_restResponse;
+
+    // -----------------------------------------------------------------------------------------------------------------
 
         lob_restClient = RestClientBuilder.buildRestClientWithAuth();
 
@@ -278,5 +293,18 @@ public class SharedDirectoryController {
      */
     private void closeWindow() {
         gob_stage.close();
+    }
+
+    /**
+     * Builds the absolute path to the shared directory
+     * @param iob_sharedDirectory the shared directory
+     * @return the absolute path
+     */
+    private String buildPathToSharedDirectory(SharedDirectory iob_sharedDirectory) {
+        DataCache lob_dataCache = DataCache.getDataCache();
+
+        return Utils.getUserBasePath() + "\\" + lob_dataCache.get(DataCache.GC_IP_KEY) + "_" +
+                lob_dataCache.get(DataCache.GC_PORT_KEY) + "\\" + lob_dataCache.get(DataCache.GC_EMAIL_KEY) +
+                "\\" + "Shared" + "\\" + iob_sharedDirectory.getDirectoryName() + "$";
     }
 }
