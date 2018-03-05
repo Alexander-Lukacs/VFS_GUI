@@ -2,9 +2,12 @@ package fileTree.models;
 
 import builder.RestClientBuilder;
 import cache.DataCache;
+import controller.MainController;
 import controller.SharedDirectoryController;
 import fileTree.interfaces.Tree;
 import fileTree.interfaces.TreeDifference;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
@@ -32,8 +35,11 @@ public class TreeControl {
     private TreeView<String> gob_treeView;
     private ContextMenu gob_contextMenu;
     private RestClient gob_restClient;
+    private MainController gob_mainController;
 
-    public TreeControl(String iva_ip, String iva_port) {
+    public TreeControl(String iva_ip, String iva_port, MainController iob_mainController) {
+        gob_mainController = iob_mainController;
+
         File lob_rootDirectory = new File(Utils.getUserBasePath());
         File lob_serverDirectory = new File(Utils.getUserBasePath() + "\\" + iva_ip + "_" + iva_port);
         File lob_userDirectory = new File(lob_serverDirectory.getAbsolutePath() + "\\" + DataCache.getDataCache().get(DataCache.GC_EMAIL_KEY));
@@ -81,20 +87,21 @@ public class TreeControl {
                     }
                 }
 
-                for (String lva_deleteFile : lob_difference.getFilesToDelete()) {
-                    int lva_directoryId = RestClient.getDirectoryIdFromRelativePath(lva_deleteFile);
-
-                    if (lva_directoryId < 0) {
-                        lva_deleteFile = gob_tree.getRoot().getAbsolutePath() + "\\Private" + lva_deleteFile;
-                    }
-
-                    File lob_file = new File(lva_deleteFile);
-                    gob_tree.deleteFile(lva_deleteFile);
-                    TreeItem<String> lob_item = TreeTool.getTreeItem(lob_file);
-                    lob_item.getParent().getChildren().remove(lob_item);
-                }
+//                for (String lva_deleteFile : lob_difference.getFilesToDelete()) {
+//                    int lva_directoryId = RestClient.getDirectoryIdFromRelativePath(lva_deleteFile);
+//
+//                    if (lva_directoryId < 0) {
+//                        lva_deleteFile = gob_tree.getRoot().getAbsolutePath() + "\\Private" + lva_deleteFile;
+//                    } else {
+//                        break;
+//                    }
+//
+//                    File lob_file = new File(lva_deleteFile);
+//                    gob_tree.deleteFile(lva_deleteFile);
+//                    TreeItem<String> lob_item = TreeTool.getTreeItem(lob_file);
+//                    lob_item.getParent().getChildren().remove(lob_item);
+//                }
             }
-
             buildContextMenu();
             gob_treeView.setContextMenu(gob_contextMenu);
             gob_treeView.setOnContextMenuRequested(event ->
@@ -127,6 +134,12 @@ public class TreeControl {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+
+        gob_treeView.getSelectionModel().selectedItemProperty()
+                .addListener((observable, old_val, new_val) -> {
+                    TreeItem selectedItem = new_val;
+                    gob_mainController.setTypeLabel(buildFileFromItem(selectedItem, gob_tree));
+                });
     }
 
     private void addFilesToTree(File iob_file, TreeItem<String> iob_treeItem) {
@@ -151,7 +164,7 @@ public class TreeControl {
                         }
                     } else {
                         //add normal file
-                        if(addFile(lob_directoryChildFile, false)) {
+                        if (addFile(lob_directoryChildFile, false)) {
                             TreeTool.getInstance().addTreeItem(iob_treeItem, lob_directoryChildFile);
                         }
                     }

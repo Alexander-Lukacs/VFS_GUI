@@ -8,20 +8,24 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.apache.commons.io.FileUtils;
 import rest.RestClient;
 import tools.AlertWindows;
+import tools.FileInformation;
 import tools.Utils;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import static controller.constants.ApplicationConstants.GC_APPLICATION_ICON_PATH;
 import static controller.constants.SettingsConstants.*;
@@ -33,6 +37,18 @@ public class MainController {
 
     @FXML
     private VBox gob_vBox = new VBox();
+
+    @FXML
+    private Label gob_label_type;
+
+    @FXML
+    private Label gob_label_name;
+
+    @FXML
+    private Label gob_label_size;
+
+    @FXML
+    private Label gob_label_content;
 
     private DataCache gob_userCache;
     private TreeControl gob_treeControl;
@@ -86,7 +102,7 @@ public class MainController {
 
     public void initialize() {
         gob_userCache = DataCache.getDataCache();
-        gob_treeControl = new TreeControl(gob_userCache.get(DataCache.GC_IP_KEY), gob_userCache.get(DataCache.GC_PORT_KEY));
+        gob_treeControl = new TreeControl(gob_userCache.get(DataCache.GC_IP_KEY), gob_userCache.get(DataCache.GC_PORT_KEY), this);
         TreeView<String> gob_treeView = TreeSingleton.getInstance().getTreeView();
         gob_vBox.getChildren().add(gob_treeView);
     }
@@ -105,5 +121,30 @@ public class MainController {
             new AlertWindows().createExceptionAlert(e.getMessage(), e);
             throw new RuntimeException(e);
         }
+    }
+
+    public void setTypeLabel(File iob_file) {
+        Thread lob_thread;
+
+        if (iob_file.isDirectory()) {
+            gob_label_type.setText("Directory");
+        }else{
+            gob_label_type.setText("File");
+        }
+
+        gob_label_name.setText(iob_file.getName());
+        gob_label_size.setText(String.valueOf(getFileSize(iob_file)));
+
+        lob_thread = new FileInformation(iob_file, gob_label_content);
+        lob_thread.setName("FileInformationThread");
+        lob_thread.start();
+    }
+
+    //TODO in einen Thread auslagern
+    private long getFileSize(File iob_file) {
+        if (iob_file.isDirectory()) {
+            return FileUtils.sizeOfDirectory(iob_file);
+        }
+        return iob_file.length();
     }
 }
