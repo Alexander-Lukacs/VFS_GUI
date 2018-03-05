@@ -236,6 +236,9 @@ public class SharedDirectoryController {
 
         lob_sharedDirectoryCache.put(iob_sharedDirectory.getId(), iob_sharedDirectory);
         DirectoryNameMapper.addNewSharedDirectory(iob_sharedDirectory.getId(), lob_file.getName());
-        lob_file.mkdir();
+
+        if (!lob_file.mkdir()) {
+            new AlertWindows().createWarningAlert(GC_COULD_NOT_CREATE_DIR);
+        }
     }
 }
