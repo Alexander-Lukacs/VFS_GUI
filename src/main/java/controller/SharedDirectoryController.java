@@ -2,6 +2,7 @@ package controller;
 
 import builder.RestClientBuilder;
 import cache.DataCache;
+import cache.SharedDirectoryCache;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -200,6 +201,7 @@ public class SharedDirectoryController {
 
     private void createSharedDirectory(SharedDirectory iob_sharedDirectory) {
         DataCache lob_dataCache = DataCache.getDataCache();
+        SharedDirectoryCache lob_sharedDirectoryCache = SharedDirectoryCache.getInstance();
         File lob_file;
         int lva_counter = 1;
         String lva_filePath;
@@ -215,10 +217,10 @@ public class SharedDirectoryController {
                 lob_file = new File(lva_filePath.replace("$", "(" + lva_counter + ")"));
                 lva_counter++;
             } while (lob_file.exists());
-
-            DirectoryNameMapper.addNewSharedDirectory(iob_sharedDirectory.getId(), lob_file.getName());
         }
 
+        lob_sharedDirectoryCache.put(iob_sharedDirectory.getId(), iob_sharedDirectory);
+        DirectoryNameMapper.addNewSharedDirectory(iob_sharedDirectory.getId(), lob_file.getName());
         lob_file.mkdir();
     }
 }

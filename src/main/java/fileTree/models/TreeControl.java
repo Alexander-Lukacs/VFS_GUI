@@ -3,6 +3,7 @@ package fileTree.models;
 import builder.RestClientBuilder;
 import cache.DataCache;
 import controller.MainController;
+import cache.SharedDirectoryCache;
 import controller.SharedDirectoryController;
 import fileTree.interfaces.Tree;
 import fileTree.interfaces.TreeDifference;
@@ -17,6 +18,7 @@ import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import models.classes.SharedDirectory;
 import rest.RestClient;
 import tools.TreeTool;
 import tools.Utils;
@@ -25,6 +27,7 @@ import tools.xmlTools.DirectoryNameMapper;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 import static controller.constants.ApplicationConstants.GC_APPLICATION_ICON_PATH;
 import static fileTree.constants.TreeControlConstants.*;
@@ -140,6 +143,8 @@ public class TreeControl {
                     TreeItem selectedItem = new_val;
                     gob_mainController.setTypeLabel(buildFileFromItem(selectedItem, gob_tree));
                 });
+
+        initSharedDirectoryCache();
     }
 
     private void addFilesToTree(File iob_file, TreeItem<String> iob_treeItem) {
@@ -477,5 +482,18 @@ public class TreeControl {
         return iob_selectedItem.getValue().equals(DirectoryNameMapper.getPrivateDirectoryName()) ||
                 iob_selectedItem.getValue().equals(DirectoryNameMapper.getPublicDirectoryName()) ||
                 iob_selectedItem.getValue().equals("Shared");
+    }
+
+    private void initSharedDirectoryCache() {
+        SharedDirectoryCache lob_sharedDirectoryCache = SharedDirectoryCache.getInstance();
+        RestClient lob_restClient = RestClientBuilder.buildRestClientWithAuth();
+        List<SharedDirectory> lli_sharedDirectories;
+
+        lli_sharedDirectories = lob_restClient.getAllSharedDirectoriesOfUser();
+
+        for (SharedDirectory lob_sharedDirectory : lli_sharedDirectories) {
+            lob_sharedDirectoryCache.put(lob_sharedDirectory.getId(), lob_sharedDirectory);
+            System.out.println(lob_sharedDirectory.toString());
+        }
     }
 }

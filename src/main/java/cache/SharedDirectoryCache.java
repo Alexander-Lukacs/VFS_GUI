@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SharedDirectoryCache {
-    private static Map<String, SharedDirectory> gob_dataCacheMap;
+    private static Map<Integer, SharedDirectory> gob_dataCacheMap;
     private static SharedDirectoryCache gob_dataCache;
 
     public static SharedDirectoryCache getInstance() {
@@ -27,7 +27,7 @@ public class SharedDirectoryCache {
      * @param iva_key   key
      * @param iva_value value
      */
-    public void put(String iva_key, SharedDirectory iva_value) {
+    public void put(Integer iva_key, SharedDirectory iva_value) {
         gob_dataCacheMap.put(iva_key, iva_value);
     }
 
@@ -54,7 +54,7 @@ public class SharedDirectoryCache {
      * @param iva_key   key
      * @param iva_value new value
      */
-    public void replaceData(String iva_key, SharedDirectory iva_value) {
+    public void replaceData(Integer iva_key, SharedDirectory iva_value) {
         gob_dataCacheMap.replace(iva_key, iva_value);
     }
 }
