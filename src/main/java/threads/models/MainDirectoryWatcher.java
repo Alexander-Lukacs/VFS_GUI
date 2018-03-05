@@ -1,8 +1,10 @@
-package fileTree.models;
+package threads.models;
 
 import fileTree.interfaces.FileChangeListener;
+import fileTree.models.TreeSingleton;
 import javafx.scene.control.TreeItem;
 import rest.RestClient;
+import threads.interfaces.Thread;
 import tools.TreeTool;
 
 import java.io.File;
@@ -12,17 +14,19 @@ import java.nio.file.Path;
 /**
  * this class contains 3 DirectoryWatchServices, one for the private, public and shared directory
  */
-public class MainDirectoryWatcher {
+class MainDirectoryWatcher implements Thread {
     private RestClient gob_restClient;
+    private DirectoryWatchService gob_watchServie;
+    private File gob_rootFile;
 
-    public MainDirectoryWatcher(RestClient iob_restClient, File iob_files) {
+    MainDirectoryWatcher(RestClient iob_restClient, File iob_files) {
         gob_restClient = iob_restClient;
-        init(iob_files);
+        gob_rootFile = iob_files;
     }
 
     private void init(File iob_file) {
         try {
-            DirectoryWatchService lob_watchService = new DirectoryWatchService(iob_file.toPath(), new FileChangeListener() {
+            gob_watchServie = new DirectoryWatchService(iob_file.toPath(), new FileChangeListener() {
                 @Override
                 public void fileAdded(Path iob_path) {
                     addFile(iob_path);
@@ -42,8 +46,18 @@ public class MainDirectoryWatcher {
                 public void fileRenamed(Path iob_path, String iva_newName) {
                     renameFile(iob_path, iva_newName);
                 }
+
+                @Override
+                public void startScan() {
+                    //on purpose empty
+                }
+
+                @Override
+                public void finishedScan() {
+                    TreeSingleton.getInstance().getDuplicateOperationsPrevention().clear();
+                }
             });
-            lob_watchService.start();
+            gob_watchServie.start();
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
@@ -51,12 +65,12 @@ public class MainDirectoryWatcher {
 
     private void addFile(Path iob_path) {
         if (TreeTool.filterRootFiles(iob_path)){
-            System.out.println("GEFILTERT:" + iob_path);
+//            System.out.println("GEFILTERT:" + iob_path);
             return;
         }
 
         boolean lva_isDirectory = iob_path.toFile().isDirectory();
-        System.out.println("fileAdded: " + iob_path);
+//        System.out.println("fileAdded: " + iob_path);
         TreeTool.createFileOrDirectory(iob_path.toFile(), lva_isDirectory, gob_restClient);
     }
 
@@ -64,7 +78,7 @@ public class MainDirectoryWatcher {
         if (TreeSingleton.getInstance().getDuplicateOperationsPrevention().wasFileDeted(iob_path)) {
             TreeSingleton.getInstance().getDuplicateOperationsPrevention().removeDeleted(iob_path);
         } else {
-            TreeItem<String> lob_itemToDelete = TreeTool.getInstance().getTreeItem(iob_path.toFile());
+            TreeItem<String> lob_itemToDelete = TreeTool.getTreeItem(iob_path.toFile());
             TreeTool.deleteFile(iob_path.toFile(), lob_itemToDelete, gob_restClient);
         }
     }
@@ -82,17 +96,27 @@ public class MainDirectoryWatcher {
             if (TreeSingleton.getInstance().getDuplicateOperationsPrevention().wasFileRenamed(iob_path)) {
                 TreeSingleton.getInstance().getDuplicateOperationsPrevention().removeRenamed(iob_path);
             } else {
-                System.out.println("RENAMED: " + iob_path + " TO: " + iva_newName);
+//                System.out.println("RENAMED: " + iob_path + " TO: " + iva_newName);
                 TreeSingleton.getInstance().getTree().renameFile(iob_path.toFile(), iva_newName);
-                TreeItem<String> lob_item = TreeTool.getInstance().getTreeItem(iob_path.toFile());
+                TreeItem<String> lob_item = TreeTool.getTreeItem(iob_path.toFile());
                 lob_item.setValue(iva_newName);
 
-                String lva_relativePath = TreeTool.getInstance().getRelativePath(iob_path.toString());
+                String lva_relativePath = TreeTool.getRelativePath(iob_path.toString());
 
                 gob_restClient.renameFile(lva_relativePath, iva_newName);
             }
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+    }
+
+    @Override
+    public void start() {
+        init(gob_rootFile);
+    }
+
+    @Override
+    public void stop() {
+        gob_watchServie.stop();
     }
 }

@@ -6,8 +6,6 @@ import controller.MainController;
 import controller.SharedDirectoryController;
 import fileTree.interfaces.Tree;
 import fileTree.interfaces.TreeDifference;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
@@ -18,6 +16,8 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import rest.RestClient;
+import threads.interfaces.Thread;
+import threads.models.ThreadManager;
 import tools.TreeTool;
 import tools.Utils;
 import tools.xmlTools.DirectoryNameMapper;
@@ -38,6 +38,8 @@ public class TreeControl {
     private MainController gob_mainController;
 
     public TreeControl(String iva_ip, String iva_port, MainController iob_mainController) {
+        int lva_loopIndex = 0;
+
         gob_mainController = iob_mainController;
 
         File lob_rootDirectory = new File(Utils.getUserBasePath());
@@ -80,27 +82,34 @@ public class TreeControl {
             Collection<TreeDifference> lco_differences = gob_restClient.compareClientAndServerTree(gob_tree);
             for (TreeDifference lob_difference : lco_differences) {
                 for (String lva_addFile : lob_difference.getFilesToInsert()) {
+                    if (lva_loopIndex == 1) {
+                        lva_addFile = "Public" + lva_addFile;
+                    }
+
                     File lob_newFile = gob_restClient.downloadFile(lva_addFile);
                     if (lob_newFile != null) {
+                        //add to private directory
                         TreeTool.getInstance().addToTreeView(lob_newFile);
                         gob_tree.addFile(lob_newFile, lob_newFile.isDirectory());
                     }
                 }
 
-//                for (String lva_deleteFile : lob_difference.getFilesToDelete()) {
-//                    int lva_directoryId = RestClient.getDirectoryIdFromRelativePath(lva_deleteFile);
-//
-//                    if (lva_directoryId < 0) {
-//                        lva_deleteFile = gob_tree.getRoot().getAbsolutePath() + "\\Private" + lva_deleteFile;
-//                    } else {
-//                        break;
-//                    }
-//
-//                    File lob_file = new File(lva_deleteFile);
-//                    gob_tree.deleteFile(lva_deleteFile);
-//                    TreeItem<String> lob_item = TreeTool.getTreeItem(lob_file);
-//                    lob_item.getParent().getChildren().remove(lob_item);
-//                }
+                for (String lva_deleteFile : lob_difference.getFilesToDelete()) {
+
+                    if (lva_loopIndex == 0) {
+                        lva_deleteFile = gob_tree.getRoot().getAbsolutePath() + "\\Private" + lva_deleteFile;
+                    }
+
+                    if (lva_loopIndex == 1) {
+                        lva_deleteFile = gob_tree.getRoot().getAbsolutePath() + "\\Public" + lva_deleteFile;
+                    }
+
+                    File lob_file = new File(lva_deleteFile);
+                    gob_tree.deleteFile(lva_deleteFile);
+                    TreeItem<String> lob_item = TreeTool.getTreeItem(lob_file);
+                    lob_item.getParent().getChildren().remove(lob_item);
+                }
+                lva_loopIndex++;
             }
             buildContextMenu();
             gob_treeView.setContextMenu(gob_contextMenu);
@@ -112,7 +121,8 @@ public class TreeControl {
             Collection<File> lob_directoriesToWatch = gob_tree.getAllDirectories();
             lob_directoriesToWatch.clear();
             lob_directoriesToWatch.add(gob_tree.getRoot());
-            MainDirectoryWatcher lob_watcher = new MainDirectoryWatcher(gob_restClient, gob_tree.getRoot());
+            Thread lob_watcher = ThreadManager.getDirectoryWatcherThread(gob_restClient, gob_tree.getRoot());
+            lob_watcher.start();
             gob_treeView.setEditable(true);
 
             gob_treeView.setCellFactory(siTreeView ->
@@ -136,10 +146,9 @@ public class TreeControl {
         }
 
         gob_treeView.getSelectionModel().selectedItemProperty()
-                .addListener((observable, old_val, new_val) -> {
-                    TreeItem selectedItem = new_val;
-                    gob_mainController.setTypeLabel(buildFileFromItem(selectedItem, gob_tree));
-                });
+                .addListener((observable, old_val, new_val) ->
+                    gob_mainController.setTypeLabel(buildFileFromItem(new_val, gob_tree))
+                );
     }
 
     private void addFilesToTree(File iob_file, TreeItem<String> iob_treeItem) {
