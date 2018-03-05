@@ -50,6 +50,9 @@ public class MainController {
     @FXML
     private Label gob_label_content;
 
+    @FXML
+    private Label gob_txt_label_content;
+
     private DataCache gob_userCache;
     private TreeControl gob_treeControl;
 
@@ -128,16 +131,21 @@ public class MainController {
 
         if (iob_file.isDirectory()) {
             gob_label_type.setText("Directory");
+            gob_txt_label_content.setVisible(true);
+            gob_label_content.setVisible(true);
+            lob_thread = new FileInformation(iob_file, gob_label_content);
+            lob_thread.setName("FileInformationThread");
+            lob_thread.start();
         }else{
             gob_label_type.setText("File");
+            gob_txt_label_content.setVisible(false);
+            gob_label_content.setVisible(false);
         }
 
         gob_label_name.setText(iob_file.getName());
         gob_label_size.setText(String.valueOf(getFileSize(iob_file)));
 
-        lob_thread = new FileInformation(iob_file, gob_label_content);
-        lob_thread.setName("FileInformationThread");
-        lob_thread.start();
+
     }
 
     //TODO in einen Thread auslagern
