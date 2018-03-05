@@ -254,45 +254,8 @@ public class RestClient {
         Collection<TreeDifference> lco_differences = new ArrayList<>();
 
         try {
-            XStream lob_xmlParser = new XStream();
-            XStream.setupDefaultSecurity(lob_xmlParser); // to be removed after 1.5
-
-            Class[] lar_allowedClasses = {TreeDifference.class, TreeDifferenceImpl.class};
-            lob_xmlParser.allowTypes(lar_allowedClasses);
-
-            Tree lob_privateTree = new TreeImpl(iob_tree.getRoot() + "\\Private");
-            Tree lob_publicTree = new TreeImpl(iob_tree.getRoot() + "\\Public");
-
-            File lob_privateRootFile = new File(iob_tree.getRoot() + "\\Private");
-            File lob_publicRootFile = new File(iob_tree.getRoot() + "\\Public");
-            
-            FileNode lob_privateNode = iob_tree.getRootNode().getChild(lob_privateRootFile);
-            FileNode lob_publicNode = iob_tree.getRootNode().getChild(lob_publicRootFile);
-            
-            lob_privateTree.addFiles(getNodeSubFiles(new HashMap<>(), lob_privateNode));
-            lob_publicTree.addFiles(getNodeSubFiles(new HashMap<>(), lob_publicNode));
-            
-            String lva_privateTreeXmlString = lob_xmlParser.toXML(lob_privateTree);
-            String lva_publicTreeXmlString = lob_xmlParser.toXML(lob_publicTree);
-
-            Response lob_privateResponse = gob_webTarget.path("/auth/files/compare").queryParam("DirectoryId", -1).request()
-                    .post(Entity.entity(lva_privateTreeXmlString, MediaType.APPLICATION_XML));
-
-            Response lob_publicResponse = gob_webTarget.path("/auth/files/compare").queryParam("DirectoryId", 0).request()
-                    .post(Entity.entity(lva_publicTreeXmlString, MediaType.APPLICATION_XML));
-
-
-            String lva_xmlPrivateDifferenceString = lob_privateResponse.readEntity(String.class);
-            String lva_xmlPublicDifferenceString = lob_publicResponse.readEntity(String.class);
-
-            System.out.println(lva_xmlPrivateDifferenceString);
-            TreeDifference lob_privateDifference = (TreeDifference) lob_xmlParser.fromXML(lva_xmlPrivateDifferenceString);
-
-            System.out.println(lva_xmlPublicDifferenceString);
-            TreeDifference lob_publicDifference = (TreeDifference) lob_xmlParser.fromXML(lva_xmlPublicDifferenceString);
-
-            lco_differences.add(lob_privateDifference);
-            lco_differences.add(lob_publicDifference);
+            lco_differences.add(compareTreeToServer("\\Private", iob_tree, -1));
+            lco_differences.add(compareTreeToServer("\\Public", iob_tree, 0));
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -301,12 +264,38 @@ public class RestClient {
         return lco_differences;
     }
 
+    private TreeDifference compareTreeToServer(String iva_directoryName, Tree iob_tree, int iva_directoryId) throws IOException {
+        XStream lob_xmlParser = new XStream();
+        XStream.setupDefaultSecurity(lob_xmlParser); // to be removed after 1.5
+
+        Class[] lar_allowedClasses = {TreeDifference.class, TreeDifferenceImpl.class};
+        lob_xmlParser.allowTypes(lar_allowedClasses);
+
+        Tree lob_tree = new TreeImpl(iob_tree.getRoot() + iva_directoryName);
+        File lob_rootFile = new File(iob_tree.getRoot() + iva_directoryName);
+        FileNode lob_privateNode = iob_tree.getRootNode().getChild(lob_rootFile);
+        lob_tree.addFiles(getNodeSubFiles(new HashMap<>(), lob_privateNode));
+        String lva_privateTreeXmlString = lob_xmlParser.toXML(lob_tree);
+
+        Response lob_privateResponse = gob_webTarget.path("/auth/files/compare").queryParam("DirectoryId", iva_directoryId).request()
+                .post(Entity.entity(lva_privateTreeXmlString, MediaType.APPLICATION_XML));
+
+        String lva_xmlDifferenceString = lob_privateResponse.readEntity(String.class);
+        System.out.println(lva_xmlDifferenceString);
+
+        return (TreeDifference) lob_xmlParser.fromXML(lva_xmlDifferenceString);
+    }
+
     public File downloadFile(String iva_filePath) {
         int lva_directoryId = getDirectoryIdFromRelativePath(iva_filePath);
 
         Response lob_response = gob_webTarget.path("/auth/files/download")
                 .queryParam("directoryId", lva_directoryId)
                 .queryParam("path", iva_filePath).request().get();
+
+        if (lob_response.getStatus() != 204  && lob_response.getStatus() != 200) {
+            return null;
+        }
 
         try {
             String lva_newFilePath = Utils.getUserBasePath() + "\\" +
@@ -480,7 +469,7 @@ public class RestClient {
         return lob_restResponse;
     }
 
-    public static int getDirectoryIdFromRelativePath(String iva_path) {
+    private static int getDirectoryIdFromRelativePath(String iva_path) {
         if (iva_path.startsWith("Shared")) {
             return 1;
         }

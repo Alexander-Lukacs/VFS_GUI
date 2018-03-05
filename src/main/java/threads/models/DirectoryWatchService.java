@@ -1,6 +1,7 @@
-package fileTree.models;
+package threads.models;
 
 import fileTree.interfaces.FileChangeListener;
+import fileTree.models.TreeSingleton;
 import org.apache.commons.io.comparator.PathFileComparator;
 
 import java.io.File;
@@ -11,7 +12,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.*;
 
-public class DirectoryWatchService implements Runnable{
+class DirectoryWatchService implements Runnable{
     private HashMap<Path, FileTime> gob_registerdPaths;
     private Path gob_root;
     private FileChangeListener gob_listender;

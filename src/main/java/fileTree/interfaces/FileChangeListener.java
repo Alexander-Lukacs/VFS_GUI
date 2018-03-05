@@ -13,7 +13,7 @@ public interface FileChangeListener extends EventListener{
 
     /**
      * if a file is removed in the root directory or a subdirectoy this method is called
-     * @param iob_path
+     * @param iob_path path of the file that was deleted
      */
     void fileDeleted(Path iob_path);
 
@@ -26,8 +26,18 @@ public interface FileChangeListener extends EventListener{
 
     /**
      * if a file was renamed in the root directory or a subdirectoy this method is called
-     * @param iob_path
-     * @param iva_newName
+     * @param iob_path path of the file that was renamed (file with old name)
+     * @param iva_newName new file name
      */
     void fileRenamed(Path iob_path, String iva_newName);
+
+    /**
+     * called when scan started
+     */
+    void startScan();
+
+    /**
+     * called when the scan is finished
+     */
+    void finishedScan();
 }

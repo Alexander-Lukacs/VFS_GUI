@@ -14,6 +14,16 @@ public class PreventDuplicateOperation {
         gob_lock = new ReentrantLock();
     }
 
+    public void clear() {gob_lock.lock();
+        try {
+        gob_map.clear();
+        } finally {
+            if (gob_lock.isHeldByCurrentThread()) {
+                gob_lock.unlock();
+            }
+        }
+    }
+
     public void putCreated(Path iob_key) {
         gob_lock.lock();
         try {
