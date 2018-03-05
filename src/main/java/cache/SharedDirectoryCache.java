@@ -37,7 +37,7 @@ public class SharedDirectoryCache {
      * @param iva_key key
      * @return value
      */
-    public SharedDirectory get(String iva_key) {
+    public SharedDirectory get(Integer iva_key) {
         return gob_dataCacheMap.get(iva_key);
     }
 

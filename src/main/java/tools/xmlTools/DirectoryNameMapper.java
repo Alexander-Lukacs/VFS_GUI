@@ -94,7 +94,11 @@ public class DirectoryNameMapper {
     }
 
     public static String getRenamedSharedDirectoryName(int iva_originalDirId) {
-        return findSharedDirectory(String.valueOf(iva_originalDirId));
+        return findSharedDirectoryById(String.valueOf(iva_originalDirId));
+    }
+
+    public static int getIdOfSharedDirectory(String lva_sharedDirectoryName) {
+        return Integer.parseInt(findSharedDirectoryByText(lva_sharedDirectoryName));
     }
 
     public static void setNameOfSharedDirectory(int iva_sharedDirOriginalId, String iva_newSharedDirName) {
@@ -237,7 +241,7 @@ public class DirectoryNameMapper {
         return lva_hasChanged;
     }
 
-    private static String findSharedDirectory(String iva_sharedDirectory) {
+    private static String findSharedDirectoryById(String iva_sharedDirectory) {
         File lob_inputFile;
         SAXBuilder lob_saxBuilder;
 
@@ -259,6 +263,38 @@ public class DirectoryNameMapper {
             for (Element lob_element : lob_nodeList) {
                 if (lob_element.getAttributeValue(GC_ATTRIBUTE_ID).equals(iva_sharedDirectory)) {
                     return lob_element.getText();
+                }
+            }
+
+        } catch (JDOMException | IOException ex) {
+            ex.printStackTrace();
+        }
+
+        throw new IllegalArgumentException(GC_SHARED_DIRECTORY_NOT_FOUND);
+    }
+
+    private static String findSharedDirectoryByText(String iva_sharedDirectoryName) {
+        File lob_inputFile;
+        SAXBuilder lob_saxBuilder;
+
+        Document lob_doc;
+        Element lob_rootElement;
+        Element lob_selectedElement;
+        List<Element> lob_nodeList;
+
+        try {
+            lob_inputFile = new File(getXmlFilePath(GC_FILE_NAME));
+            lob_saxBuilder = new SAXBuilder();
+            lob_doc = lob_saxBuilder.build(lob_inputFile);
+
+            lob_rootElement = lob_doc.getRootElement();
+
+            lob_selectedElement = lob_rootElement.getChild(GC_SHARED_DIR_ROOT_ELEMENT);
+            lob_nodeList = lob_selectedElement.getChildren();
+
+            for (Element lob_element : lob_nodeList) {
+                if (lob_element.getText().equals(iva_sharedDirectoryName)) {
+                    return lob_element.getAttributeValue(GC_ATTRIBUTE_ID);
                 }
             }
 

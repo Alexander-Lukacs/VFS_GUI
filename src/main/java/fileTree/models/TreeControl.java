@@ -2,13 +2,11 @@ package fileTree.models;
 
 import builder.RestClientBuilder;
 import cache.DataCache;
-import controller.MainController;
 import cache.SharedDirectoryCache;
+import controller.MainController;
 import controller.SharedDirectoryController;
 import fileTree.interfaces.Tree;
 import fileTree.interfaces.TreeDifference;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
@@ -427,6 +425,13 @@ public class TreeControl {
     private void sharedDirectoryScene(TreeItem iob_treeItem) {
         FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("views/sharedDirectoryScreen.fxml"));
         GridPane lob_pane;
+        int lva_sharedDirectoryId;
+        String lva_selectedItemName;
+        SharedDirectoryCache lob_sharedDirectoryCache = SharedDirectoryCache.getInstance();
+        SharedDirectory lob_sharedDirectory;
+
+        lva_selectedItemName = gob_treeView.getSelectionModel().getSelectedItem().getValue();
+
         try {
             lob_pane = lob_loader.load();
             Scene lob_scene = new Scene(lob_pane);
@@ -441,8 +446,10 @@ public class TreeControl {
                 lob_controller.initData(null, lob_stage);
 
             } else {
-                // TODO shared Directory übergeben
-                //lob_controller.initData(null, lob_stage);
+                lva_sharedDirectoryId = DirectoryNameMapper.getIdOfSharedDirectory(lva_selectedItemName);
+                lob_sharedDirectory = lob_sharedDirectoryCache.get(lva_sharedDirectoryId);
+
+                lob_controller.initData(lob_sharedDirectory, lob_stage);
             }
 
             lob_stage.show();
