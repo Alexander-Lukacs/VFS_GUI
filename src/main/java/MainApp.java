@@ -3,7 +3,7 @@ import cache.DataCache;
 import controller.LoginController;
 import javafx.application.Application;
 import javafx.stage.Stage;
-import rest.clients.RestClient;
+import restful.clients.RestClient;
 import services.NotifyServerThread;
 import tools.AlertWindows;
 

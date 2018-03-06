@@ -1,10 +1,10 @@
 package builder;
 
 import cache.DataCache;
-import rest.clients.FileRestClient;
-import rest.clients.RestClient;
-import rest.clients.SharedDirectoryRestClient;
-import rest.clients.UserRestClient;
+import restful.clients.FileRestClient;
+import restful.clients.RestClient;
+import restful.clients.SharedDirectoryRestClient;
+import restful.clients.UserRestClient;
 
 import static cache.DataCache.*;
 

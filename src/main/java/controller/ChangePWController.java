@@ -11,14 +11,14 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import models.classes.User;
-import rest.clients.UserRestClient;
+import restful.clients.UserRestClient;
 import tools.AlertWindows;
 import tools.Utils;
 import tools.Validation;
 import tools.xmlTools.LastSessionStorage;
 
 import static cache.DataCache.*;
-import static rest.constants.HttpStatusCodes.GC_HTTP_OK;
+import static restful.constants.HttpStatusCodes.GC_HTTP_OK;
 import static controller.constants.SettingsConstants.GC_ADMIN_ADD;
 import static controller.constants.SettingsConstants.GC_CHANGE_IP_PORT;
 import static tools.constants.AlertConstants.*;

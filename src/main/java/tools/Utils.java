@@ -2,7 +2,7 @@ package tools;
 
 import models.classes.RestResponse;
 
-import static rest.constants.HttpStatusCodes.*;
+import static restful.constants.HttpStatusCodes.*;
 
 public class Utils {
     private static final String GC_FILE_BASE_PATH = "C:\\Users\\$\\Documents\\FileSystem";

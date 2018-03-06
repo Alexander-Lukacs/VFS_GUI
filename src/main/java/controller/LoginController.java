@@ -14,7 +14,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import models.classes.RestResponse;
 import models.classes.User;
-import rest.clients.UserRestClient;
+import restful.clients.UserRestClient;
 import tools.AlertWindows;
 import tools.Utils;
 import tools.Validation;
@@ -27,7 +27,7 @@ import java.util.Objects;
 import static cache.DataCache.*;
 import static controller.constants.ApplicationConstants.GC_APPLICATION_ICON_PATH;
 import static controller.constants.SettingsConstants.GC_VFS;
-import static rest.constants.HttpStatusCodes.GC_HTTP_OK;
+import static restful.constants.HttpStatusCodes.GC_HTTP_OK;
 import static tools.constants.AlertConstants.*;
 
 public class LoginController {

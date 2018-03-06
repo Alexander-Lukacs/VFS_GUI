@@ -7,8 +7,7 @@ import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import rest.clients.FileRestClient;
-import rest.clients.RestClient;
+import restful.clients.FileRestClient;
 
 import javax.swing.filechooser.FileSystemView;
 import java.awt.image.BufferedImage;

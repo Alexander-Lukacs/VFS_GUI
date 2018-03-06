@@ -12,8 +12,8 @@ import javafx.stage.Stage;
 import models.classes.RestResponse;
 import models.classes.SharedDirectory;
 import models.classes.User;
-import rest.clients.SharedDirectoryRestClient;
-import rest.clients.UserRestClient;
+import restful.clients.SharedDirectoryRestClient;
+import restful.clients.UserRestClient;
 import tools.AlertWindows;
 import tools.Utils;
 import tools.Validation;
@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static controller.constants.SharedDirectoryConstants.*;
-import static rest.constants.HttpStatusCodes.GC_HTTP_OK;
+import static restful.constants.HttpStatusCodes.GC_HTTP_OK;
 
 /**
  * Created by Mesut on 01.03.2018.

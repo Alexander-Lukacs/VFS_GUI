@@ -3,8 +3,7 @@ package threads.models;
 import fileTree.interfaces.FileChangeListener;
 import fileTree.models.TreeSingleton;
 import javafx.scene.control.TreeItem;
-import rest.clients.FileRestClient;
-import rest.clients.RestClient;
+import restful.clients.FileRestClient;
 import threads.interfaces.Thread;
 import tools.TreeTool;
 

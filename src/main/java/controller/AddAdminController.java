@@ -8,12 +8,12 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import models.classes.User;
-import rest.clients.UserRestClient;
+import restful.clients.UserRestClient;
 import tools.Utils;
 
 import java.util.List;
 
-import static rest.constants.HttpStatusCodes.GC_HTTP_OK;
+import static restful.constants.HttpStatusCodes.GC_HTTP_OK;
 import static controller.constants.SettingsConstants.GC_CHANGE_IP_PORT;
 import static controller.constants.SettingsConstants.GC_CHANGE_PW;
 

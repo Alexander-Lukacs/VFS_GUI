@@ -1,4 +1,4 @@
-package rest.clients;
+package restful.clients;
 
 import com.thoughtworks.xstream.XStream;
 import models.classes.RestResponse;
@@ -11,7 +11,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
-import static rest.constants.RestResourcesPaths.*;
+import static restful.constants.RestResourcesPaths.*;
 
 public class SharedDirectoryRestClient extends RestClient {
     public SharedDirectoryRestClient(String iva_baseUrl, String iva_email, String iva_password) {

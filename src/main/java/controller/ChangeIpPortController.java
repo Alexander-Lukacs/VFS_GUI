@@ -10,7 +10,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import rest.clients.RestClient;
+import restful.clients.RestClient;
 import tools.AlertWindows;
 import tools.Validation;
 import tools.xmlTools.LastSessionStorage;

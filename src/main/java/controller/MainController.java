@@ -16,7 +16,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.apache.commons.io.FileUtils;
-import rest.clients.RestClient;
+import restful.clients.RestClient;
 import tools.AlertWindows;
 import tools.FileInformation;
 import tools.Utils;

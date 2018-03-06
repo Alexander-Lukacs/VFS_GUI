@@ -8,8 +8,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.TransferMode;
-import rest.clients.FileRestClient;
-import rest.clients.RestClient;
+import restful.clients.FileRestClient;
 import tools.TreeTool;
 import tools.xmlTools.DirectoryNameMapper;
 

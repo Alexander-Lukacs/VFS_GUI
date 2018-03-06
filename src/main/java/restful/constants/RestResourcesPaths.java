@@ -1,4 +1,4 @@
-package rest.constants;
+package restful.constants;
 
 public abstract class RestResourcesPaths {
     public static final String GC_REST_ADD_USER_PATH = "/user/addNewUser";

@@ -1,4 +1,4 @@
-package rest.clients;
+package restful.clients;
 
 import models.classes.RestResponse;
 import org.glassfish.jersey.client.ClientConfig;
@@ -12,7 +12,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import static rest.constants.RestResourcesPaths.GC_REST_UNREGISTER_CLIENT;
+import static restful.constants.RestResourcesPaths.GC_REST_UNREGISTER_CLIENT;
 
 /**
  * Created by Mesut on 25.01.2018.

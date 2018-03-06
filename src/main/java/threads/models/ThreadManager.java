@@ -1,7 +1,6 @@
 package threads.models;
 
-import rest.clients.FileRestClient;
-import rest.clients.RestClient;
+import restful.clients.FileRestClient;
 import threads.interfaces.Thread;
 
 import java.io.File;
