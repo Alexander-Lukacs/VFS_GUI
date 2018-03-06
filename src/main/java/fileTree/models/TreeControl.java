@@ -18,8 +18,7 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import models.classes.SharedDirectory;
 import rest.clients.FileRestClient;
-import rest.clients.RestClient;
-import rest.clients.SharedDirectoryClient;
+import rest.clients.SharedDirectoryRestClient;
 import threads.interfaces.Thread;
 import threads.models.ThreadManager;
 import tools.TreeTool;
@@ -506,7 +505,7 @@ public class TreeControl {
 
     private void initSharedDirectoryCache() {
         SharedDirectoryCache lob_sharedDirectoryCache = SharedDirectoryCache.getInstance();
-        SharedDirectoryClient lob_restClient = RestClientBuilder.buildSharedDirectoryClientWithAuth();
+        SharedDirectoryRestClient lob_restClient = RestClientBuilder.buildSharedDirectoryClientWithAuth();
         List<SharedDirectory> lli_sharedDirectories;
 
         lli_sharedDirectories = lob_restClient.getAllSharedDirectoriesOfUser();

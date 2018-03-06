@@ -4,7 +4,6 @@ import builder.RestClientBuilder;
 import cache.DataCache;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
-import rest.clients.RestClient;
 import models.classes.RestResponse;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -12,7 +11,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import models.classes.User;
-import rest.clients.UserClient;
+import rest.clients.UserRestClient;
 import tools.AlertWindows;
 import tools.Utils;
 import tools.Validation;
@@ -75,7 +74,7 @@ public class ChangePWController {
     public void onClickChangePassword() {
         Stage lob_stage;
         RestResponse lob_restResponse;
-        UserClient lob_restClient;
+        UserRestClient lob_restClient;
         User lob_user;
 
         String lva_email = gob_dataCache.get(GC_EMAIL_KEY);

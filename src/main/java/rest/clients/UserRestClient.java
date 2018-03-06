@@ -17,12 +17,12 @@ import static rest.constants.HttpStatusCodes.GC_HTTP_OK;
 import static rest.constants.RestResourcesPaths.*;
 import static rest.constants.RestResourcesPaths.GC_REST_ADD_ADMIN_PATH;
 
-public class UserClient extends RestClient {
-    public UserClient(String iva_baseUrl) {
+public class UserRestClient extends RestClient {
+    public UserRestClient(String iva_baseUrl) {
         super(iva_baseUrl);
     }
 
-    public UserClient(String iva_baseUrl, String iva_email, String iva_password) {
+    public UserRestClient(String iva_baseUrl, String iva_email, String iva_password) {
         super(iva_baseUrl, iva_email, iva_password);
     }
 

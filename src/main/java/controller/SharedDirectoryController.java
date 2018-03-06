@@ -12,9 +12,8 @@ import javafx.stage.Stage;
 import models.classes.RestResponse;
 import models.classes.SharedDirectory;
 import models.classes.User;
-import rest.clients.RestClient;
-import rest.clients.SharedDirectoryClient;
-import rest.clients.UserClient;
+import rest.clients.SharedDirectoryRestClient;
+import rest.clients.UserRestClient;
 import tools.AlertWindows;
 import tools.Utils;
 import tools.Validation;
@@ -96,7 +95,7 @@ public class SharedDirectoryController {
     public void onClickAddMember() {
     // Declaration block -----------------------------------------------------------------------------------------------
 
-        UserClient lob_restClient;
+        UserRestClient lob_restClient;
         DataCache lob_dataCache = DataCache.getDataCache();
         String lva_email;
         boolean lva_userNotExists = true;
@@ -166,7 +165,7 @@ public class SharedDirectoryController {
         User lob_owner = new User();
         User lob_member;
         List<User> lli_memberList = new ArrayList<>();
-        SharedDirectoryClient lob_restClient;
+        SharedDirectoryRestClient lob_restClient;
         RestResponse lob_restResponse;
         DataCache lob_dataCache = DataCache.getDataCache();
 
@@ -249,7 +248,7 @@ public class SharedDirectoryController {
 
         List<User> lli_oldMemberList;
         boolean lva_found;
-        SharedDirectoryClient lob_restClient;
+        SharedDirectoryRestClient lob_restClient;
         RestResponse lob_restResponse;
 
     // -----------------------------------------------------------------------------------------------------------------

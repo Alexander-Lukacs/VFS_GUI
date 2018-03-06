@@ -1,7 +1,6 @@
 package controller;
 
 import builder.RestClientBuilder;
-import rest.clients.RestClient;
 import models.classes.RestResponse;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -9,7 +8,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import models.classes.User;
-import rest.clients.UserClient;
+import rest.clients.UserRestClient;
 import tools.Utils;
 
 import java.util.List;
@@ -33,7 +32,7 @@ public class AddAdminController {
 
     @FXML
     public void initialize() {
-        UserClient lob_restClient;
+        UserRestClient lob_restClient;
         lob_restClient = RestClientBuilder.buildUserClientWithAuth();
 
         gob_userList = lob_restClient.getAllUser();
@@ -65,7 +64,7 @@ public class AddAdminController {
 
     public void onClick() {
         RestResponse lob_restResponse;
-        UserClient lob_restClient;
+        UserRestClient lob_restClient;
 
         lob_restClient = RestClientBuilder.buildUserClientWithAuth();
 

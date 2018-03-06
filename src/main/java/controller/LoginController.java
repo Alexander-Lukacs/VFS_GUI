@@ -14,8 +14,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import models.classes.RestResponse;
 import models.classes.User;
-import rest.clients.RestClient;
-import rest.clients.UserClient;
+import rest.clients.UserRestClient;
 import tools.AlertWindows;
 import tools.Utils;
 import tools.Validation;
@@ -87,7 +86,7 @@ public class LoginController {
      */
 
     public void onClick() {
-        UserClient lob_restClient;
+        UserRestClient lob_restClient;
         User lob_user = new User();
 
         String lva_ip = gob_tf_ipAddress.getText();
@@ -133,7 +132,7 @@ public class LoginController {
         String lva_confirmPassword = gob_tf_confirmPassword1.getText();
 
         RestResponse lob_restResponse;
-        UserClient lob_restClient;
+        UserRestClient lob_restClient;
         User lob_user;
 
         if (checkIfRegisterDataValid(lva_ip, lva_port, lva_name, lva_email, lva_password, lva_confirmPassword)) {

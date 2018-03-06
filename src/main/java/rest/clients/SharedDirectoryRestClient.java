@@ -13,8 +13,8 @@ import java.util.List;
 
 import static rest.constants.RestResourcesPaths.*;
 
-public class SharedDirectoryClient extends RestClient {
-    public SharedDirectoryClient(String iva_baseUrl, String iva_email, String iva_password) {
+public class SharedDirectoryRestClient extends RestClient {
+    public SharedDirectoryRestClient(String iva_baseUrl, String iva_email, String iva_password) {
         super(iva_baseUrl, iva_email, iva_password);
     }
 
