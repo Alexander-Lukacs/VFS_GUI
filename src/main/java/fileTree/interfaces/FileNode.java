@@ -1,9 +1,5 @@
 package fileTree.interfaces;
 
-import com.sun.xml.internal.bind.AnyTypeAdapter;
-
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.File;
 import java.util.Collection;
 
