@@ -126,6 +126,7 @@ public class MainController {
 
     public void setTypeLabel(File iob_file) {
         Thread lob_thread;
+        long lva_fileSize_kb;
 
         if (iob_file.isDirectory()) {
             gob_label_type.setText("Directory");
@@ -141,7 +142,8 @@ public class MainController {
         }
 
         gob_label_name.setText(iob_file.getName());
-        gob_label_size.setText(String.valueOf(getFileSize(iob_file)));
+        lva_fileSize_kb = getFileSize(iob_file) / 1024; // um aus den Bytes kB zu machen / 1024
+        gob_label_size.setText(String.valueOf(lva_fileSize_kb + " KB"));
 
 
     }
