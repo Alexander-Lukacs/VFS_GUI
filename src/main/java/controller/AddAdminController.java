@@ -1,7 +1,7 @@
 package controller;
 
 import builder.RestClientBuilder;
-import rest.RestClient;
+import rest.clients.RestClient;
 import models.classes.RestResponse;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -9,6 +9,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import models.classes.User;
+import rest.clients.UserClient;
 import tools.Utils;
 
 import java.util.List;
@@ -32,8 +33,8 @@ public class AddAdminController {
 
     @FXML
     public void initialize() {
-        RestClient lob_restClient;
-        lob_restClient = RestClientBuilder.buildRestClientWithAuth();
+        UserClient lob_restClient;
+        lob_restClient = RestClientBuilder.buildUserClientWithAuth();
 
         gob_userList = lob_restClient.getAllUser();
 
@@ -64,9 +65,9 @@ public class AddAdminController {
 
     public void onClick() {
         RestResponse lob_restResponse;
-        RestClient lob_restClient;
+        UserClient lob_restClient;
 
-        lob_restClient = RestClientBuilder.buildRestClientWithAuth();
+        lob_restClient = RestClientBuilder.buildUserClientWithAuth();
 
         for (User lob_user : gob_userList) {
             if (lob_user.getEmail().equals(gob_lvUser.getSelectionModel().getSelectedItem())) {

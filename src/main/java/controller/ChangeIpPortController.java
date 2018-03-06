@@ -10,7 +10,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import rest.RestClient;
+import rest.clients.RestClient;
 import tools.AlertWindows;
 import tools.Validation;
 import tools.xmlTools.LastSessionStorage;
@@ -19,7 +19,6 @@ import static cache.DataCache.GC_IP_KEY;
 import static cache.DataCache.GC_PORT_KEY;
 import static controller.constants.SettingsConstants.GC_ADMIN_ADD;
 import static controller.constants.SettingsConstants.GC_CHANGE_PW;
-import static controller.constants.SettingsConstants.GC_LOGOUT;
 import static tools.constants.AlertConstants.GC_WARNING_IP_PORT;
 import static tools.constants.AlertConstants.GC_WARNING_PORT;
 

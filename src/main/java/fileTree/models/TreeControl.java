@@ -17,7 +17,9 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import models.classes.SharedDirectory;
-import rest.RestClient;
+import rest.clients.FileRestClient;
+import rest.clients.RestClient;
+import rest.clients.SharedDirectoryClient;
 import threads.interfaces.Thread;
 import threads.models.ThreadManager;
 import tools.TreeTool;
@@ -37,7 +39,7 @@ public class TreeControl {
     private Tree gob_tree;
     private TreeView<String> gob_treeView;
     private ContextMenu gob_contextMenu;
-    private RestClient gob_restClient;
+    private FileRestClient gob_restClient;
     private MainController gob_mainController;
 
     public TreeControl(String iva_ip, String iva_port, MainController iob_mainController) {
@@ -52,7 +54,7 @@ public class TreeControl {
         File lob_privateDirectory = new File(lob_userDirectory.getAbsolutePath() + "\\Private");
         File lob_sharedDirectories = new File(lob_userDirectory.getAbsolutePath() + "\\Shared");
 
-        gob_restClient = RestClientBuilder.buildRestClientWithAuth();
+        gob_restClient = RestClientBuilder.buildFileRestClientWithAuth();
 
         //create the root directory if it does not exist
         TreeTool.getInstance().createDirectory(lob_rootDirectory);
@@ -504,14 +506,13 @@ public class TreeControl {
 
     private void initSharedDirectoryCache() {
         SharedDirectoryCache lob_sharedDirectoryCache = SharedDirectoryCache.getInstance();
-        RestClient lob_restClient = RestClientBuilder.buildRestClientWithAuth();
+        SharedDirectoryClient lob_restClient = RestClientBuilder.buildSharedDirectoryClientWithAuth();
         List<SharedDirectory> lli_sharedDirectories;
 
         lli_sharedDirectories = lob_restClient.getAllSharedDirectoriesOfUser();
 
         for (SharedDirectory lob_sharedDirectory : lli_sharedDirectories) {
             lob_sharedDirectoryCache.put(lob_sharedDirectory.getId(), lob_sharedDirectory);
-            System.out.println(lob_sharedDirectory.toString());
         }
     }
 }

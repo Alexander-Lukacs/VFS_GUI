@@ -14,7 +14,8 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import models.classes.RestResponse;
 import models.classes.User;
-import rest.RestClient;
+import rest.clients.RestClient;
+import rest.clients.UserClient;
 import tools.AlertWindows;
 import tools.Utils;
 import tools.Validation;
@@ -86,7 +87,7 @@ public class LoginController {
      */
 
     public void onClick() {
-        RestClient lob_restClient;
+        UserClient lob_restClient;
         User lob_user = new User();
 
         String lva_ip = gob_tf_ipAddress.getText();
@@ -98,7 +99,7 @@ public class LoginController {
             gob_dataCache.put(GC_IP_KEY, lva_ip);
             gob_dataCache.put(GC_PORT_KEY, lva_port);
 
-            lob_restClient = RestClientBuilder.buildRestClientWithAuth(lva_ip, lva_port, lva_email, lva_password);
+            lob_restClient = RestClientBuilder.buildUserClientWithAuth(lva_ip, lva_port, lva_email, lva_password);
 
             try {
                 lob_user.setEmail(lva_email);
@@ -132,7 +133,7 @@ public class LoginController {
         String lva_confirmPassword = gob_tf_confirmPassword1.getText();
 
         RestResponse lob_restResponse;
-        RestClient lob_restClient;
+        UserClient lob_restClient;
         User lob_user;
 
         if (checkIfRegisterDataValid(lva_ip, lva_port, lva_name, lva_email, lva_password, lva_confirmPassword)) {
@@ -142,7 +143,7 @@ public class LoginController {
 
             lob_user = new User(lva_email, lva_password, lva_name);
 
-            lob_restClient = RestClientBuilder.buildRestClient(lva_ip, lva_port);
+            lob_restClient = RestClientBuilder.buildUserClient(lva_ip, lva_port);
             lob_restResponse = lob_restClient.registerNewUser(lob_user);
 
             if (lob_restResponse != null) {

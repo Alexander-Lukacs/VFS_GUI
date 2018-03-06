@@ -12,7 +12,9 @@ import javafx.stage.Stage;
 import models.classes.RestResponse;
 import models.classes.SharedDirectory;
 import models.classes.User;
-import rest.RestClient;
+import rest.clients.RestClient;
+import rest.clients.SharedDirectoryClient;
+import rest.clients.UserClient;
 import tools.AlertWindows;
 import tools.Utils;
 import tools.Validation;
@@ -94,7 +96,7 @@ public class SharedDirectoryController {
     public void onClickAddMember() {
     // Declaration block -----------------------------------------------------------------------------------------------
 
-        RestClient lob_restClient;
+        UserClient lob_restClient;
         DataCache lob_dataCache = DataCache.getDataCache();
         String lva_email;
         boolean lva_userNotExists = true;
@@ -102,7 +104,7 @@ public class SharedDirectoryController {
 
     // -----------------------------------------------------------------------------------------------------------------
 
-        lob_restClient = RestClientBuilder.buildRestClientWithAuth();
+        lob_restClient = RestClientBuilder.buildUserClientWithAuth();
         gli_userList = lob_restClient.getAllUser();
 
         lva_email = gob_tf_email.getText().trim();
@@ -164,7 +166,7 @@ public class SharedDirectoryController {
         User lob_owner = new User();
         User lob_member;
         List<User> lli_memberList = new ArrayList<>();
-        RestClient lob_restClient;
+        SharedDirectoryClient lob_restClient;
         RestResponse lob_restResponse;
         DataCache lob_dataCache = DataCache.getDataCache();
 
@@ -188,7 +190,7 @@ public class SharedDirectoryController {
             lob_sharedDirectory.setMembers(lli_memberList);
 
             // Adds the shared directory to the server
-            lob_restClient = RestClientBuilder.buildRestClientWithAuth();
+            lob_restClient = RestClientBuilder.buildSharedDirectoryClientWithAuth();
             lob_restResponse = lob_restClient.addNewSharedDirectory(lob_sharedDirectory);
             Utils.printResponseMessage(lob_restResponse);
 
@@ -247,12 +249,12 @@ public class SharedDirectoryController {
 
         List<User> lli_oldMemberList;
         boolean lva_found;
-        RestClient lob_restClient;
+        SharedDirectoryClient lob_restClient;
         RestResponse lob_restResponse;
 
     // -----------------------------------------------------------------------------------------------------------------
 
-        lob_restClient = RestClientBuilder.buildRestClientWithAuth();
+        lob_restClient = RestClientBuilder.buildSharedDirectoryClientWithAuth();
 
         if (!gob_sharedDirectory.getDirectoryName().equals(gob_tf_directory_name.getText())) {
             DirectoryNameMapper.addNewSharedDirectory(gob_sharedDirectory.getId(), gob_tf_directory_name.getText());

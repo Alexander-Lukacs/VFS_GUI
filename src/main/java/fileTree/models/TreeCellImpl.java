@@ -8,7 +8,8 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.TransferMode;
-import rest.RestClient;
+import rest.clients.FileRestClient;
+import rest.clients.RestClient;
 import tools.TreeTool;
 import tools.xmlTools.DirectoryNameMapper;
 
@@ -19,9 +20,9 @@ import static tools.TreeTool.buildFileFromItem;
 public class TreeCellImpl extends TreeCell<String> {
     private TextField gob_textField;
     private Tree gob_tree;
-    private RestClient gob_restClient;
+    private FileRestClient gob_restClient;
 
-    public TreeCellImpl(Tree iob_tree, RestClient iob_restClient) {
+    public TreeCellImpl(Tree iob_tree, FileRestClient iob_restClient) {
         gob_tree = iob_tree;
         gob_restClient = iob_restClient;
         setEvents();

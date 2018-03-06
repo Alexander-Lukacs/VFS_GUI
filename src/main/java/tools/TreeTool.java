@@ -7,7 +7,8 @@ import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import rest.RestClient;
+import rest.clients.FileRestClient;
+import rest.clients.RestClient;
 
 import javax.swing.filechooser.FileSystemView;
 import java.awt.image.BufferedImage;
@@ -164,7 +165,7 @@ public class TreeTool {
         return iob_tree.getFile(lob_path.toString());
     }
 
-    public static boolean createFileOrDirectory(File iob_newFile, boolean isDirectory, RestClient iob_restClient) {
+    public static boolean createFileOrDirectory(File iob_newFile, boolean isDirectory, FileRestClient iob_restClient) {
         //-------------------------------Variables----------------------------
         String lva_relativeFilePath;
         //--------------------------------------------------------------------
@@ -194,7 +195,7 @@ public class TreeTool {
      * @param iob_itemToDelete item to delete in the tree
      * @return true if all files were deleted, otherwise false
      */
-    public static boolean deleteFile(File iob_file, TreeItem<String> iob_itemToDelete, RestClient iob_restClient) {
+    public static boolean deleteFile(File iob_file, TreeItem<String> iob_itemToDelete, FileRestClient iob_restClient) {
         //-------------------------------Variables----------------------------------------
         String lva_relativePath;
         //--------------------------------------------------------------------------------
@@ -230,7 +231,7 @@ public class TreeTool {
         return root_file.equals(iob_path.getParent().toFile());
     }
 
-    public static void moveFile(Path iob_path, Path iob_destination, boolean iva_moveJustInTree, RestClient iob_restClient) {
+    public static void moveFile(Path iob_path, Path iob_destination, boolean iva_moveJustInTree, FileRestClient iob_restClient) {
         //-------------------------Variables------------------------------------
         TreeItem<String> lob_item = getTreeItem(iob_path.toFile());
         TreeItem<String> lob_parent = getTreeItem(iob_destination.toFile());

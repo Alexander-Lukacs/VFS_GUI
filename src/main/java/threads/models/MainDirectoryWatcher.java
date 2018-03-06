@@ -3,7 +3,8 @@ package threads.models;
 import fileTree.interfaces.FileChangeListener;
 import fileTree.models.TreeSingleton;
 import javafx.scene.control.TreeItem;
-import rest.RestClient;
+import rest.clients.FileRestClient;
+import rest.clients.RestClient;
 import threads.interfaces.Thread;
 import tools.TreeTool;
 
@@ -15,11 +16,11 @@ import java.nio.file.Path;
  * this class contains 3 DirectoryWatchServices, one for the private, public and shared directory
  */
 class MainDirectoryWatcher implements Thread {
-    private RestClient gob_restClient;
+    private FileRestClient gob_restClient;
     private DirectoryWatchService gob_watchServie;
     private File gob_rootFile;
 
-    MainDirectoryWatcher(RestClient iob_restClient, File iob_files) {
+    MainDirectoryWatcher(FileRestClient iob_restClient, File iob_files) {
         gob_restClient = iob_restClient;
         gob_rootFile = iob_files;
     }
