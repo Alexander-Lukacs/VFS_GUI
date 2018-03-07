@@ -88,7 +88,9 @@ public class TreeCellImpl extends TreeCell<String> {
             Dragboard lob_dragBoard;
             ClipboardContent lob_content;
 
-            if (lob_selectedItem != null && !isRootChildElement(lob_selectedItem)) {
+            if (lob_selectedItem != null && !isRootChildElement(lob_selectedItem) &&
+                    !lob_selectedItem.getParent().getValue().equals("Shared")) {
+
                 lob_dragBoard = this.startDragAndDrop(TransferMode.MOVE);
                 lob_content = new ClipboardContent();
                 lob_content.putString(lob_selectedItem.getValue());
