@@ -21,7 +21,6 @@ import tools.xmlTools.DirectoryNameMapper;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -40,9 +39,9 @@ public class SharedDirectoryController {
     private TextField gob_tf_email;
     @FXML
     private ListView<String> gob_memberListView;
+
     private SharedDirectory gob_sharedDirectory;
     private Stage gob_stage;
-
     private List<User> gli_userList;
     private HashMap<String, User> gob_userMap;
 
@@ -275,6 +274,11 @@ public class SharedDirectoryController {
         closeWindow();
     }
 
+    /**
+     * Checks if member was added
+     *
+     * @param ili_oldMemberList old member list
+     */
     private void checkIfMemberWasAddedToSharedDirectory(List<User> ili_oldMemberList) {
         // Declaration block -----------------------------------------------------------------------------------------------
         boolean lva_found;
@@ -286,7 +290,6 @@ public class SharedDirectoryController {
 
         lob_restClient = RestClientBuilder.buildSharedDirectoryClientWithAuth();
 
-        // check if member was added
         for (String lob_userMail : gli_memberList) {
             lva_found = false;
 
@@ -306,17 +309,19 @@ public class SharedDirectoryController {
                     if (lob_restResponse.getHttpStatus() == GC_HTTP_OK) {
                         gob_sharedDirectory.getMembers().add(lob_user);
                         lob_sharedDirectoryCache.replaceData(gob_sharedDirectory.getId(), gob_sharedDirectory);
-
-                        // TODO löschen
-                        System.out.println(lob_sharedDirectoryCache.get(gob_sharedDirectory.getId()));
                     }
                 }
             }
         }
     }
 
+    /**
+     * Checks if a member was removed
+     *
+     * @param ili_oldMemberList old member list
+     */
     private void checkIfMemberWasRemovedFromSharedDirectory(List<User> ili_oldMemberList) {
-    // Declaration block -----------------------------------------------------------------------------------------------
+        // Declaration block -----------------------------------------------------------------------------------------------
 
         SharedDirectoryRestClient lob_restClient;
         RestResponse lob_restResponse;
@@ -324,12 +329,12 @@ public class SharedDirectoryController {
         String lva_email;
         User lob_user;
 
-    // -----------------------------------------------------------------------------------------------------------------
+        // -----------------------------------------------------------------------------------------------------------------
 
         lob_restClient = RestClientBuilder.buildSharedDirectoryClientWithAuth();
 
-        // check if member was removed
-        for (int i = 0 ; i < ili_oldMemberList.size() ; i++) {
+        // do not transform this for loop into a for each loop to avoid concurrentModificationException
+        for (int i = 0; i < ili_oldMemberList.size(); i++) {
             lob_user = ili_oldMemberList.get(i);
             lva_email = lob_user.getEmail();
 
@@ -341,10 +346,6 @@ public class SharedDirectoryController {
                 if (lob_restResponse.getHttpStatus() == GC_HTTP_OK) {
                     gob_sharedDirectory.getMembers().remove(lob_user);
                     lob_sharedDirectoryCache.replaceData(gob_sharedDirectory.getId(), gob_sharedDirectory);
-
-                    // TODO löschen
-                    System.out.println(Arrays.toString(ili_oldMemberList.toArray()));
-                    System.out.println(lob_sharedDirectoryCache.get(gob_sharedDirectory.getId()));
                 }
             }
         }
