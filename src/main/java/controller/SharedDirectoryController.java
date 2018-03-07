@@ -21,6 +21,7 @@ import tools.xmlTools.DirectoryNameMapper;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static controller.constants.SharedDirectoryConstants.*;
@@ -42,7 +43,9 @@ public class SharedDirectoryController {
 
     private SharedDirectory gob_sharedDirectory;
     private Stage gob_stage;
+
     private List<User> gli_userList;
+    private HashMap<String, User> gob_userMap;
 
     /**
      * Initialise the sharedDirectory currently selected in the treeView
@@ -50,8 +53,19 @@ public class SharedDirectoryController {
      * @param iob_stage the current stage
      */
     public void initData(SharedDirectory iob_sharedDirectory, Stage iob_stage) {
+        UserRestClient lob_restClient;
+
         gob_sharedDirectory = iob_sharedDirectory;
         gob_stage = iob_stage;
+
+        // Get all users and cache them
+        lob_restClient = RestClientBuilder.buildUserClientWithAuth();
+        gli_userList = lob_restClient.getAllUser();
+
+        gob_userMap = new HashMap<>();
+        for (User lob_tmpUser : gli_userList) {
+            gob_userMap.put(lob_tmpUser.getEmail(), lob_tmpUser);
+        }
 
         initScene();
     }
@@ -95,16 +109,12 @@ public class SharedDirectoryController {
     public void onClickAddMember() {
     // Declaration block -----------------------------------------------------------------------------------------------
 
-        UserRestClient lob_restClient;
         DataCache lob_dataCache = DataCache.getDataCache();
         String lva_email;
         boolean lva_userNotExists = true;
         boolean lva_valid;
 
     // -----------------------------------------------------------------------------------------------------------------
-
-        lob_restClient = RestClientBuilder.buildUserClientWithAuth();
-        gli_userList = lob_restClient.getAllUser();
 
         lva_email = gob_tf_email.getText().trim();
         lva_valid = Validation.isEmailValid(lva_email);
@@ -191,11 +201,14 @@ public class SharedDirectoryController {
             // Adds the shared directory to the server
             lob_restClient = RestClientBuilder.buildSharedDirectoryClientWithAuth();
             lob_restResponse = lob_restClient.addNewSharedDirectory(lob_sharedDirectory);
-            Utils.printResponseMessage(lob_restResponse);
 
-            // If the shared directory was successfully to the server, add the shared directory
-            // to the tree view and to the explorer
-            if (lob_restResponse.getHttpStatus() == GC_HTTP_OK) {
+            if (lob_restResponse.getHttpStatus() != GC_HTTP_OK) {
+                Utils.printResponseMessage(lob_restResponse);
+            } else {
+                new AlertWindows().createInformationAlert("Shared directory successful created!");
+
+                // If the shared directory was successfully to the server, add the shared directory
+                // to the tree view and to the explorer
                 lob_sharedDirectory.setId(Integer.parseInt(lob_restResponse.getResponseMessage()));
                 createSharedDirectory(lob_sharedDirectory);
             }
@@ -250,39 +263,64 @@ public class SharedDirectoryController {
         boolean lva_found;
         SharedDirectoryRestClient lob_restClient;
         RestResponse lob_restResponse;
+        User lob_user;
+        SharedDirectoryCache lob_sharedDirectoryCache = SharedDirectoryCache.getInstance();
 
     // -----------------------------------------------------------------------------------------------------------------
 
         lob_restClient = RestClientBuilder.buildSharedDirectoryClientWithAuth();
 
+        // Rename shared directory locally in shared directory name mapper
         if (!gob_sharedDirectory.getDirectoryName().equals(gob_tf_directory_name.getText())) {
-            DirectoryNameMapper.addNewSharedDirectory(gob_sharedDirectory.getId(), gob_tf_directory_name.getText());
+            DirectoryNameMapper.setNameOfSharedDirectory(gob_sharedDirectory.getId(), gob_tf_directory_name.getText());
         }
 
         lli_oldMemberList = gob_sharedDirectory.getMembers();
 
         // check if member was removed
-        for (User lob_user : lli_oldMemberList) {
-            if (!gli_memberList.contains(lob_user.getEmail())) {
-                lob_restResponse = lob_restClient.removeMemberFromSharedDirectory(gob_sharedDirectory, lob_user);
+        for (User lob_tmpUser : lli_oldMemberList) {
+            if (!gli_memberList.contains(lob_tmpUser.getEmail())) {
+                lob_restResponse = lob_restClient.removeMemberFromSharedDirectory(gob_sharedDirectory, lob_tmpUser);
                 Utils.printResponseMessage(lob_restResponse);
+
+                if (lob_restResponse.getHttpStatus() == GC_HTTP_OK) {
+                    lob_user = gob_userMap.get(lob_tmpUser.getEmail());
+
+                    if (lob_user != null) {
+                        gob_sharedDirectory.getMembers().remove(lob_user);
+                        lob_sharedDirectoryCache.replaceData(gob_sharedDirectory.getId(), gob_sharedDirectory);
+
+                        // TODO löschen
+                        System.out.println(lob_sharedDirectoryCache.get(gob_sharedDirectory.getId()));
+                        closeWindow();
+                    }
+                }
             }
         }
 
         // check if member was added
         for (String lob_userMail : gli_memberList) {
             lva_found = false;
-            for (User lob_user : lli_oldMemberList) {
-                if (lob_user.getEmail().equals(lob_userMail)) {
+            for (User lob_tmpUser : lli_oldMemberList) {
+                if (lob_tmpUser.getEmail().equals(lob_userMail)) {
                     lva_found = true;
                 }
             }
 
             if (!lva_found) {
-                for (User tmpUser : gli_userList) {
-                    if (tmpUser.getEmail().equals(lob_userMail)) {
-                        lob_restResponse = lob_restClient.addNewMemberToSharedDirectory(gob_sharedDirectory, tmpUser);
-                        Utils.printResponseMessage(lob_restResponse);
+                lob_user = gob_userMap.get(lob_userMail);
+
+                if (lob_user != null) {
+                    lob_restResponse = lob_restClient.addNewMemberToSharedDirectory(gob_sharedDirectory, lob_user);
+                    Utils.printResponseMessage(lob_restResponse);
+
+                    if (lob_restResponse.getHttpStatus() == GC_HTTP_OK) {
+                        gob_sharedDirectory.getMembers().add(lob_user);
+                        lob_sharedDirectoryCache.replaceData(gob_sharedDirectory.getId(), gob_sharedDirectory);
+
+                        // TODO löschen
+                        System.out.println(lob_sharedDirectoryCache.get(gob_sharedDirectory.getId()));
+                        closeWindow();
                     }
                 }
             }
@@ -307,5 +345,14 @@ public class SharedDirectoryController {
         return Utils.getUserBasePath() + "\\" + lob_dataCache.get(DataCache.GC_IP_KEY) + "_" +
                 lob_dataCache.get(DataCache.GC_PORT_KEY) + "\\" + lob_dataCache.get(DataCache.GC_EMAIL_KEY) +
                 "\\" + "Shared" + "\\" + iob_sharedDirectory.getDirectoryName() + "$";
+    }
+
+    public static void main(String[] args) {
+        HashMap<String, String> a = new HashMap<>();
+
+        a.put("a" , "b");
+
+        System.out.println(a.get("a"));
+        System.out.println(a.get("b"));
     }
 }
