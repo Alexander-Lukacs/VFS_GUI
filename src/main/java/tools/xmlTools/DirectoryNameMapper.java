@@ -15,8 +15,6 @@ import java.io.IOException;
 import java.util.List;
 
 import static tools.constants.DirectoryNameMapperConstants.*;
-import static tools.xmlTools.XmlTools.modify;
-import static tools.xmlTools.XmlTools.readXml;
 
 public class DirectoryNameMapper {
     private static final String GC_FILE_NAME = "mapping.xml";

@@ -106,7 +106,6 @@ public class MainController {
 
     public void initialize() {
         gob_userCache = DataCache.getDataCache();
-        System.out.println(gob_userCache.get(DataCache.GC_EMAIL_KEY));
         gob_treeControl = new TreeControl(gob_userCache.get(DataCache.GC_IP_KEY), gob_userCache.get(DataCache.GC_PORT_KEY), this);
         TreeView<String> gob_treeView = TreeSingleton.getInstance().getTreeView();
         gob_vBox.getChildren().add(gob_treeView);

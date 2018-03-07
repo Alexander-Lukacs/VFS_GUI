@@ -42,36 +42,9 @@ public class TreeControl {
     private MainController gob_mainController;
 
     public TreeControl(String iva_ip, String iva_port, MainController iob_mainController) {
-        int lva_loopIndex = 0;
-
         gob_mainController = iob_mainController;
-
-        File lob_rootDirectory = new File(Utils.getUserBasePath());
-        File lob_serverDirectory = new File(Utils.getUserBasePath() + "\\" + iva_ip + "_" + iva_port);
-        File lob_userDirectory = new File(lob_serverDirectory.getAbsolutePath() + "\\" + DataCache.getDataCache().get(DataCache.GC_EMAIL_KEY));
-        File lob_publicDirectory = new File(lob_userDirectory.getAbsolutePath() + "\\Public");
-        File lob_privateDirectory = new File(lob_userDirectory.getAbsolutePath() + "\\Private");
-        File lob_sharedDirectories = new File(lob_userDirectory.getAbsolutePath() + "\\Shared");
-
         gob_restClient = RestClientBuilder.buildFileRestClientWithAuth();
-
-        //create the root directory if it does not exist
-        TreeTool.getInstance().createDirectory(lob_rootDirectory);
-
-        //create the server directory if it does not exist
-        TreeTool.getInstance().createDirectory(lob_serverDirectory);
-
-        //create the user directory if it does not exist
-        TreeTool.getInstance().createDirectory(lob_userDirectory);
-
-        //create the public directory
-        TreeTool.getInstance().createDirectory(lob_publicDirectory);
-
-        //create the private directory
-        TreeTool.getInstance().createDirectory(lob_privateDirectory);
-
-        //create the shared directory
-        TreeTool.getInstance().createDirectory(lob_sharedDirectories);
+        File lob_userDirectory = initDirectories(iva_ip, iva_port);
 
         try {
             TreeSingleton.setTreeRootPath(lob_userDirectory.getCanonicalPath());
@@ -85,38 +58,6 @@ public class TreeControl {
             ThreadManager.getFileManagerThread().start();
             addFilesToTree(gob_tree.getRoot());
             ThreadManager.addCommandToFileManager(null, FileManagerConstants.GC_COMPARE_TREE, false, gob_tree);
-//            Collection<TreeDifference> lco_differences = gob_restClient.compareClientAndServerTree(gob_tree);
-//            for (TreeDifference lob_difference : lco_differences) {
-//                for (String lva_addFile : lob_difference.getFilesToInsert()) {
-//                    if (lva_loopIndex == 1) {
-//                        lva_addFile = "Public" + lva_addFile;
-//                    }
-//
-//                    File lob_newFile = gob_restClient.downloadFile(lva_addFile);
-//                    if (lob_newFile != null) {
-//                        //add to private directory
-//                        TreeTool.getInstance().addToTreeView(lob_newFile);
-//                        gob_tree.addFile(lob_newFile, lob_newFile.isDirectory());
-//                    }
-//                }
-//
-//                for (String lva_deleteFile : lob_difference.getFilesToDelete()) {
-//
-//                    if (lva_loopIndex == 0) {
-//                        lva_deleteFile = gob_tree.getRoot().getAbsolutePath() + "\\Private" + lva_deleteFile;
-//                    }
-//
-//                    if (lva_loopIndex == 1) {
-//                        lva_deleteFile = gob_tree.getRoot().getAbsolutePath() + "\\Public" + lva_deleteFile;
-//                    }
-//
-//                    File lob_file = new File(lva_deleteFile);
-//                    gob_tree.deleteFile(lva_deleteFile);
-//                    TreeItem<String> lob_item = TreeTool.getTreeItem(lob_file);
-//                    lob_item.getParent().getChildren().remove(lob_item);
-//                }
-//                lva_loopIndex++;
-//            }
             buildContextMenu();
             gob_treeView.setContextMenu(gob_contextMenu);
             gob_treeView.setOnContextMenuRequested(event ->
@@ -183,13 +124,13 @@ public class TreeControl {
         }
     }
 
-    private boolean addFile(File iob_file, boolean iva_isDirectory) {
-        if (TreeTool.filterRootFiles(iob_file.toPath())) {
-            return false;
-        }
-        this.gob_tree.addFile(iob_file, iva_isDirectory);
-        return true;
-    }
+//    private boolean addFile(File iob_file, boolean iva_isDirectory) {
+//        if (TreeTool.filterRootFiles(iob_file.toPath())) {
+//            return false;
+//        }
+//        this.gob_tree.addFile(iob_file, iva_isDirectory);
+//        return true;
+//    }
 
     private void buildContextMenu() {
         //-----------------------Variables---------------------------------
@@ -208,10 +149,13 @@ public class TreeControl {
                     gob_treeView.getSelectionModel().getSelectedItem(), gob_tree
             );
             TreeItem<String> lob_selectedItem = gob_treeView.getSelectionModel().getSelectedItem();
-            if (deleteFile(lob_selectedFile, lob_selectedItem, gob_restClient)) {
-                System.out.println("GELÖSCHT");
-                addAllDeleted(lob_selectedFile);
-            }
+//            if (deleteFile(lob_selectedFile, lob_selectedItem, gob_restClient)) {
+//                System.out.println("GELÖSCHT");
+//                addAllDeleted(lob_selectedFile);
+//            }
+            ThreadManager.addCommandToFileManager(lob_selectedFile, FileManagerConstants.GC_DELETE,
+                    true, gob_tree);
+            addAllDeleted(lob_selectedFile);
         });
 
         lob_newDirectory = new MenuItem("New Directory");
@@ -387,13 +331,18 @@ public class TreeControl {
 
     private void createNewDirectory() {
         File lob_newFile = buildNewFile("\\Neuer Ordner$");
-        createFileOrDirectory(lob_newFile, true, gob_restClient);
+//        createFileOrDirectory(lob_newFile, true, gob_restClient);
+        ThreadManager.addCommandToFileManager(lob_newFile, FileManagerConstants.GC_ADD,
+                true, true);
         TreeSingleton.getInstance().getDuplicateOperationsPrevention().putCreated(lob_newFile.toPath());
     }
 
     private void createNewFile() {
         File lob_newFile = buildNewFile("\\Neue Datei$.txt");
-        createFileOrDirectory(lob_newFile, false, gob_restClient);
+//        createFileOrDirectory(lob_newFile, false, gob_restClient);
+        ThreadManager.addCommandToFileManager(lob_newFile, FileManagerConstants.GC_ADD,
+                true, false);
+
         TreeSingleton.getInstance().getDuplicateOperationsPrevention().putCreated(lob_newFile.toPath());
 
     }
@@ -506,5 +455,34 @@ public class TreeControl {
         for (SharedDirectory lob_sharedDirectory : lli_sharedDirectories) {
             lob_sharedDirectoryCache.put(lob_sharedDirectory.getId(), lob_sharedDirectory);
         }
+    }
+
+    private File initDirectories(String iva_ip, String iva_port) {
+        File lob_rootDirectory = new File(Utils.getUserBasePath());
+        File lob_serverDirectory = new File(Utils.getUserBasePath() + "\\" + iva_ip + "_" + iva_port);
+        File lob_userDirectory = new File(lob_serverDirectory.getAbsolutePath() + "\\" + DataCache.getDataCache().get(DataCache.GC_EMAIL_KEY));
+        File lob_publicDirectory = new File(lob_userDirectory.getAbsolutePath() + "\\Public");
+        File lob_privateDirectory = new File(lob_userDirectory.getAbsolutePath() + "\\Private");
+        File lob_sharedDirectories = new File(lob_userDirectory.getAbsolutePath() + "\\Shared");
+
+        //create the root directory if it does not exist
+        TreeTool.getInstance().createDirectory(lob_rootDirectory);
+
+        //create the server directory if it does not exist
+        TreeTool.getInstance().createDirectory(lob_serverDirectory);
+
+        //create the user directory if it does not exist
+        TreeTool.getInstance().createDirectory(lob_userDirectory);
+
+        //create the public directory
+        TreeTool.getInstance().createDirectory(lob_publicDirectory);
+
+        //create the private directory
+        TreeTool.getInstance().createDirectory(lob_privateDirectory);
+
+        //create the shared directory
+        TreeTool.getInstance().createDirectory(lob_sharedDirectories);
+
+        return lob_userDirectory;
     }
 }

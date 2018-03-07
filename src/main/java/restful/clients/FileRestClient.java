@@ -13,6 +13,7 @@ import fileTree.models.TreeDifferenceImpl;
 import fileTree.models.TreeImpl;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
+import tools.TreeTool;
 import tools.Utils;
 
 import javax.ws.rs.client.Client;
@@ -25,9 +26,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -58,9 +56,15 @@ public class FileRestClient extends RestClient {
 // Create a new Directory on the Server
 // ---------------------------------------------------------------------------------------------------------------------
 
-    public boolean uploadFilesToServer(File iob_filesToUpload, String iva_relativeFilePath) {
+    public boolean uploadFilesToServer(File iob_filesToUpload) {
         DataCache lob_dataCache = DataCache.getDataCache();
-        int lva_directoryId = getDirectoryIdFromRelativePath(iva_relativeFilePath);
+        String lva_relativeFilePath;
+        try {
+            lva_relativeFilePath = TreeTool.getRelativePath(iob_filesToUpload.getCanonicalPath());
+        }catch (IOException ex) {
+            return false;
+        }
+        int lva_directoryId = getDirectoryIdFromRelativePath(lva_relativeFilePath);
 
         HttpAuthenticationFeature lob_authDetails = HttpAuthenticationFeature.basic(
                 lob_dataCache.get(DataCache.GC_EMAIL_KEY),
@@ -74,7 +78,7 @@ public class FileRestClient extends RestClient {
 
         WebTarget lob_target = lob_client.target("http://" + lob_dataCache.get(DataCache.GC_IP_KEY) + ":" +
                 lob_dataCache.get(DataCache.GC_PORT_KEY) + "/api/auth/files/upload")
-                .queryParam("path", iva_relativeFilePath)
+                .queryParam("path", lva_relativeFilePath)
                 .queryParam("directoryId", lva_directoryId);
         lob_target.register(MultiPartWriter.class);
 
@@ -91,13 +95,21 @@ public class FileRestClient extends RestClient {
 // Delete a File or a Directory on the Server
 // ---------------------------------------------------------------------------------------------------------------------
 
-    public boolean createDirectoryOnServer(String iva_relativeDirectoryPath) {
-        int lva_directoryId = getDirectoryIdFromRelativePath(iva_relativeDirectoryPath);
+    public boolean createDirectoryOnServer(File iob_file) {
+        String lva_relativePath;
+        int lva_directoryId;
+
+        try {
+            lva_relativePath = TreeTool.getRelativePath(iob_file.getCanonicalPath());
+        } catch (IOException ex) {
+            return false;
+        }
+        lva_directoryId = getDirectoryIdFromRelativePath(lva_relativePath);
 
         Response lob_response = gob_webTarget.path("/auth/files/createDirectory")
                 .queryParam("directoryId", lva_directoryId)
                 .request()
-                .post(Entity.entity(iva_relativeDirectoryPath, MediaType.TEXT_PLAIN));
+                .post(Entity.entity(lva_relativePath, MediaType.TEXT_PLAIN));
         return lob_response.getStatus() == 200;
     }
 
@@ -105,11 +117,19 @@ public class FileRestClient extends RestClient {
 // Delete a Directory and move the that it contained one up
 // ---------------------------------------------------------------------------------------------------------------------
 
-    public boolean deleteOnServer(String iva_relativePath) {
+    public boolean deleteOnServer(File iob_file) {
+        String lva_relativePath;
+
+        try {
+            lva_relativePath = TreeTool.getRelativePath(iob_file.getCanonicalPath());
+        } catch (IOException ex) {
+            return false;
+        }
+
         Response lob_response = gob_webTarget.path("/auth/files/delete")
-                .queryParam("directoryId", getDirectoryIdFromRelativePath(iva_relativePath))
+                .queryParam("directoryId", getDirectoryIdFromRelativePath(lva_relativePath))
                 .request()
-                .post(Entity.entity(iva_relativePath, MediaType.TEXT_PLAIN));
+                .post(Entity.entity(lva_relativePath, MediaType.TEXT_PLAIN));
         return lob_response.getStatus() == 200;
     }
 

@@ -132,6 +132,7 @@ public class SharedDirectoryController {
             lob_sharedDirCache.removeData(gob_sharedDirectory.getId());
 
             ThreadManager.getFileManagerThread().start();
+            System.out.println("SHARE: " + gob_sharedDirectoryFile);
             ThreadManager.addCommandToFileManager(gob_sharedDirectoryFile, FileManagerConstants.GC_DELETE,
                     true, TreeSingleton.getInstance().getTree());
         }

@@ -168,28 +168,28 @@ public class TreeTool {
         return iob_tree.getFile(lob_path.toString());
     }
 
-    public static boolean createFileOrDirectory(File iob_newFile, boolean isDirectory, FileRestClient iob_restClient) {
-        //-------------------------------Variables----------------------------
-        String lva_relativeFilePath;
-        //--------------------------------------------------------------------
-        try {
-
-            lva_relativeFilePath = getRelativePath(iob_newFile.getCanonicalPath());
-
-            TreeSingleton.getInstance().getTree().addFile(iob_newFile, isDirectory);
-            TreeTool.getInstance().addToTreeView(iob_newFile);
-
-            if (isDirectory) {
-                iob_restClient.createDirectoryOnServer(lva_relativeFilePath);
-            } else {
-                iob_restClient.uploadFilesToServer(iob_newFile, lva_relativeFilePath);
-            }
-
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return true;
-    }
+//    public static boolean createFileOrDirectory(File iob_newFile, boolean isDirectory, FileRestClient iob_restClient) {
+//        //-------------------------------Variables----------------------------
+//        String lva_relativeFilePath;
+//        //--------------------------------------------------------------------
+//        try {
+//
+//            lva_relativeFilePath = getRelativePath(iob_newFile.getCanonicalPath());
+//
+//            TreeSingleton.getInstance().getTree().addFile(iob_newFile, isDirectory);
+//            TreeTool.getInstance().addToTreeView(iob_newFile);
+//
+//            if (isDirectory) {
+//                iob_restClient.createDirectoryOnServer(lva_relativeFilePath);
+//            } else {
+//                iob_restClient.uploadFilesToServer(iob_newFile, lva_relativeFilePath);
+//            }
+//
+//        } catch (IOException ex) {
+//            ex.printStackTrace();
+//        }
+//        return true;
+//    }
 
     public void deleteItem(File iob_file) {
         TreeItem<String> lob_item = searchTreeItem(iob_file);
@@ -198,28 +198,28 @@ public class TreeTool {
         }
     }
 
-    /**
-     * delete a file on the client, explorer and server
-     *
-     * @param iob_file         file to delete
-     * @param iob_itemToDelete item to delete in the tree
-     * @return true if all files were deleted, otherwise false
-     */
-    public static boolean deleteFile(File iob_file, TreeItem<String> iob_itemToDelete, FileRestClient iob_restClient) {
-        //-------------------------------Variables----------------------------------------
-        String lva_relativePath;
-        //--------------------------------------------------------------------------------
-        try {
-            lva_relativePath = getRelativePath(iob_file.getCanonicalPath());
-            iob_restClient.deleteOnServer(lva_relativePath);
-
-            iob_itemToDelete.getParent().getChildren().remove(iob_itemToDelete);
-            return TreeSingleton.getInstance().getTree().deleteFile(iob_file);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return false;
-    }
+//    /**
+//     * delete a file on the client, explorer and server
+//     *
+//     * @param iob_file         file to delete
+//     * @param iob_itemToDelete item to delete in the tree
+//     * @return true if all files were deleted, otherwise false
+//     */
+//    public static boolean deleteFile(File iob_file, TreeItem<String> iob_itemToDelete, FileRestClient iob_restClient) {
+//        //-------------------------------Variables----------------------------------------
+//        String lva_relativePath;
+//        //--------------------------------------------------------------------------------
+//        try {
+//            lva_relativePath = getRelativePath(iob_file.getCanonicalPath());
+//            iob_restClient.deleteOnServer(lva_relativePath);
+//
+//            iob_itemToDelete.getParent().getChildren().remove(iob_itemToDelete);
+//            return TreeSingleton.getInstance().getTree().deleteFile(iob_file);
+//        } catch (IOException ex) {
+//            ex.printStackTrace();
+//        }
+//        return false;
+//    }
     /**
      * filter all new files on the same level as public, shared and private
      * @return return true if the file is on the same level, otherwise false

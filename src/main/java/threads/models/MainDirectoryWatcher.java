@@ -4,6 +4,7 @@ import fileTree.interfaces.FileChangeListener;
 import fileTree.models.TreeSingleton;
 import javafx.scene.control.TreeItem;
 import restful.clients.FileRestClient;
+import threads.constants.FileManagerConstants;
 import threads.interfaces.ThreadControl;
 import tools.TreeTool;
 
@@ -71,15 +72,17 @@ class MainDirectoryWatcher implements ThreadControl {
 
         boolean lva_isDirectory = iob_path.toFile().isDirectory();
 //        System.out.println("fileAdded: " + iob_path);
-        TreeTool.createFileOrDirectory(iob_path.toFile(), lva_isDirectory, gob_restClient);
+//        TreeTool.createFileOrDirectory(iob_path.toFile(), lva_isDirectory, gob_restClient);
+        ThreadManager.addCommandToFileManager(iob_path.toFile(), FileManagerConstants.GC_UPLOAD_TO_SERVER, false);
     }
 
     private void deleteFile(Path iob_path) {
         if (TreeSingleton.getInstance().getDuplicateOperationsPrevention().wasFileDeted(iob_path)) {
             TreeSingleton.getInstance().getDuplicateOperationsPrevention().removeDeleted(iob_path);
         } else {
-            TreeItem<String> lob_itemToDelete = TreeTool.getTreeItem(iob_path.toFile());
-            TreeTool.deleteFile(iob_path.toFile(), lob_itemToDelete, gob_restClient);
+//            TreeItem<String> lob_itemToDelete = TreeTool.getTreeItem(iob_path.toFile());
+            ThreadManager.addCommandToFileManager(iob_path.toFile(), FileManagerConstants.GC_DELETE, true);
+//            TreeTool.deleteFile(iob_path.toFile(), lob_itemToDelete, gob_restClient);
         }
     }
 
