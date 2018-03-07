@@ -15,8 +15,6 @@ import java.io.IOException;
 import java.util.List;
 
 import static tools.constants.DirectoryNameMapperConstants.*;
-import static tools.xmlTools.XmlTools.modify;
-import static tools.xmlTools.XmlTools.readXml;
 
 public class DirectoryNameMapper {
     private static final String GC_FILE_NAME = "mapping.xml";
@@ -324,10 +322,9 @@ public class DirectoryNameMapper {
 
     private static String getXmlFilePath() {
         DataCache lob_dataCache = DataCache.getDataCache();
-        String a = Utils.getUserBasePath() + "\\" + lob_dataCache.get(DataCache.GC_IP_KEY) + "_" +
+        return Utils.getUserBasePath() + "\\" + lob_dataCache.get(DataCache.GC_IP_KEY) + "_" +
                 lob_dataCache.get(DataCache.GC_PORT_KEY) + "\\" + lob_dataCache.get(DataCache.GC_EMAIL_KEY)
                 + "\\config\\" + GC_FILE_NAME;
-        return a;
     }
 
     private static String readXml(String iva_elementToRead, String iva_fileName) {

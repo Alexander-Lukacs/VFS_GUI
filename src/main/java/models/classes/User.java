@@ -5,6 +5,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Objects;
 
 
+@SuppressWarnings("WeakerAccess")
 @XmlRootElement
 public class User {
     private String email;

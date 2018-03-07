@@ -477,13 +477,6 @@ public class TreeControl {
 
         if (lob_treeItem != null) {
             lob_file = buildFileFromItem(lob_treeItem, gob_tree);
-
-//            if (lob_file.isFile()) {
-//                lob_treeItem = lob_treeItem.getParent();
-//            }
-
-            lob_file = buildFileFromItem(lob_treeItem, gob_tree);
-
             return lob_file.toPath().toString();
         }
 

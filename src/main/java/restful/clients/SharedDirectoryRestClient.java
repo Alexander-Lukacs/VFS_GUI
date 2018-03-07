@@ -9,7 +9,6 @@ import tools.AlertWindows;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Collection;
 import java.util.List;
 
 import static restful.constants.RestResourcesPaths.*;
@@ -97,6 +96,7 @@ public class SharedDirectoryRestClient extends RestClient {
      * Get all shared directories of an user
      * @return List of all shared directories of an user
      */
+    @SuppressWarnings("unchecked")
     public List<SharedDirectory> getAllSharedDirectoriesOfUser() {
         List<SharedDirectory> lli_userSharedDirectory = null;
         XStream lob_xmlParser = new XStream();

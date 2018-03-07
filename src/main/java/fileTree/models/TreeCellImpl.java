@@ -16,6 +16,7 @@ import java.io.File;
 
 import static tools.TreeTool.buildFileFromItem;
 
+@SuppressWarnings("WeakerAccess")
 public class TreeCellImpl extends TreeCell<String> {
     private TextField gob_textField;
     private Tree gob_tree;
