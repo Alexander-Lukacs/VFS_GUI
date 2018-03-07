@@ -9,6 +9,7 @@ import tools.AlertWindows;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Collection;
 import java.util.List;
 
 import static restful.constants.RestResourcesPaths.*;
@@ -92,6 +93,7 @@ public class SharedDirectoryRestClient extends RestClient {
         try {
             Response response = gob_webTarget.path("sharedDirectory/auth/getAllSharedDirectories").request().get();
             lva_sharedDirectoryXmlString  = response.readEntity(String.class);
+            System.out.println(lva_sharedDirectoryXmlString);
             lli_userSharedDirectory = (List<SharedDirectory>) lob_xmlParser.fromXML(lva_sharedDirectoryXmlString);
         } catch (Exception ex) {
             new AlertWindows().createExceptionAlert(ex.getMessage(), ex);

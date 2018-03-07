@@ -4,7 +4,7 @@ import fileTree.interfaces.FileChangeListener;
 import fileTree.models.TreeSingleton;
 import javafx.scene.control.TreeItem;
 import restful.clients.FileRestClient;
-import threads.interfaces.Thread;
+import threads.interfaces.ThreadControl;
 import tools.TreeTool;
 
 import java.io.File;
@@ -14,7 +14,7 @@ import java.nio.file.Path;
 /**
  * this class contains 3 DirectoryWatchServices, one for the private, public and shared directory
  */
-class MainDirectoryWatcher implements Thread {
+class MainDirectoryWatcher implements ThreadControl {
     private FileRestClient gob_restClient;
     private DirectoryWatchService gob_watchServie;
     private File gob_rootFile;

@@ -121,6 +121,10 @@ public class TreeTool {
         return item;
     }
 
+    public static boolean isFileInTreeView(File iob_file) {
+        return searchTreeItem(iob_file) != null;
+    }
+
     public static String getRelativePath(String iva_filePath) throws IOException {
         String lva_regex = TreeSingleton.getInstance().getTree().getRoot().getCanonicalPath();
 
@@ -185,6 +189,13 @@ public class TreeTool {
             ex.printStackTrace();
         }
         return true;
+    }
+
+    public void deleteItem(File iob_file) {
+        TreeItem<String> lob_item = searchTreeItem(iob_file);
+        if (lob_item != null) {
+            lob_item.getParent().getChildren().remove(lob_item);
+        }
     }
 
     /**

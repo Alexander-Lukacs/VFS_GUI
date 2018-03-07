@@ -1,6 +1,6 @@
 package threads.interfaces;
 
-public interface Thread {
+public interface ThreadControl {
     void start();
 
     void stop();

@@ -6,7 +6,6 @@ import cache.SharedDirectoryCache;
 import controller.MainController;
 import controller.SharedDirectoryController;
 import fileTree.interfaces.Tree;
-import fileTree.interfaces.TreeDifference;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
@@ -19,7 +18,8 @@ import javafx.stage.Stage;
 import models.classes.SharedDirectory;
 import restful.clients.FileRestClient;
 import restful.clients.SharedDirectoryRestClient;
-import threads.interfaces.Thread;
+import threads.constants.FileManagerConstants;
+import threads.interfaces.ThreadControl;
 import threads.models.ThreadManager;
 import tools.TreeTool;
 import tools.Utils;
@@ -82,39 +82,41 @@ public class TreeControl {
             TreeItem<String> lob_root = new TreeItem<>(gob_tree.getRoot().getName());
             lob_root.setGraphic(TreeTool.getInstance().getTreeIcon(gob_tree.getRoot().getCanonicalPath()));
             gob_treeView.setRoot(lob_root);
-            addFilesToTree(gob_tree.getRoot(), gob_treeView.getRoot());
-            Collection<TreeDifference> lco_differences = gob_restClient.compareClientAndServerTree(gob_tree);
-            for (TreeDifference lob_difference : lco_differences) {
-                for (String lva_addFile : lob_difference.getFilesToInsert()) {
-                    if (lva_loopIndex == 1) {
-                        lva_addFile = "Public" + lva_addFile;
-                    }
-
-                    File lob_newFile = gob_restClient.downloadFile(lva_addFile);
-                    if (lob_newFile != null) {
-                        //add to private directory
-                        TreeTool.getInstance().addToTreeView(lob_newFile);
-                        gob_tree.addFile(lob_newFile, lob_newFile.isDirectory());
-                    }
-                }
-
-                for (String lva_deleteFile : lob_difference.getFilesToDelete()) {
-
-                    if (lva_loopIndex == 0) {
-                        lva_deleteFile = gob_tree.getRoot().getAbsolutePath() + "\\Private" + lva_deleteFile;
-                    }
-
-                    if (lva_loopIndex == 1) {
-                        lva_deleteFile = gob_tree.getRoot().getAbsolutePath() + "\\Public" + lva_deleteFile;
-                    }
-
-                    File lob_file = new File(lva_deleteFile);
-                    gob_tree.deleteFile(lva_deleteFile);
-                    TreeItem<String> lob_item = TreeTool.getTreeItem(lob_file);
-                    lob_item.getParent().getChildren().remove(lob_item);
-                }
-                lva_loopIndex++;
-            }
+            ThreadManager.getFileManagerThread().start();
+            addFilesToTree(gob_tree.getRoot());
+            ThreadManager.addCommandToFileManager(null, FileManagerConstants.GC_COMPARE_TREE, false, gob_tree);
+//            Collection<TreeDifference> lco_differences = gob_restClient.compareClientAndServerTree(gob_tree);
+//            for (TreeDifference lob_difference : lco_differences) {
+//                for (String lva_addFile : lob_difference.getFilesToInsert()) {
+//                    if (lva_loopIndex == 1) {
+//                        lva_addFile = "Public" + lva_addFile;
+//                    }
+//
+//                    File lob_newFile = gob_restClient.downloadFile(lva_addFile);
+//                    if (lob_newFile != null) {
+//                        //add to private directory
+//                        TreeTool.getInstance().addToTreeView(lob_newFile);
+//                        gob_tree.addFile(lob_newFile, lob_newFile.isDirectory());
+//                    }
+//                }
+//
+//                for (String lva_deleteFile : lob_difference.getFilesToDelete()) {
+//
+//                    if (lva_loopIndex == 0) {
+//                        lva_deleteFile = gob_tree.getRoot().getAbsolutePath() + "\\Private" + lva_deleteFile;
+//                    }
+//
+//                    if (lva_loopIndex == 1) {
+//                        lva_deleteFile = gob_tree.getRoot().getAbsolutePath() + "\\Public" + lva_deleteFile;
+//                    }
+//
+//                    File lob_file = new File(lva_deleteFile);
+//                    gob_tree.deleteFile(lva_deleteFile);
+//                    TreeItem<String> lob_item = TreeTool.getTreeItem(lob_file);
+//                    lob_item.getParent().getChildren().remove(lob_item);
+//                }
+//                lva_loopIndex++;
+//            }
             buildContextMenu();
             gob_treeView.setContextMenu(gob_contextMenu);
             gob_treeView.setOnContextMenuRequested(event ->
@@ -125,9 +127,8 @@ public class TreeControl {
             Collection<File> lob_directoriesToWatch = gob_tree.getAllDirectories();
             lob_directoriesToWatch.clear();
             lob_directoriesToWatch.add(gob_tree.getRoot());
-            Thread lob_watcher = ThreadManager.getDirectoryWatcherThread(gob_restClient, gob_tree.getRoot());
+            ThreadControl lob_watcher = ThreadManager.getDirectoryWatcherThread(gob_restClient, gob_tree.getRoot());
             lob_watcher.start();
-            gob_treeView.setEditable(true);
 
             gob_treeView.setCellFactory(siTreeView ->
                     new TreeCellImpl(this.gob_tree, this.gob_restClient)
@@ -157,15 +158,11 @@ public class TreeControl {
         initSharedDirectoryCache();
     }
 
-    private void addFilesToTree(File iob_file, TreeItem<String> iob_treeItem) {
-        TreeItem<String> lob_newItem;
-
+    private void addFilesToTree(File iob_file) {
         //we have to add the child nodes of the file if the file is a direcotry
         if (iob_file.isDirectory()) {
             //add the directory itself
-            if (!addFile(iob_file, true)) {
-                return;
-            }
+            ThreadManager.addCommandToFileManager(iob_file, FileManagerConstants.GC_ADD, false);
 
             File[] lob_fileList = iob_file.listFiles();
             if (lob_fileList != null) {
@@ -174,21 +171,15 @@ public class TreeControl {
                     //if the directory contains another directory, do the same for it
                     if (lob_directoryChildFile.isDirectory()) {
                         if (!TreeTool.filterRootFiles(lob_directoryChildFile.toPath())) {
-                            lob_newItem = TreeTool.getInstance().addTreeItem(iob_treeItem, lob_directoryChildFile);
-                            addFilesToTree(lob_directoryChildFile, lob_newItem);
+                            addFilesToTree(lob_directoryChildFile);
                         }
                     } else {
-                        //add normal file
-                        if (addFile(lob_directoryChildFile, false)) {
-                            TreeTool.getInstance().addTreeItem(iob_treeItem, lob_directoryChildFile);
-                        }
+                        ThreadManager.addCommandToFileManager(lob_directoryChildFile, FileManagerConstants.GC_ADD, false);
                     }
                 }
             }
         } else {
-            if (addFile(iob_file, false)) {
-                TreeTool.getInstance().addTreeItem(iob_treeItem, iob_file);
-            }
+            ThreadManager.addCommandToFileManager(iob_file, FileManagerConstants.GC_ADD, false);
         }
     }
 

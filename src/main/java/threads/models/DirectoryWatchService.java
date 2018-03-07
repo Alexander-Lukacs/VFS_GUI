@@ -276,7 +276,7 @@ class DirectoryWatchService implements Runnable{
     }
 
     /**
-     * start the scan routine in a new Thread
+     * start the scan routine in a new ThreadControl
      */
     public void start() {
         Thread lob_runnerThread = new Thread(this, DirectoryWatchService.class.getSimpleName());

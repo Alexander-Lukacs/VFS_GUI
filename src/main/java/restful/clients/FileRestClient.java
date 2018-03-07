@@ -25,6 +25,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -176,14 +179,13 @@ public class FileRestClient extends RestClient {
         File lob_rootFile = new File(iob_tree.getRoot() + iva_directoryName);
         FileNode lob_privateNode = iob_tree.getRootNode().getChild(lob_rootFile);
         lob_tree.addFiles(getNodeSubFiles(new HashMap<>(), lob_privateNode));
-        String lva_privateTreeXmlString = lob_xmlParser.toXML(lob_tree);
+        String lva_treeXmlString = lob_xmlParser.toXML(lob_tree);
 
         Response lob_privateResponse = gob_webTarget.path("/auth/files/compare").queryParam("DirectoryId", iva_directoryId).request()
-                .post(Entity.entity(lva_privateTreeXmlString, MediaType.APPLICATION_XML));
+                .post(Entity.entity(lva_treeXmlString, MediaType.APPLICATION_XML));
 
         String lva_xmlDifferenceString = lob_privateResponse.readEntity(String.class);
         System.out.println(lva_xmlDifferenceString);
-
         return (TreeDifference) lob_xmlParser.fromXML(lva_xmlDifferenceString);
     }
 

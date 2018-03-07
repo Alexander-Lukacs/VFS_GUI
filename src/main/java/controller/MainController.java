@@ -148,7 +148,7 @@ public class MainController {
 
     }
 
-    //TODO in einen Thread auslagern
+    //TODO in einen ThreadControl auslagern
     private long getFileSize(File iob_file) {
         if (iob_file.isDirectory()) {
             return FileUtils.sizeOfDirectory(iob_file);
