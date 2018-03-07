@@ -46,12 +46,12 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         lob_command.gob_file = iob_file;
         lob_command.gva_command = iva_commando;
         lob_command.gva_doOnServer = false;
-        lob_command.gva_commandSuccessfullOnServer = false;
+        lob_command.gva_commandSuccessfulOnServer = false;
 
         if (iar_fileInformation.length != 0) {
-            lob_command.gar_fleInformations = iar_fileInformation;
+            lob_command.gar_fileInformation = iar_fileInformation;
         } else {
-            lob_command.gar_fleInformations = null;
+            lob_command.gar_fileInformation = null;
         }
         gco_commands.add(lob_command);
 
@@ -60,12 +60,12 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             lob_serverCommand.gob_file = iob_file;
             lob_serverCommand.gva_command = iva_commando + "_on_server";
             lob_serverCommand.gva_doOnServer = true;
-            lob_serverCommand.gar_fleInformations = iar_fileInformation;
+            lob_serverCommand.gar_fileInformation = iar_fileInformation;
 
             if (iar_fileInformation.length != 0) {
-                lob_serverCommand.gar_fleInformations = iar_fileInformation;
+                lob_serverCommand.gar_fileInformation = iar_fileInformation;
             } else {
-                lob_serverCommand.gar_fleInformations = null;
+                lob_serverCommand.gar_fileInformation = null;
             }
 
             gco_commands.add(lob_serverCommand);
@@ -148,8 +148,8 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         System.out.println(iob_command.gob_file);
 
         if (!iob_command.gob_file.exists()) {
-            if (iob_command.gar_fleInformations[0] instanceof Boolean) {
-                lva_isDirectory = (Boolean) iob_command.gar_fleInformations[0];
+            if (iob_command.gar_fileInformation[0] instanceof Boolean) {
+                lva_isDirectory = (Boolean) iob_command.gar_fileInformation[0];
             } else {
                 // the information if it was a file or directory was not provided, therefore remove the command
                 // and return
@@ -185,13 +185,13 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         Tree lob_tree;
         int lva_loopIndex = 0;
 
-        if (iob_command.gar_fleInformations == null) {
+        if (iob_command.gar_fileInformation == null) {
             gco_commands.remove(iob_command);
             return;
         }
 
-        if (iob_command.gar_fleInformations[0] instanceof Tree) {
-            lob_tree = (Tree) iob_command.gar_fleInformations[0];
+        if (iob_command.gar_fileInformation[0] instanceof Tree) {
+            lob_tree = (Tree) iob_command.gar_fileInformation[0];
         } else {
             gco_commands.remove(iob_command);
             return;
@@ -223,8 +223,8 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             removeCommand(iob_command);
         }
 
-        if (iob_command.gar_fleInformations[0] instanceof Tree) {
-            lob_tree = (Tree) iob_command.gar_fleInformations[0];
+        if (iob_command.gar_fileInformation[0] instanceof Tree) {
+            lob_tree = (Tree) iob_command.gar_fileInformation[0];
         } else {
             removeCommand(iob_command);
             return;
@@ -314,10 +314,10 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
     }
 
     private class Command {
-        private Object[] gar_fleInformations;
+        private Object[] gar_fileInformation;
         private File gob_file;
         private String gva_command;
         private boolean gva_doOnServer;
-        private boolean gva_commandSuccessfullOnServer;
+        private boolean gva_commandSuccessfulOnServer;
     }
 }

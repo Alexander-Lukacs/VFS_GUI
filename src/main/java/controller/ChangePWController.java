@@ -143,7 +143,7 @@ public class ChangePWController {
 
     /**
      * Adds Key Listener to the TextFields
-     * to react on Keypress ENTER
+     * to react on key pressed ENTER
      */
     private void addKeyListener(){
         gob_tf_oldPassword.setOnKeyPressed(ke -> {

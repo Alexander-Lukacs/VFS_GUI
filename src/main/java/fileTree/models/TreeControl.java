@@ -159,7 +159,7 @@ public class TreeControl {
     }
 
     private void addFilesToTree(File iob_file) {
-        //we have to add the child nodes of the file if the file is a direcotry
+        //we have to add the child nodes of the file if the file is a directory
         if (iob_file.isDirectory()) {
             //add the directory itself
             ThreadManager.addCommandToFileManager(iob_file, FileManagerConstants.GC_ADD, false);
@@ -209,7 +209,7 @@ public class TreeControl {
             );
             TreeItem<String> lob_selectedItem = gob_treeView.getSelectionModel().getSelectedItem();
             if (deleteFile(lob_selectedFile, lob_selectedItem, gob_restClient)) {
-                System.out.println("GELÖSCHT");
+                System.out.println("Deleted");
                 addAllDeleted(lob_selectedFile);
             }
         });

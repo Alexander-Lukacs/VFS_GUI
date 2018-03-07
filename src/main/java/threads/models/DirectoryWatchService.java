@@ -13,13 +13,13 @@ import java.nio.file.attribute.FileTime;
 import java.util.*;
 
 class DirectoryWatchService implements Runnable{
-    private HashMap<Path, FileTime> gob_registerdPaths;
+    private HashMap<Path, FileTime> gob_registeredPaths;
     private Path gob_root;
-    private FileChangeListener gob_listender;
+    private FileChangeListener gob_listener;
     private static boolean gob_isRunning = false;
 
     /**
-     * Register the WatchService on the root diretory. Scan at the same time all children of the root directory and
+     * Register the WatchService on the root directory. Scan at the same time all children of the root directory and
      * register them too
      * @param iob_root the root to watch
      * @param iob_listener call the fitting method if something happens in the registered directories
@@ -30,12 +30,12 @@ class DirectoryWatchService implements Runnable{
         Collection<Path> lco_firstScan;
         //------------------------------------------------------------------------------
         gob_root = iob_root;
-        gob_listender = iob_listener;
+        gob_listener = iob_listener;
         if (!iob_root.toFile().exists() || !iob_root.toFile().isDirectory()) {
             throw new IOException("The Path to Watch is no Directory");
         }
 
-        gob_registerdPaths = new HashMap<>();
+        gob_registeredPaths = new HashMap<>();
         lco_firstScan = scan(gob_root.toFile(), new HashMap<>()).keySet();
 
         for (Path lob_scannedPath : lco_firstScan) {
@@ -50,7 +50,7 @@ class DirectoryWatchService implements Runnable{
     private void register(Path iob_path) throws IOException{
         gob_isRunning = true;
         BasicFileAttributes lob_attr = Files.readAttributes(iob_path, BasicFileAttributes.class);
-        gob_registerdPaths.put(iob_path, lob_attr.creationTime());
+        gob_registeredPaths.put(iob_path, lob_attr.creationTime());
     }
 
     private void scanRootAndCompare() throws IOException {
@@ -66,11 +66,11 @@ class DirectoryWatchService implements Runnable{
         lco_scanned = scan(gob_root.toFile(), new HashMap<>());
 
         //create a copy of the paths that are registered
-        lco_tmp = new HashMap<>(gob_registerdPaths);
+        lco_tmp = new HashMap<>(gob_registeredPaths);
 
         //remove all entries that have not changed
         lco_tmp.keySet().removeAll(lco_scanned.keySet());
-        lco_scanned.keySet().removeAll(gob_registerdPaths.keySet());
+        lco_scanned.keySet().removeAll(gob_registeredPaths.keySet());
 
         boolean wasFileRenamedOrMoved = false;
 
@@ -85,11 +85,11 @@ class DirectoryWatchService implements Runnable{
                     //now we have 3 cases
                     //first case: the file was just renamed
                     if (!lob_entry.getKey().toFile().getName().equals(lob_scannedEntry.getKey().toFile().getName())) {
-                        File lob_oldfilePath = lob_entry.getKey().toFile();
-                        lco_renamed.put(lob_oldfilePath, lob_scannedEntry.getKey().toFile());
+                        File lob_oldFilePath = lob_entry.getKey().toFile();
+                        lco_renamed.put(lob_oldFilePath, lob_scannedEntry.getKey().toFile());
 
                         String lva_renamedFilePath = lob_entry.getKey().toString().replaceFirst("[^\\\\]*$", lob_scannedEntry.getKey().toFile().getName());
-                        lco_renamed.put(lob_oldfilePath, new File(lva_renamedFilePath));
+                        lco_renamed.put(lob_oldFilePath, new File(lva_renamedFilePath));
 
                         //second case: the file was moved and renamed
                         if (!lob_entry.getKey().getParent().equals(lob_scannedEntry.getKey().getParent())) {
@@ -103,7 +103,7 @@ class DirectoryWatchService implements Runnable{
                     }
                     wasFileRenamedOrMoved = true;
                     //remove the old file path from the registered items
-                    gob_registerdPaths.remove(lob_entry.getKey());
+                    gob_registeredPaths.remove(lob_entry.getKey());
 
                     //add the new path to the registered items
                     register(lob_scannedEntry.getKey());
@@ -116,7 +116,7 @@ class DirectoryWatchService implements Runnable{
             //the file was not moved or renamed
             if (!wasFileRenamedOrMoved) {
                 //the file was deleted so delete it from the registered items
-                gob_registerdPaths.remove(lob_entry.getKey());
+                gob_registeredPaths.remove(lob_entry.getKey());
                 lli_delete.add(lob_entry.getKey().toFile());
             }
         }
@@ -159,7 +159,7 @@ class DirectoryWatchService implements Runnable{
         filesAdded(test);
 
         System.out.println("----------------------------------------------------------");
-        for (Map.Entry<Path, FileTime> lob_entry : gob_registerdPaths.entrySet()) {
+        for (Map.Entry<Path, FileTime> lob_entry : gob_registeredPaths.entrySet()) {
             System.out.println(lob_entry.getKey());
         }
         System.out.println("----------------------------------------------------------");
@@ -169,7 +169,7 @@ class DirectoryWatchService implements Runnable{
         filterChildren(ili_files);
         for (File lob_file: ili_files) {
             System.out.println("OLD: " + lob_file.getAbsolutePath() + " NEW: " + ico_renamed.get(lob_file));
-            gob_listender.fileRenamed(lob_file.toPath(), ico_renamed.get(lob_file).getName());
+            gob_listener.fileRenamed(lob_file.toPath(), ico_renamed.get(lob_file).getName());
         }
     }
 
@@ -183,7 +183,7 @@ class DirectoryWatchService implements Runnable{
         filterChildren(ili_files);
         for (File lob_file : ili_files) {
             System.out.println("MOVED: " + lob_file.toPath() + " TO " + ico_moved.get(lob_file).toPath());
-            gob_listender.fileMoved(lob_file.toPath(), ico_moved.get(lob_file).toPath());
+            gob_listener.fileMoved(lob_file.toPath(), ico_moved.get(lob_file).toPath());
         }
     }
 
@@ -196,7 +196,7 @@ class DirectoryWatchService implements Runnable{
 
         for (File lob_file : ili_files) {
             System.out.println("DELETED: " + lob_file.toPath());
-            gob_listender.fileDeleted(lob_file.toPath());
+            gob_listener.fileDeleted(lob_file.toPath());
         }
     }
 
@@ -209,7 +209,7 @@ class DirectoryWatchService implements Runnable{
             try {
                 System.out.println("ADDED: " + lob_file.toPath());
                 register(lob_file.toPath());
-                gob_listender.fileAdded(lob_file.toPath());
+                gob_listener.fileAdded(lob_file.toPath());
             } catch (IOException ex) {
                 ex.printStackTrace();
             }

@@ -251,7 +251,7 @@ public class TreeTool {
         //----------------------------------------------------------------------
         try {
             if (!TreeSingleton.getInstance().getTree().moveFile(iob_path.toFile(), lva_destination, iva_moveJustInTree)) {
-                new AlertWindows().createErrorAlert("Fiie could not be moved. There is a File with the same name");
+                new AlertWindows().createErrorAlert("File could not be moved. There is a File with the same name");
                 return;
             }
 

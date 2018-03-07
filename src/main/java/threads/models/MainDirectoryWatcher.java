@@ -16,7 +16,7 @@ import java.nio.file.Path;
  */
 class MainDirectoryWatcher implements ThreadControl {
     private FileRestClient gob_restClient;
-    private DirectoryWatchService gob_watchServie;
+    private DirectoryWatchService gob_watchService;
     private File gob_rootFile;
 
     MainDirectoryWatcher(FileRestClient iob_restClient, File iob_files) {
@@ -26,7 +26,7 @@ class MainDirectoryWatcher implements ThreadControl {
 
     private void init(File iob_file) {
         try {
-            gob_watchServie = new DirectoryWatchService(iob_file.toPath(), new FileChangeListener() {
+            gob_watchService = new DirectoryWatchService(iob_file.toPath(), new FileChangeListener() {
                 @Override
                 public void fileAdded(Path iob_path) {
                     addFile(iob_path);
@@ -57,7 +57,7 @@ class MainDirectoryWatcher implements ThreadControl {
                     TreeSingleton.getInstance().getDuplicateOperationsPrevention().clear();
                 }
             });
-            gob_watchServie.start();
+            gob_watchService.start();
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
@@ -65,7 +65,7 @@ class MainDirectoryWatcher implements ThreadControl {
 
     private void addFile(Path iob_path) {
         if (TreeTool.filterRootFiles(iob_path)){
-//            System.out.println("GEFILTERT:" + iob_path);
+//            System.out.println("Filtered:" + iob_path);
             return;
         }
 
@@ -117,6 +117,6 @@ class MainDirectoryWatcher implements ThreadControl {
 
     @Override
     public void stop() {
-        gob_watchServie.stop();
+        gob_watchService.stop();
     }
 }

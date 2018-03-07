@@ -94,15 +94,15 @@ public class TreeImpl implements Tree {
     @Override
     public boolean addFiles(Map<File, Boolean> iob_fileCollection) {
         //------------------------Variables--------------------------------
-        boolean lr_isNodeInsertionSuccssful = true;
+        boolean lr_isNodeInsertionSuccessful = true;
         //-----------------------------------------------------------------
 
         for (File lob_file : iob_fileCollection.keySet()) {
             if(!addFile(lob_file, iob_fileCollection.get(lob_file))){
-                lr_isNodeInsertionSuccssful = false;
+                lr_isNodeInsertionSuccessful = false;
             }
         }
-        return lr_isNodeInsertionSuccssful;
+        return lr_isNodeInsertionSuccessful;
     }
 
     /**
@@ -300,7 +300,7 @@ public class TreeImpl implements Tree {
      * the directory itself
      *
      * @param iob_directory directory to delete
-     * @return ture if the directory was removed, otherwise false
+     * @return true if the directory was removed, otherwise false
      */
     @Override
     public boolean deleteDirectoryOnly(File iob_directory) {
@@ -321,7 +321,7 @@ public class TreeImpl implements Tree {
      * the directory itself
      *
      * @param iva_path directory path to delete
-     * @return ture if the directory was removed, otherwise false
+     * @return true if the directory was removed, otherwise false
      */
     @Override
     public boolean deleteDirectoryOnly(String iva_path) {
@@ -426,7 +426,7 @@ public class TreeImpl implements Tree {
     /**
      * rename a file
      *
-     * @param iva_path    path of the file to renam
+     * @param iva_path    path of the file to rename
      * @param iva_newName new file name
      * @return true if the file was renamed, otherwise false
      */
@@ -548,7 +548,7 @@ public class TreeImpl implements Tree {
 //     * its possible that some nodes point to files, do not exist anymore. This can happen after a directory or a file
 //     * has been moved
 //     *
-//     * WARNIG: This method must be called with a node that points to a correct file, otherwise the
+//     * WARNING: This method must be called with a node that points to a correct file, otherwise the
 //     * behaviour is unexpected
 //     *
 //     * @param iob_nodeToUpdate node that could contain a non existing file

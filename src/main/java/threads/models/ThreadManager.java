@@ -10,7 +10,7 @@ public class ThreadManager {
     private static FileManagerThreadControl gob_fileManagerInstance;
 
     /**
-     * if no instance of the directryWatcher exists, create a new one
+     * if no instance of the directoryWatcher exists, create a new one
      * @param iob_restClient restClient for the watchService
      * @param iob_files root file to monitor
      * @return the instance of the already existing or new directoryWatchService
@@ -26,7 +26,7 @@ public class ThreadManager {
      * Before calling this Method, call the method that uses Parameters to create a new instance of the service
      * @return the instance of the directoryWatchService (can be null)
      */
-    public static ThreadControl getDrectoryWatcherThread() {
+    public static ThreadControl getDirectoryWatcherThread() {
         return gob_directoryWatcherInstance;
     }
 
