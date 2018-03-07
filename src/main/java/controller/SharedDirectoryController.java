@@ -241,7 +241,7 @@ public class SharedDirectoryController {
             if (lob_restResponse.getHttpStatus() != GC_HTTP_OK) {
                 Utils.printResponseMessage(lob_restResponse);
             } else {
-                new AlertWindows().createInformationAlert("Shared directory successful created!");
+                new AlertWindows().createInformationAlert(GC_SHARED_DIR_CREATED);
 
                 // If the shared directory was successfully to the server, add the shared directory
                 // to the tree view and to the explorer
@@ -255,7 +255,7 @@ public class SharedDirectoryController {
         }
     }
 
-    /**
+    /**GC_SHARED_DIR_CREATED
      * Create a shared directory in the explorer and tree view
      *
      * @param iob_sharedDirectory the shared directory
