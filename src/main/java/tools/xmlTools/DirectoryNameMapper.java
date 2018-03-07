@@ -329,4 +329,57 @@ public class DirectoryNameMapper {
                 + "\\config\\" + GC_FILE_NAME;
         return a;
     }
+
+    private static String readXml(String iva_elementToRead, String iva_fileName) {
+        File lob_inputFile;
+        SAXBuilder lob_saxBuilder;
+
+        Document lob_doc;
+        Element lob_rootElement;
+        Element lob_selectedElement;
+        String lob_elementValue = "";
+
+        try {
+            lob_inputFile = new File(getXmlFilePath());
+            lob_saxBuilder = new SAXBuilder();
+            lob_doc = lob_saxBuilder.build(lob_inputFile);
+
+            lob_rootElement = lob_doc.getRootElement();
+
+            lob_selectedElement = lob_rootElement.getChild(iva_elementToRead);
+            lob_elementValue = lob_selectedElement.getText();
+
+        } catch (JDOMException | IOException ex) {
+            ex.printStackTrace();
+        }
+
+        return lob_elementValue;
+    }
+
+    private static void modify(String iva_elementName, String iva_newValue, String iva_fileName) {
+        File lob_inputFile;
+        SAXBuilder lob_saxBuilder;
+        Document lob_doc;
+        Element lob_rootElement;
+        Element lob_elementToModify;
+
+        try {
+            lob_inputFile = new File(getXmlFilePath());
+            lob_saxBuilder = new SAXBuilder();
+            lob_doc = lob_saxBuilder.build(lob_inputFile);
+            lob_rootElement = lob_doc.getRootElement();
+
+
+            lob_elementToModify = lob_rootElement.getChild(iva_elementName);
+            lob_elementToModify.setText(iva_newValue);
+
+            XMLOutputter xmlOutput = new XMLOutputter();
+
+            xmlOutput.setFormat(Format.getPrettyFormat());
+            xmlOutput.output(lob_doc, new FileWriter(getXmlFilePath()));
+
+        } catch (JDOMException | IOException ex) {
+            ex.printStackTrace();
+        }
+    }
 }
