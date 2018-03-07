@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 import models.classes.RestResponse;
 import models.classes.SharedDirectory;
 import models.classes.User;
+import restful.clients.RestClient;
 import restful.clients.SharedDirectoryRestClient;
 import restful.clients.UserRestClient;
 import tools.AlertWindows;
@@ -100,6 +101,34 @@ public class SharedDirectoryController {
         } else {
             changeSharedDirectory();
         }
+    }
+
+    public void onClickDelete() {
+        DataCache lob_dataCache = DataCache.getDataCache();
+        SharedDirectoryCache lob_sharedDirCache = SharedDirectoryCache.getInstance();
+        User lob_user;
+        SharedDirectoryRestClient lob_restClient;
+        RestResponse lob_restResponse;
+
+        lob_restClient = RestClientBuilder.buildSharedDirectoryClientWithAuth();
+
+        lob_user = gob_userMap.get(lob_dataCache.get(DataCache.GC_EMAIL_KEY));
+
+        if (gob_sharedDirectory.getOwner().getEmail().equals(lob_user.getEmail())) {
+            lob_restResponse = lob_restClient.deleteSharedDirectory(gob_sharedDirectory);
+        } else {
+            lob_restResponse = lob_restClient.removeMemberFromSharedDirectory(gob_sharedDirectory, lob_user);
+        }
+
+        Utils.printResponseMessage(lob_restResponse);
+
+        if (lob_restResponse.getHttpStatus() == GC_HTTP_OK) {
+            DirectoryNameMapper.removeSharedDirectory(gob_sharedDirectory.getId());
+            lob_sharedDirCache.removeData(gob_sharedDirectory.getId());
+            // TODO delete shared directory in explorer
+        }
+
+        closeWindow();
     }
 
     /**

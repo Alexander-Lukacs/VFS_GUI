@@ -57,4 +57,8 @@ public class SharedDirectoryCache {
     public void replaceData(Integer iva_key, SharedDirectory iva_value) {
         gob_dataCacheMap.replace(iva_key, iva_value);
     }
+
+    public void removeData(Integer iva_key) {
+        gob_dataCacheMap.remove(iva_key);
+    }
 }

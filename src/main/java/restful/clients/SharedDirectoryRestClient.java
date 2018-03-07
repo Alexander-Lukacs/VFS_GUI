@@ -62,7 +62,23 @@ public class SharedDirectoryRestClient extends RestClient {
      * @return RestResponse with the status of the request
      */
     public RestResponse deleteSharedDirectory(SharedDirectory iob_sharedDirectory) {
-        return createPostRequest(GC_REST_DELETE_SHARED_DIRECTORY, iob_sharedDirectory);
+       RestResponse lob_restResponse = new RestResponse();
+        XStream lob_xmlParse = new XStream();
+        XStream.setupDefaultSecurity(lob_xmlParse);
+
+        String lva_sharedDirectoryXmlString = lob_xmlParse.toXML(iob_sharedDirectory);
+
+        try {
+            Response response = gob_webTarget.path(GC_REST_DELETE_SHARED_DIRECTORY).request()
+                    .post(Entity.entity(lva_sharedDirectoryXmlString, MediaType.APPLICATION_XML));
+
+            lob_restResponse.setResponseMessage(response.readEntity(String.class));
+            lob_restResponse.setHttpStatus(response.getStatus());
+        } catch (Exception ex) {
+            new AlertWindows().createExceptionAlert(ex.getMessage(), ex);
+        }
+
+        return lob_restResponse;
     }
 
     /**
