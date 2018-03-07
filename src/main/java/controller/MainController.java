@@ -2,6 +2,7 @@ package controller;
 
 import builder.RestClientBuilder;
 import cache.DataCache;
+import cache.SharedDirectoryCache;
 import fileTree.models.TreeControl;
 import fileTree.models.TreeSingleton;
 import javafx.event.ActionEvent;
@@ -62,6 +63,7 @@ public class MainController {
     public void onClick(ActionEvent e) throws RuntimeException, IOException {
         RestClient lob_restClient;
         DataCache lob_dataCache = DataCache.getDataCache();
+        SharedDirectoryCache lob_sharedDirectoryCache = SharedDirectoryCache.getInstance();
 
         switch (((Button) e.getSource()).getText()) {
             case GC_SETTINGS:
@@ -82,6 +84,7 @@ public class MainController {
                 Stage stage = ((Stage) gob_btnSettings.getScene().getWindow());
                 stage.close();
                 gob_userCache.clearDataCache();
+                lob_sharedDirectoryCache.clearDataCache();
                 LoginController ob_x = new LoginController();
                 ob_x.start(stage);
                 break;
