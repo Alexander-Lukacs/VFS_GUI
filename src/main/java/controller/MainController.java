@@ -19,7 +19,7 @@ import javafx.stage.Stage;
 import org.apache.commons.io.FileUtils;
 import restful.clients.RestClient;
 import tools.AlertWindows;
-import tools.FileInformation;
+import threads.models.DirectoryCounterThread;
 import tools.Utils;
 
 import java.awt.*;
@@ -100,6 +100,7 @@ public class MainController {
                     }
 
                 }
+
                 break;
         }
     }
@@ -135,7 +136,7 @@ public class MainController {
             gob_label_type.setText("Directory");
             gob_txt_label_content.setVisible(true);
             gob_label_content.setVisible(true);
-            lob_thread = new FileInformation(iob_file, gob_label_content);
+            lob_thread = new DirectoryCounterThread(iob_file, gob_label_content);
             lob_thread.setName("FileInformationThread");
             lob_thread.start();
         }else{

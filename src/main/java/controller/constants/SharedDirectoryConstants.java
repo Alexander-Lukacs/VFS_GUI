@@ -11,4 +11,5 @@ public abstract class SharedDirectoryConstants {
     public static final String GC_SHARED_DIRECTORY_NAME_EMPTY = "The shared directory name is empty!";
 
     public static final String GC_COULD_NOT_CREATE_DIR = "Could not create a shared directory in explorer!";
+    public static final String GC_SHARED_DIR_CREATED = "Shared directory successful created!";
 }

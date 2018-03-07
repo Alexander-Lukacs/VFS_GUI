@@ -97,7 +97,7 @@ public class ChangeIpPortController {
                     lob_restClient.unregisterClient();
                     Platform.exit();
                 }catch (Exception ex){
-                    new AlertWindows().createWarningAlert("hoppla");
+                    new AlertWindows().createWarningAlert("Error while unregister client from server");
                 }
 
             } else {

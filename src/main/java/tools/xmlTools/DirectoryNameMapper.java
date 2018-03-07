@@ -322,10 +322,9 @@ public class DirectoryNameMapper {
 
     private static String getXmlFilePath() {
         DataCache lob_dataCache = DataCache.getDataCache();
-        String a = Utils.getUserBasePath() + "\\" + lob_dataCache.get(DataCache.GC_IP_KEY) + "_" +
+        return Utils.getUserBasePath() + "\\" + lob_dataCache.get(DataCache.GC_IP_KEY) + "_" +
                 lob_dataCache.get(DataCache.GC_PORT_KEY) + "\\" + lob_dataCache.get(DataCache.GC_EMAIL_KEY)
                 + "\\config\\" + GC_FILE_NAME;
-        return a;
     }
 
     private static String readXml(String iva_elementToRead, String iva_fileName) {

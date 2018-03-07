@@ -100,7 +100,7 @@ public class TreeControl {
     }
 
     private void addFilesToTree(File iob_file) {
-        //we have to add the child nodes of the file if the file is a direcotry
+        //we have to add the child nodes of the file if the file is a directory
         if (iob_file.isDirectory()) {
             //add the directory itself
             ThreadManager.addCommandToFileManager(iob_file, FileManagerConstants.GC_ADD, false);
@@ -426,13 +426,6 @@ public class TreeControl {
 
         if (lob_treeItem != null) {
             lob_file = buildFileFromItem(lob_treeItem, gob_tree);
-
-            if (lob_file.isFile()) {
-                lob_treeItem = lob_treeItem.getParent();
-            }
-
-            lob_file = buildFileFromItem(lob_treeItem, gob_tree);
-
             return lob_file.toPath().toString();
         }
 

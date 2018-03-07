@@ -4,7 +4,7 @@ import controller.LoginController;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import restful.clients.RestClient;
-import services.NotifyServerThread;
+import threads.models.NotifyServerThread;
 import tools.AlertWindows;
 
 import static cache.DataCache.GC_EMAIL_KEY;

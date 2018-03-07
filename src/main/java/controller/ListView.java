@@ -12,6 +12,7 @@ import java.util.List;
 import static cache.DataCache.GC_IS_ADMIN_KEY;
 import static controller.constants.SettingsConstants.*;
 
+@SuppressWarnings("WeakerAccess")
 public class ListView {
     public void loadSettingsList(javafx.scene.control.ListView<String> gob_lvOptions) {
         DataCache lob_dataCache = DataCache.getDataCache();

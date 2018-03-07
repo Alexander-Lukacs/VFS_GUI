@@ -102,7 +102,7 @@ public interface Tree {
      * move all files that the directory contains to the parent directory and delete
      * the directory itself
      * @param iob_directory directory to delete
-     * @return ture if the directory was removed, otherwise false
+     * @return true if the directory was removed, otherwise false
      */
     boolean deleteDirectoryOnly(File iob_directory);
 
@@ -110,7 +110,7 @@ public interface Tree {
      * move all files that the directory contains to the parent directory and delete
      * the directory itself
      * @param iva_path directory path to delete
-     * @return ture if the directory was removed, otherwise false
+     * @return true if the directory was removed, otherwise false
      */
     boolean deleteDirectoryOnly(String iva_path);
 
@@ -138,7 +138,7 @@ public interface Tree {
 
     /**
      * rename a file
-     * @param iva_path path of the file to renam
+     * @param iva_path path of the file to rename
      * @param iva_newName new file name
      * @return true if the file was renamed, otherwise false
      */
