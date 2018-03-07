@@ -78,7 +78,7 @@
                                 </VBox.margin>
                             </PasswordField>
                             <Label layoutX="377.0" layoutY="184.0" text="Repeat Password"/>
-                            <PasswordField fx:id="gob_tf_confirmPassword1">
+                            <PasswordField fx:id="gob_tf_confirmPassword">
                                 <VBox.margin>
                                     <Insets left="250.0" right="250.0"/>
                                 </VBox.margin>
