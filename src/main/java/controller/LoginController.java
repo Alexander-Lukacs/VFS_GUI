@@ -11,6 +11,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import models.classes.RestResponse;
 import models.classes.User;
@@ -47,7 +48,7 @@ public class LoginController {
     @FXML
     private TextField gob_tf_registerPassword;
     @FXML
-    private TextField gob_tf_confirmPassword1;
+    private TextField gob_tf_confirmPassword;
     @FXML
     private TextField gob_tf_ipAddress;
     @FXML
@@ -59,6 +60,10 @@ public class LoginController {
 
     @FXML
     public void initialize() {
+
+        addKeyListener();
+
+
         gob_dataCache = DataCache.getDataCache();
         gob_btnLogin.setOnKeyPressed(
                 event -> {
@@ -84,7 +89,6 @@ public class LoginController {
      * Validate inputs
      * sends inputs to Server, to Login.
      */
-
     public void onClick() {
         UserRestClient lob_restClient;
         User lob_user = new User();
@@ -129,7 +133,7 @@ public class LoginController {
         String lva_name = gob_tf_newUserName.getText();
         String lva_email = gob_tf_newUserEmail.getText();
         String lva_password = gob_tf_registerPassword.getText();
-        String lva_confirmPassword = gob_tf_confirmPassword1.getText();
+        String lva_confirmPassword = gob_tf_confirmPassword.getText();
 
         RestResponse lob_restResponse;
         UserRestClient lob_restClient;
@@ -159,6 +163,7 @@ public class LoginController {
 
             }
         }
+       // ist voll doof wegen Ip und port.... lol setTextFromXmlToTf();
     }
 
     private boolean checkIfLoginDataValid(String iva_ip, String iva_port, String iva_email, String iva_password) {
@@ -228,13 +233,13 @@ public class LoginController {
         if (!Validation.isPasswordValid(iva_password)) {
             lob_sb.append(GC_WARNING_PASSWORD);
             gob_tf_registerPassword.setText("");
-            gob_tf_confirmPassword1.setText("");
+            gob_tf_confirmPassword.setText("");
             lva_validationFailure = true;
         }
 
         if (!Validation.passwordEqualsValidation(iva_password, iva_confirmPassword)) {
             lob_sb.append(GC_WARNING_PASSWORD_NOT_EQUAL);
-            gob_tf_confirmPassword1.setText("");
+            gob_tf_confirmPassword.setText("");
             gob_tf_registerPassword.setText("");
             lva_validationFailure = true;
         }
@@ -268,5 +273,41 @@ public class LoginController {
         iob_stage.setTitle(GC_VFS);
         iob_stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream(GC_APPLICATION_ICON_PATH)));
         iob_stage.show();
+    }
+
+    /**
+     * Adds Key Listener to the TextFields
+     * to react on Keypress ENTER
+     */
+    private void addKeyListener() {
+        gob_tf_userLoginEmail.setOnKeyPressed(ke -> {
+            if (ke.getCode().equals(KeyCode.ENTER)) {
+                onClick();
+            }
+        });
+
+        gob_tf_loginPassword.setOnKeyPressed(ke -> {
+            if (ke.getCode().equals(KeyCode.ENTER)) {
+                onClick();
+            }
+        });
+
+        gob_tf_newUserEmail.setOnKeyPressed(ke -> {
+            if (ke.getCode().equals(KeyCode.ENTER)) {
+                onClickRegister();
+            }
+        });
+
+        gob_tf_registerPassword.setOnKeyPressed(ke -> {
+            if (ke.getCode().equals(KeyCode.ENTER)) {
+                onClickRegister();
+            }
+        });
+
+        gob_tf_confirmPassword.setOnKeyPressed(ke -> {
+            if (ke.getCode().equals(KeyCode.ENTER)) {
+                onClickRegister();
+            }
+        });
     }
 }

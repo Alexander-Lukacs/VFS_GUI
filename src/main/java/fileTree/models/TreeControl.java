@@ -264,7 +264,8 @@ public class TreeControl {
         for (MenuItem lob_item : gob_contextMenu.getItems()) {
             switch (lob_item.getText()) {
                 case GC_MENU_ITEM_DELETE_ONLY_DIR:
-                    if (!lob_selectedFile.isDirectory() || isRootChildElement(lob_treeItem)) {
+                    if (!lob_selectedFile.isDirectory() || isRootChildElement(lob_treeItem)
+                            || lob_treeItem.getParent().getValue().equals(GC_DIR_NAME)) {
                         lob_item.setDisable(true);
                     } else {
                         lob_item.setDisable(false);
@@ -272,7 +273,7 @@ public class TreeControl {
                     break;
 
                 case GC_MENU_ITEM_DELETE:
-                    if (isRootChildElement(lob_treeItem)) {
+                    if (isRootChildElement(lob_treeItem) || lob_treeItem.getParent().getValue().equals(GC_DIR_NAME)) {
                         lob_item.setDisable(true);
                     } else {
                         lob_item.setDisable(false);

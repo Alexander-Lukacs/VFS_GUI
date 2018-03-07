@@ -3,6 +3,7 @@ package controller;
 import builder.RestClientBuilder;
 import cache.DataCache;
 import javafx.scene.control.Button;
+import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import models.classes.RestResponse;
 import javafx.fxml.FXML;
@@ -45,6 +46,7 @@ public class ChangePWController {
      * Initialisation of ListView
      */
     public void initialize() {
+        addKeyListener();
         gob_listView.loadSettingsList(gob_lvOptions);
         gob_dataCache = DataCache.getDataCache();
     }
@@ -137,5 +139,29 @@ public class ChangePWController {
         }
 
         return true;
+    }
+
+    /**
+     * Adds Key Listener to the TextFields
+     * to react on Keypress ENTER
+     */
+    private void addKeyListener(){
+        gob_tf_oldPassword.setOnKeyPressed(ke -> {
+            if (ke.getCode().equals(KeyCode.ENTER)) {
+                onClickChangePassword();
+            }
+        });
+
+        gob_tf_newPassword.setOnKeyPressed(ke -> {
+            if (ke.getCode().equals(KeyCode.ENTER)) {
+                onClickChangePassword();
+            }
+        });
+
+        gob_tf_confirmPassword.setOnKeyPressed(ke -> {
+            if (ke.getCode().equals(KeyCode.ENTER)) {
+                onClickChangePassword();
+            }
+        });
     }
 }

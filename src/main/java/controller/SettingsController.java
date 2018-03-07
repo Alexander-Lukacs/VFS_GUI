@@ -44,7 +44,7 @@ public class SettingsController {
                 AnchorPane lob_pane = lob_loader.load();
                 gob_rootPane.getChildren().setAll(lob_pane);
             }
-            // TODO schauen ob es eine besser Methode gibt, als ein leerer catch block
+            // TODO schauen ob es evtl. eine besser Methode gibt, als ein leerer catch block
         } catch (Exception ignore) {}
     }
 }

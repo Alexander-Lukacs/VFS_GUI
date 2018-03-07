@@ -32,16 +32,19 @@ public class TreeCellImpl extends TreeCell<String> {
         TreeItem<String> lob_item = getTreeItem();
         File lob_file = TreeTool.buildFileFromItem(lob_item, TreeSingleton.getInstance().getTree());
 
-        if (lob_file.exists()) {
-            super.startEdit();
+        if (!lob_item.getValue().equals("Shared")) {
+            if (lob_file.exists()) {
+                super.startEdit();
 
-            if (gob_textField == null) {
-                createTextField();
+                if (gob_textField == null) {
+                    createTextField();
+                }
+                setText(null);
+                setGraphic(gob_textField);
+                gob_textField.selectAll();
             }
-            setText(null);
-            setGraphic(gob_textField);
-            gob_textField.selectAll();
         }
+
     }
 
     @Override
@@ -85,7 +88,9 @@ public class TreeCellImpl extends TreeCell<String> {
             Dragboard lob_dragBoard;
             ClipboardContent lob_content;
 
-            if (lob_selectedItem != null && !isRootChildElement(lob_selectedItem)) {
+            if (lob_selectedItem != null && !isRootChildElement(lob_selectedItem) &&
+                    !lob_selectedItem.getParent().getValue().equals("Shared")) {
+
                 lob_dragBoard = this.startDragAndDrop(TransferMode.MOVE);
                 lob_content = new ClipboardContent();
                 lob_content.putString(lob_selectedItem.getValue());

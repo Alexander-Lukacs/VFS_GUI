@@ -1,11 +1,13 @@
 package tools.xmlTools;
 
+import cache.DataCache;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import tools.Utils;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -13,12 +15,15 @@ import java.io.IOException;
 import java.util.List;
 
 import static tools.constants.DirectoryNameMapperConstants.*;
-import static tools.xmlTools.XmlTools.*;
+import static tools.xmlTools.XmlTools.modify;
+import static tools.xmlTools.XmlTools.readXml;
 
 public class DirectoryNameMapper {
     private static final String GC_FILE_NAME = "mapping.xml";
 
     private static void createXmlFile() {
+        DataCache lob_dataCache = DataCache.getDataCache();
+        File lob_file;
         Document lob_doc;
 
         Element lob_rootElement;
@@ -53,7 +58,15 @@ public class DirectoryNameMapper {
             lob_xmlOutput = new XMLOutputter();
             lob_xmlOutput.setFormat(Format.getPrettyFormat());
 
-            lva_xmlFilePath = getXmlFilePath(GC_FILE_NAME);
+            lob_file = new File(Utils.getUserBasePath() + "\\" + lob_dataCache.get(DataCache.GC_IP_KEY) + "_" +
+                    lob_dataCache.get(DataCache.GC_PORT_KEY) + "\\" + lob_dataCache.get(DataCache.GC_EMAIL_KEY)
+                    + "\\config");
+
+            if (!lob_file.exists()) {
+                lob_file.mkdir();
+            }
+
+            lva_xmlFilePath = getXmlFilePath();
             lob_xmlOutput.output(lob_doc, new FileWriter(lva_xmlFilePath));
 
         } catch (IOException ex) {
@@ -62,7 +75,7 @@ public class DirectoryNameMapper {
     }
 
     public static String getPrivateDirectoryName() {
-        if (checkIfFileNotExist(GC_FILE_NAME)) {
+        if (checkIfFileNotExist()) {
             createXmlFile();
         }
 
@@ -70,7 +83,7 @@ public class DirectoryNameMapper {
     }
 
     public static void setPrivateDirectoryName(String iva_dirName) {
-        if (checkIfFileNotExist(GC_FILE_NAME)) {
+        if (checkIfFileNotExist()) {
             createXmlFile();
         }
 
@@ -78,7 +91,7 @@ public class DirectoryNameMapper {
     }
 
     public static String getPublicDirectoryName() {
-        if (checkIfFileNotExist(GC_FILE_NAME)) {
+        if (checkIfFileNotExist()) {
             createXmlFile();
         }
 
@@ -86,7 +99,7 @@ public class DirectoryNameMapper {
     }
 
     public static void setPublicDirectoryName(String iva_dirName) {
-        if (checkIfFileNotExist(GC_FILE_NAME)) {
+        if (checkIfFileNotExist()) {
             createXmlFile();
         }
 
@@ -127,12 +140,12 @@ public class DirectoryNameMapper {
         boolean hasChanged = false;
 
 
-        if (checkIfFileNotExist(GC_FILE_NAME)) {
+        if (checkIfFileNotExist()) {
             createXmlFile();
         }
 
         try {
-            lob_inputFile = new File(getXmlFilePath(GC_FILE_NAME));
+            lob_inputFile = new File(getXmlFilePath());
             lob_saxBuilder = new SAXBuilder();
             lob_doc = lob_saxBuilder.build(lob_inputFile);
 
@@ -151,7 +164,7 @@ public class DirectoryNameMapper {
             lob_xmlOutput = new XMLOutputter();
             lob_xmlOutput.setFormat(Format.getPrettyFormat());
 
-            lva_xmlFilePath = getXmlFilePath(GC_FILE_NAME);
+            lva_xmlFilePath = getXmlFilePath();
             lob_xmlOutput.output(lob_doc, new FileWriter(lva_xmlFilePath));
 
         } catch (IOException | JDOMException ex) {
@@ -174,12 +187,12 @@ public class DirectoryNameMapper {
         Element lob_rootElement;
         Element lob_selectedElement;
 
-        if (checkIfFileNotExist(GC_FILE_NAME)) {
+        if (checkIfFileNotExist()) {
             createXmlFile();
         }
 
         try {
-            lob_inputFile = new File(getXmlFilePath(GC_FILE_NAME));
+            lob_inputFile = new File(getXmlFilePath());
             lob_saxBuilder = new SAXBuilder();
             lob_doc = lob_saxBuilder.build(lob_inputFile);
 
@@ -191,7 +204,7 @@ public class DirectoryNameMapper {
             lob_xmlOutput = new XMLOutputter();
             lob_xmlOutput.setFormat(Format.getPrettyFormat());
 
-            lva_xmlFilePath = getXmlFilePath(GC_FILE_NAME);
+            lva_xmlFilePath = getXmlFilePath();
             lob_xmlOutput.output(lob_doc, new FileWriter(lva_xmlFilePath));
 
         } catch (IOException | JDOMException ex) {
@@ -208,12 +221,12 @@ public class DirectoryNameMapper {
         List<Element> lob_nodeList;
         boolean lva_hasChanged = false;
 
-        if (checkIfFileNotExist(GC_FILE_NAME)) {
+        if (checkIfFileNotExist()) {
             createXmlFile();
         }
 
         try {
-            lob_inputFile = new File(getXmlFilePath(GC_FILE_NAME));
+            lob_inputFile = new File(getXmlFilePath());
             lob_saxBuilder = new SAXBuilder();
             lob_doc = lob_saxBuilder.build(lob_inputFile);
             lob_rootElement = lob_doc.getRootElement();
@@ -232,7 +245,7 @@ public class DirectoryNameMapper {
             XMLOutputter xmlOutput = new XMLOutputter();
 
             xmlOutput.setFormat(Format.getPrettyFormat());
-            xmlOutput.output(lob_doc, new FileWriter(getXmlFilePath(GC_FILE_NAME)));
+            xmlOutput.output(lob_doc, new FileWriter(getXmlFilePath()));
 
         } catch (JDOMException | IOException ex) {
             ex.printStackTrace();
@@ -251,7 +264,7 @@ public class DirectoryNameMapper {
         List<Element> lob_nodeList;
 
         try {
-            lob_inputFile = new File(getXmlFilePath(GC_FILE_NAME));
+            lob_inputFile = new File(getXmlFilePath());
             lob_saxBuilder = new SAXBuilder();
             lob_doc = lob_saxBuilder.build(lob_inputFile);
 
@@ -283,7 +296,7 @@ public class DirectoryNameMapper {
         List<Element> lob_nodeList;
 
         try {
-            lob_inputFile = new File(getXmlFilePath(GC_FILE_NAME));
+            lob_inputFile = new File(getXmlFilePath());
             lob_saxBuilder = new SAXBuilder();
             lob_doc = lob_saxBuilder.build(lob_inputFile);
 
@@ -303,5 +316,70 @@ public class DirectoryNameMapper {
         }
 
         throw new IllegalArgumentException(GC_SHARED_DIRECTORY_NOT_FOUND);
+    }
+
+    private static boolean checkIfFileNotExist() {
+        return !new File(getXmlFilePath()).exists();
+    }
+
+    private static String getXmlFilePath() {
+        DataCache lob_dataCache = DataCache.getDataCache();
+        String a = Utils.getUserBasePath() + "\\" + lob_dataCache.get(DataCache.GC_IP_KEY) + "_" +
+                lob_dataCache.get(DataCache.GC_PORT_KEY) + "\\" + lob_dataCache.get(DataCache.GC_EMAIL_KEY)
+                + "\\config\\" + GC_FILE_NAME;
+        return a;
+    }
+
+    private static String readXml(String iva_elementToRead, String iva_fileName) {
+        File lob_inputFile;
+        SAXBuilder lob_saxBuilder;
+
+        Document lob_doc;
+        Element lob_rootElement;
+        Element lob_selectedElement;
+        String lob_elementValue = "";
+
+        try {
+            lob_inputFile = new File(getXmlFilePath());
+            lob_saxBuilder = new SAXBuilder();
+            lob_doc = lob_saxBuilder.build(lob_inputFile);
+
+            lob_rootElement = lob_doc.getRootElement();
+
+            lob_selectedElement = lob_rootElement.getChild(iva_elementToRead);
+            lob_elementValue = lob_selectedElement.getText();
+
+        } catch (JDOMException | IOException ex) {
+            ex.printStackTrace();
+        }
+
+        return lob_elementValue;
+    }
+
+    private static void modify(String iva_elementName, String iva_newValue, String iva_fileName) {
+        File lob_inputFile;
+        SAXBuilder lob_saxBuilder;
+        Document lob_doc;
+        Element lob_rootElement;
+        Element lob_elementToModify;
+
+        try {
+            lob_inputFile = new File(getXmlFilePath());
+            lob_saxBuilder = new SAXBuilder();
+            lob_doc = lob_saxBuilder.build(lob_inputFile);
+            lob_rootElement = lob_doc.getRootElement();
+
+
+            lob_elementToModify = lob_rootElement.getChild(iva_elementName);
+            lob_elementToModify.setText(iva_newValue);
+
+            XMLOutputter xmlOutput = new XMLOutputter();
+
+            xmlOutput.setFormat(Format.getPrettyFormat());
+            xmlOutput.output(lob_doc, new FileWriter(getXmlFilePath()));
+
+        } catch (JDOMException | IOException ex) {
+            ex.printStackTrace();
+        }
     }
 }

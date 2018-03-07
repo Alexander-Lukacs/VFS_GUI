@@ -2,6 +2,7 @@ package controller;
 
 import builder.RestClientBuilder;
 import cache.DataCache;
+import cache.SharedDirectoryCache;
 import fileTree.models.TreeControl;
 import fileTree.models.TreeSingleton;
 import javafx.event.ActionEvent;
@@ -82,6 +83,7 @@ public class MainController {
                 Stage stage = ((Stage) gob_btnSettings.getScene().getWindow());
                 stage.close();
                 gob_userCache.clearDataCache();
+                lob_sharedDirectoryCache.clearDataCache();
                 LoginController ob_x = new LoginController();
                 ob_x.start(stage);
                 break;
@@ -103,6 +105,7 @@ public class MainController {
 
     public void initialize() {
         gob_userCache = DataCache.getDataCache();
+        System.out.println(gob_userCache.get(DataCache.GC_EMAIL_KEY));
         gob_treeControl = new TreeControl(gob_userCache.get(DataCache.GC_IP_KEY), gob_userCache.get(DataCache.GC_PORT_KEY), this);
         TreeView<String> gob_treeView = TreeSingleton.getInstance().getTreeView();
         gob_vBox.getChildren().add(gob_treeView);
@@ -148,7 +151,7 @@ public class MainController {
 
     }
 
-    //TODO in einen ThreadControl auslagern
+    //TODO evtl. in einen Thread auslagern
     private long getFileSize(File iob_file) {
         if (iob_file.isDirectory()) {
             return FileUtils.sizeOfDirectory(iob_file);

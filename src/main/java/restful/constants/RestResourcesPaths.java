@@ -10,6 +10,6 @@ public abstract class RestResourcesPaths {
 
     public static final String GC_REST_ADD_NEW_SHARED_DIRECTORY = "sharedDirectory/auth/addNewSharedDirectory/";
     public static final String GC_REST_ADD_NEW_MEMBER_TO_SHARED_DIR = "sharedDirectory/auth/addNewMemberToSharedDirectory/";
-    public static final String GC_REST_DELETE_SHARED_DIRECTORY = "sharedDirectory/auth/deleteSharedDirectory/";
+    public static final String GC_REST_DELETE_SHARED_DIRECTORY = "/sharedDirectory/auth/deleteSharedDirectory";
     public static final String GC_REST_REMOVE_MEMBER_FROM_SHARED_DIR = "sharedDirectory/auth/removeMemberFromSharedDirectory/";
 }
