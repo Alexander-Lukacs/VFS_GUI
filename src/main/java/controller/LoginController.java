@@ -163,6 +163,7 @@ public class LoginController {
 
             }
         }
+        setTextFromXmlToTf();
     }
 
     private boolean checkIfLoginDataValid(String iva_ip, String iva_port, String iva_email, String iva_password) {
