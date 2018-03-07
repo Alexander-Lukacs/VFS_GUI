@@ -21,6 +21,7 @@ import tools.xmlTools.DirectoryNameMapper;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -32,15 +33,13 @@ import static restful.constants.HttpStatusCodes.GC_HTTP_OK;
  * SharedDirectory Scene
  */
 public class SharedDirectoryController {
+    private final ObservableList<String> gli_memberList = FXCollections.observableArrayList();
     @FXML
     private TextField gob_tf_directory_name;
     @FXML
     private TextField gob_tf_email;
     @FXML
     private ListView<String> gob_memberListView;
-
-    private final ObservableList<String> gli_memberList = FXCollections.observableArrayList();
-
     private SharedDirectory gob_sharedDirectory;
     private Stage gob_stage;
 
@@ -49,8 +48,9 @@ public class SharedDirectoryController {
 
     /**
      * Initialise the sharedDirectory currently selected in the treeView
+     *
      * @param iob_sharedDirectory currently selected sharedDirectory
-     * @param iob_stage the current stage
+     * @param iob_stage           the current stage
      */
     public void initData(SharedDirectory iob_sharedDirectory, Stage iob_stage) {
         UserRestClient lob_restClient;
@@ -107,14 +107,14 @@ public class SharedDirectoryController {
      * Add member button listener
      */
     public void onClickAddMember() {
-    // Declaration block -----------------------------------------------------------------------------------------------
+        // Declaration block -----------------------------------------------------------------------------------------------
 
         DataCache lob_dataCache = DataCache.getDataCache();
         String lva_email;
         boolean lva_userNotExists = true;
         boolean lva_valid;
 
-    // -----------------------------------------------------------------------------------------------------------------
+        // -----------------------------------------------------------------------------------------------------------------
 
         lva_email = gob_tf_email.getText().trim();
         lva_valid = Validation.isEmailValid(lva_email);
@@ -169,7 +169,7 @@ public class SharedDirectoryController {
      * Adds a new shared directory to the explorer and to the server
      */
     private void addNewSharedDirectory() {
-    // Declaration block -----------------------------------------------------------------------------------------------
+        // Declaration block -----------------------------------------------------------------------------------------------
 
         SharedDirectory lob_sharedDirectory = new SharedDirectory();
         User lob_owner = new User();
@@ -179,7 +179,7 @@ public class SharedDirectoryController {
         RestResponse lob_restResponse;
         DataCache lob_dataCache = DataCache.getDataCache();
 
-    // -----------------------------------------------------------------------------------------------------------------
+        // -----------------------------------------------------------------------------------------------------------------
 
         try {
             if (gob_tf_directory_name.getText().trim().isEmpty()) {
@@ -220,17 +220,18 @@ public class SharedDirectoryController {
 
     /**
      * Create a shared directory in the explorer and tree view
+     *
      * @param iob_sharedDirectory the shared directory
      */
     private void createSharedDirectory(SharedDirectory iob_sharedDirectory) {
-    // Declaration block -----------------------------------------------------------------------------------------------
+        // Declaration block -----------------------------------------------------------------------------------------------
 
         SharedDirectoryCache lob_sharedDirectoryCache = SharedDirectoryCache.getInstance();
         File lob_file;
         int lva_counter = 1;
         String lva_filePath;
 
-    // -----------------------------------------------------------------------------------------------------------------
+        // -----------------------------------------------------------------------------------------------------------------
 
         lva_filePath = buildPathToSharedDirectory(iob_sharedDirectory);
 
@@ -257,18 +258,9 @@ public class SharedDirectoryController {
      * Change the shared directory
      */
     private void changeSharedDirectory() {
-    // Declaration block -----------------------------------------------------------------------------------------------
-
+        // Declaration block -----------------------------------------------------------------------------------------------
         List<User> lli_oldMemberList;
-        boolean lva_found;
-        SharedDirectoryRestClient lob_restClient;
-        RestResponse lob_restResponse;
-        User lob_user;
-        SharedDirectoryCache lob_sharedDirectoryCache = SharedDirectoryCache.getInstance();
-
-    // -----------------------------------------------------------------------------------------------------------------
-
-        lob_restClient = RestClientBuilder.buildSharedDirectoryClientWithAuth();
+        // -----------------------------------------------------------------------------------------------------------------
 
         // Rename shared directory locally in shared directory name mapper
         if (!gob_sharedDirectory.getDirectoryName().equals(gob_tf_directory_name.getText())) {
@@ -277,31 +269,28 @@ public class SharedDirectoryController {
 
         lli_oldMemberList = gob_sharedDirectory.getMembers();
 
-        // check if member was removed
-        for (User lob_tmpUser : lli_oldMemberList) {
-            if (!gli_memberList.contains(lob_tmpUser.getEmail())) {
-                lob_restResponse = lob_restClient.removeMemberFromSharedDirectory(gob_sharedDirectory, lob_tmpUser);
-                Utils.printResponseMessage(lob_restResponse);
+        checkIfMemberWasRemovedFromSharedDirectory(lli_oldMemberList);
+        checkIfMemberWasAddedToSharedDirectory(lli_oldMemberList);
 
-                if (lob_restResponse.getHttpStatus() == GC_HTTP_OK) {
-                    lob_user = gob_userMap.get(lob_tmpUser.getEmail());
+        closeWindow();
+    }
 
-                    if (lob_user != null) {
-                        gob_sharedDirectory.getMembers().remove(lob_user);
-                        lob_sharedDirectoryCache.replaceData(gob_sharedDirectory.getId(), gob_sharedDirectory);
+    private void checkIfMemberWasAddedToSharedDirectory(List<User> ili_oldMemberList) {
+        // Declaration block -----------------------------------------------------------------------------------------------
+        boolean lva_found;
+        User lob_user;
+        SharedDirectoryRestClient lob_restClient;
+        RestResponse lob_restResponse;
+        SharedDirectoryCache lob_sharedDirectoryCache = SharedDirectoryCache.getInstance();
+        // -----------------------------------------------------------------------------------------------------------------
 
-                        // TODO löschen
-                        System.out.println(lob_sharedDirectoryCache.get(gob_sharedDirectory.getId()));
-                        closeWindow();
-                    }
-                }
-            }
-        }
+        lob_restClient = RestClientBuilder.buildSharedDirectoryClientWithAuth();
 
         // check if member was added
         for (String lob_userMail : gli_memberList) {
             lva_found = false;
-            for (User lob_tmpUser : lli_oldMemberList) {
+
+            for (User lob_tmpUser : ili_oldMemberList) {
                 if (lob_tmpUser.getEmail().equals(lob_userMail)) {
                     lva_found = true;
                 }
@@ -320,8 +309,42 @@ public class SharedDirectoryController {
 
                         // TODO löschen
                         System.out.println(lob_sharedDirectoryCache.get(gob_sharedDirectory.getId()));
-                        closeWindow();
                     }
+                }
+            }
+        }
+    }
+
+    private void checkIfMemberWasRemovedFromSharedDirectory(List<User> ili_oldMemberList) {
+    // Declaration block -----------------------------------------------------------------------------------------------
+
+        SharedDirectoryRestClient lob_restClient;
+        RestResponse lob_restResponse;
+        SharedDirectoryCache lob_sharedDirectoryCache = SharedDirectoryCache.getInstance();
+        String lva_email;
+        User lob_user;
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+        lob_restClient = RestClientBuilder.buildSharedDirectoryClientWithAuth();
+
+        // check if member was removed
+        for (int i = 0 ; i < ili_oldMemberList.size() ; i++) {
+            lob_user = ili_oldMemberList.get(i);
+            lva_email = lob_user.getEmail();
+
+            if (!gli_memberList.contains(lva_email)) {
+
+                lob_restResponse = lob_restClient.removeMemberFromSharedDirectory(gob_sharedDirectory, lob_user);
+                Utils.printResponseMessage(lob_restResponse);
+
+                if (lob_restResponse.getHttpStatus() == GC_HTTP_OK) {
+                    gob_sharedDirectory.getMembers().remove(lob_user);
+                    lob_sharedDirectoryCache.replaceData(gob_sharedDirectory.getId(), gob_sharedDirectory);
+
+                    // TODO löschen
+                    System.out.println(Arrays.toString(ili_oldMemberList.toArray()));
+                    System.out.println(lob_sharedDirectoryCache.get(gob_sharedDirectory.getId()));
                 }
             }
         }
@@ -336,6 +359,7 @@ public class SharedDirectoryController {
 
     /**
      * Builds the absolute path to the shared directory
+     *
      * @param iob_sharedDirectory the shared directory
      * @return the absolute path
      */
@@ -345,14 +369,5 @@ public class SharedDirectoryController {
         return Utils.getUserBasePath() + "\\" + lob_dataCache.get(DataCache.GC_IP_KEY) + "_" +
                 lob_dataCache.get(DataCache.GC_PORT_KEY) + "\\" + lob_dataCache.get(DataCache.GC_EMAIL_KEY) +
                 "\\" + "Shared" + "\\" + iob_sharedDirectory.getDirectoryName() + "$";
-    }
-
-    public static void main(String[] args) {
-        HashMap<String, String> a = new HashMap<>();
-
-        a.put("a" , "b");
-
-        System.out.println(a.get("a"));
-        System.out.println(a.get("b"));
     }
 }
