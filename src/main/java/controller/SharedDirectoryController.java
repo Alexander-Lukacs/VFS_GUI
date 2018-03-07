@@ -3,6 +3,7 @@ package controller;
 import builder.RestClientBuilder;
 import cache.DataCache;
 import cache.SharedDirectoryCache;
+import fileTree.models.TreeSingleton;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -12,9 +13,10 @@ import javafx.stage.Stage;
 import models.classes.RestResponse;
 import models.classes.SharedDirectory;
 import models.classes.User;
-import restful.clients.RestClient;
 import restful.clients.SharedDirectoryRestClient;
 import restful.clients.UserRestClient;
+import threads.constants.FileManagerConstants;
+import threads.models.ThreadManager;
 import tools.AlertWindows;
 import tools.Utils;
 import tools.Validation;
@@ -23,6 +25,7 @@ import tools.xmlTools.DirectoryNameMapper;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import static controller.constants.SharedDirectoryConstants.*;
@@ -45,6 +48,7 @@ public class SharedDirectoryController {
     private Stage gob_stage;
     private List<User> gli_userList;
     private HashMap<String, User> gob_userMap;
+    private File gob_sharedDirectoryFile;
 
     /**
      * Initialise the sharedDirectory currently selected in the treeView
@@ -52,10 +56,11 @@ public class SharedDirectoryController {
      * @param iob_sharedDirectory currently selected sharedDirectory
      * @param iob_stage           the current stage
      */
-    public void initData(SharedDirectory iob_sharedDirectory, Stage iob_stage) {
+    public void initData(SharedDirectory iob_sharedDirectory, Stage iob_stage, File iobSharedDirectoryFile) {
         UserRestClient lob_restClient;
 
         gob_sharedDirectory = iob_sharedDirectory;
+        gob_sharedDirectoryFile = iobSharedDirectoryFile;
         gob_stage = iob_stage;
 
         // Get all users and cache them
@@ -125,7 +130,10 @@ public class SharedDirectoryController {
         if (lob_restResponse.getHttpStatus() == GC_HTTP_OK) {
             DirectoryNameMapper.removeSharedDirectory(gob_sharedDirectory.getId());
             lob_sharedDirCache.removeData(gob_sharedDirectory.getId());
-            // TODO delete shared directory in explorer
+
+            ThreadManager.getFileManagerThread().start();
+            ThreadManager.addCommandToFileManager(gob_sharedDirectoryFile, FileManagerConstants.GC_DELETE,
+                    true, TreeSingleton.getInstance().getTree());
         }
 
         closeWindow();
@@ -239,6 +247,7 @@ public class SharedDirectoryController {
                 // to the tree view and to the explorer
                 lob_sharedDirectory.setId(Integer.parseInt(lob_restResponse.getResponseMessage()));
                 createSharedDirectory(lob_sharedDirectory);
+                closeWindow();
             }
 
         } catch (IllegalArgumentException ex) {
@@ -362,9 +371,8 @@ public class SharedDirectoryController {
 
         lob_restClient = RestClientBuilder.buildSharedDirectoryClientWithAuth();
 
-        // do not transform this for loop into a for each loop to avoid concurrentModificationException
-        for (int i = 0; i < ili_oldMemberList.size(); i++) {
-            lob_user = ili_oldMemberList.get(i);
+        for (Iterator<User> lob_iterator = ili_oldMemberList.iterator(); lob_iterator.hasNext();) {
+            lob_user = lob_iterator.next();
             lva_email = lob_user.getEmail();
 
             if (!gli_memberList.contains(lva_email)) {
@@ -373,7 +381,7 @@ public class SharedDirectoryController {
                 Utils.printResponseMessage(lob_restResponse);
 
                 if (lob_restResponse.getHttpStatus() == GC_HTTP_OK) {
-                    gob_sharedDirectory.getMembers().remove(lob_user);
+                    lob_iterator.remove();
                     lob_sharedDirectoryCache.replaceData(gob_sharedDirectory.getId(), gob_sharedDirectory);
                 }
             }

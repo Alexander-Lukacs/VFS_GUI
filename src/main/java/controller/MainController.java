@@ -63,6 +63,7 @@ public class MainController {
     public void onClick(ActionEvent e) throws RuntimeException, IOException {
         RestClient lob_restClient;
         DataCache lob_dataCache = DataCache.getDataCache();
+        SharedDirectoryCache lob_sharedDirectoryCache = SharedDirectoryCache.getInstance();
 
         switch (((Button) e.getSource()).getText()) {
             case GC_SETTINGS:

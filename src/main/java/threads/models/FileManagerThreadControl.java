@@ -4,6 +4,7 @@ import builder.RestClientBuilder;
 import fileTree.interfaces.Tree;
 import fileTree.interfaces.TreeDifference;
 import fileTree.models.TreeSingleton;
+import javafx.application.Platform;
 import restful.clients.FileRestClient;
 import threads.interfaces.ThreadControl;
 import tools.TreeTool;
@@ -216,7 +217,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
      */
     private void deleteLocalFile(Command iob_command) {
         Tree lob_tree;
-        TreeTool.getInstance().deleteItem(iob_command.gob_file);
+        Platform.runLater(() -> TreeTool.getInstance().deleteItem(iob_command.gob_file));
 
         if (iob_command.gob_file == null) {
             removeCommand(iob_command);

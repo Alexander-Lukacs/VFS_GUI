@@ -447,13 +447,14 @@ public class TreeControl {
             SharedDirectoryController lob_controller = lob_loader.getController();
 
             if (iob_treeItem.getValue().equals("Shared")) {
-                lob_controller.initData(null, lob_stage);
+                lob_controller.initData(null, lob_stage, null);
 
             } else {
                 lva_sharedDirectoryId = DirectoryNameMapper.getIdOfSharedDirectory(lva_selectedItemName);
                 lob_sharedDirectory = lob_sharedDirectoryCache.get(lva_sharedDirectoryId);
 
-                lob_controller.initData(lob_sharedDirectory, lob_stage);
+                lob_controller.initData(lob_sharedDirectory, lob_stage,
+                        buildFileFromItem(gob_treeView.getSelectionModel().getSelectedItem(), gob_tree));
             }
 
             lob_stage.show();
