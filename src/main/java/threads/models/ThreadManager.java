@@ -43,4 +43,16 @@ public class ThreadManager {
         }
         gob_fileManagerInstance.addFileWithCommando(iob_file, iva_commando, iva_executeCommandOnServer, iar_fileInformation);
     }
+
+    public static void stopAndClear() {
+        if (gob_directoryWatcherInstance != null) {
+            gob_directoryWatcherInstance.stop();
+            gob_directoryWatcherInstance.clear();
+        }
+
+        if (gob_fileManagerInstance != null) {
+            gob_fileManagerInstance.stop();
+            gob_fileManagerInstance.clear();
+        }
+    }
 }

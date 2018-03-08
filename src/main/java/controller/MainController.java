@@ -18,6 +18,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.apache.commons.io.FileUtils;
 import restful.clients.RestClient;
+import threads.models.ThreadManager;
 import tools.AlertWindows;
 import threads.models.DirectoryCounterThread;
 import tools.Utils;

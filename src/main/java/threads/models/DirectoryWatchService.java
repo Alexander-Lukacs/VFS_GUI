@@ -290,4 +290,8 @@ class DirectoryWatchService implements Runnable{
     public void stop() {
         gob_isRunning = false;
     }
+
+    public void clear() {
+        this.gob_registeredPaths.clear();
+    }
 }

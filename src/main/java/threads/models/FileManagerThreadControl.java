@@ -41,6 +41,11 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         isRunning = true;
     }
 
+    @Override
+    public void clear() {
+        this.gco_commands.clear();
+    }
+
     public void addFileWithCommando(File iob_file, String iva_commando, boolean iva_executeCommandOnServer, Object... iar_fileInformation) {
         Command lob_command = new Command();
         Command lob_serverCommand;
@@ -154,6 +159,11 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         try {
             lva_isDirectory = getBooleanFromInformationArray(iob_command, 0);
         } catch (RuntimeException ex) {
+            gco_commands.remove(iob_command);
+            return;
+        }
+
+        if (TreeTool.filterRootFiles(iob_command.gob_file.toPath())) {
             gco_commands.remove(iob_command);
             return;
         }
@@ -274,6 +284,11 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             return;
         }
 
+        if (TreeTool.filterRootFiles(iob_command.gob_file.toPath())) {
+            gco_commands.remove(iob_command);
+            return;
+        }
+
         if (lva_isDirectory) {
             if (gob_restClient.createDirectoryOnServer(iob_command.gob_file)) {
                 gco_commands.remove(iob_command);
@@ -307,13 +322,13 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
 
     private boolean getBooleanFromInformationArray(Command iob_command, int iob_index) {
         if (!iob_command.gob_file.exists()) {
-            if (iob_command.gar_fleInformations == null || iob_command.gar_fleInformations.length == 0) {
+            if (iob_command.gar_fileInformation == null || iob_command.gar_fileInformation.length == 0) {
                 gco_commands.remove(iob_command);
                 throw new RuntimeException();
             }
 
-            if (iob_command.gar_fleInformations[iob_index] instanceof Boolean) {
-                return (Boolean) iob_command.gar_fleInformations[iob_index];
+            if (iob_command.gar_fileInformation[iob_index] instanceof Boolean) {
+                return (Boolean) iob_command.gar_fileInformation[iob_index];
             } else {
                 // the information if it was a file or directory was not provided, therefore remove the command
                 // and return

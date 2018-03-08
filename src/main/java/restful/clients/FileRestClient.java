@@ -87,7 +87,7 @@ public class FileRestClient extends RestClient {
 
         Response lob_response = lob_target.request().post(Entity.entity(lob_multiPart, lob_multiPart.getMediaType()));
 
-        System.out.println(iob_filesToUpload.getName() + ": " + lob_response.getStatus());
+        System.out.println("UPLOAD: " + iob_filesToUpload.getName() + ": " + lob_response.getStatus());
         return lob_response.getStatus() == 200;
     }
 

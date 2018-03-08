@@ -4,4 +4,6 @@ public interface ThreadControl {
     void start();
 
     void stop();
+
+    void clear();
 }
