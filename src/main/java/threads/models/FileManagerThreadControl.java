@@ -236,10 +236,12 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             if (!iob_command.gob_file.exists()) {
                 try {
                     if (!iob_command.gob_file.createNewFile()) {
+                        iob_command.gva_maxTries++;
                         gva_commandIndex.incrementAndGet();
                         return;
                     }
                 } catch (IOException ex) {
+                    iob_command.gva_maxTries++;
                     gva_commandIndex.incrementAndGet();
                     return;
                 }
@@ -248,6 +250,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             if (gob_restClient.uploadFilesToServer(iob_command.gob_file)) {
                 gco_commands.remove(iob_command);
             } else {
+                iob_command.gva_maxTries++;
                 gva_commandIndex.incrementAndGet();
             }
         }
@@ -563,7 +566,6 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         File lob_directory;
         File lob_newFile;
         byte[] lar_fileContent;
-        int lva_directoryId;
 
         try {
             lva_relativePath = getObjectFromInformationArray(iob_command, 0, String.class);
@@ -579,25 +581,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             return;
         }
 
-//        lva_newFilePath = Utils.getUserBasePath() + "\\" +
-//                DataCache.getDataCache().get(DataCache.GC_IP_KEY) +
-//                "_" +
-//                DataCache.getDataCache().get(DataCache.GC_PORT_KEY) +
-//                "\\" +
-//                DataCache.getDataCache().get(DataCache.GC_EMAIL_KEY) +
-//                "\\";
-//
-//        lva_directoryId = Utils.getDirectoryIdFromRelativePath(lva_relativePath);
-//
-//        if (lva_directoryId < 0) {
-//            lva_newFilePath += "Private";
-//        } else if (lva_directoryId > 0) {
-//            lva_newFilePath += "Shared";
-//        }
-//
-//        lva_newFilePath += lva_relativePath;
-
-        lva_newFilePath = Utils.convertRelativeToAbsolutePath(lva_relativePath);
+        lva_newFilePath = Utils.convertRelativeToAbsolutePath(lva_relativePath, false);
 
         //the download returned a file so it must be a directory
         if (lob_downloadContent instanceof Integer) {
