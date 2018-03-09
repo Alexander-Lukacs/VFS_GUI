@@ -28,10 +28,8 @@ public class MainApp extends Application {
         try {
             ServerSocket serverSocket = new ServerSocket(32001);
             serverSocket.close();
-        } catch (BindException ex) {
+        } catch (Exception ex) {
             System.exit(1);
-        } catch (IOException ex) {
-            ex.printStackTrace();
         }
 
         launch(args);
