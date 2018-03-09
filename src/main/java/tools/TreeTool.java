@@ -7,7 +7,6 @@ import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import restful.clients.FileRestClient;
 
 import javax.swing.filechooser.FileSystemView;
 import java.awt.image.BufferedImage;
@@ -78,7 +77,7 @@ public class TreeTool {
             do {
                 lva_directoryCreated = iob_directory.mkdir();
                 lva_tries++;
-            } while(lva_tries < 10 && !lva_directoryCreated);
+            } while (lva_tries < 10 && !lva_directoryCreated);
 
             if (!lva_directoryCreated) {
                 new AlertWindows().createErrorAlert("There was a problem to create the directory \"" +
@@ -166,14 +165,17 @@ public class TreeTool {
         lob_path.insert(0, iob_tree.getRoot().getParent());
         return iob_tree.getFile(lob_path.toString());
     }
+
     public void deleteItem(File iob_file) {
         TreeItem<String> lob_item = searchTreeItem(iob_file);
         if (lob_item != null) {
             lob_item.getParent().getChildren().remove(lob_item);
         }
     }
+
     /**
      * filter all new files on the same level as public, shared and private
+     *
      * @return return true if the file is on the same level, otherwise false
      */
     public static boolean filterRootFiles(Path iob_path) {
@@ -185,6 +187,7 @@ public class TreeTool {
         return !iob_path.startsWith(lob_privatePath) && !iob_path.startsWith(lob_publicPath) && !iob_path.startsWith(lob_sharedPath);
 
     }
+
     private String[] removeBasePathAndConvertToArray(String iva_filePath) throws IOException {
         String lva_basePath = TreeSingleton.getInstance().getTree().getRoot().getCanonicalPath();
         lva_basePath = lva_basePath.replaceAll("\\\\", "\\\\\\\\");

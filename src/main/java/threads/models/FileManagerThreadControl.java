@@ -15,7 +15,10 @@ import tools.Utils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static threads.constants.FileManagerConstants.*;
@@ -75,6 +78,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
 
     /**
      * forward the given command to the matching method
+     *
      * @param iob_command contains all information about the command
      */
     private void executeCommand(Command iob_command) {
@@ -139,7 +143,8 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
                 compareTrees(iob_command);
                 break;
 
-            default: gco_commands.remove(iob_command);
+            default:
+                gco_commands.remove(iob_command);
         }
     }
 
@@ -150,11 +155,12 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
     //------------------------------------------------------------------------------------------------------------------
     // "GC_ADD"
     //------------------------------------------------------------------------------------------------------------------
+
     /**
      * add the file only to the client
+     *
      * @param iob_command expected input in gar_information if the file does not exist:
      *                    1. boolean is the file a directory
-     *
      */
     @SuppressWarnings("Duplicates")
     private void addLocalFile(Command iob_command) {
@@ -190,8 +196,10 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
     //------------------------------------------------------------------------------------------------------------------
     // "GC_UPLOAD_TO_SERVER"
     //------------------------------------------------------------------------------------------------------------------
+
     /**
      * upload a file or a directory to the server
+     *
      * @param iob_command expected input in gar_information if the file is a directory and not yet created:
      *                    1. boolean is the file a directory
      */
@@ -256,8 +264,10 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
     //------------------------------------------------------------------------------------------------------------------
     // "GC_DELETE"
     //------------------------------------------------------------------------------------------------------------------
+
     /**
      * delete file on the client
+     *
      * @param iob_command expected input in gar_information:
      *                    1. tree from the client
      */
@@ -286,8 +296,10 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
     //------------------------------------------------------------------------------------------------------------------
     // "GC_DELETE_ON_SERVER"
     //------------------------------------------------------------------------------------------------------------------
+
     /**
      * delete a file on the server
+     *
      * @param iob_command file cant be null
      */
     private void deleteFileOnServer(Command iob_command) {
@@ -311,6 +323,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
     //------------------------------------------------------------------------------------------------------------------
     // "GC_MOVE"
     //------------------------------------------------------------------------------------------------------------------
+
     /**
      * @param iob_command expected input in gar_information:
      *                    1: new File path
@@ -372,6 +385,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
     //------------------------------------------------------------------------------------------------------------------
     // "GC_MOVE_ON_SERVER"
     //------------------------------------------------------------------------------------------------------------------
+
     /**
      * @param iob_command expected input in gar_information:
      *                    1: new File path
@@ -441,7 +455,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         for (TreeItem<String> lob_child : lob_item.getChildren()) {
             if (!canFileBeMoved(lob_child, lob_parent)) {
                 gco_commands.remove(iob_command);
-                Platform.runLater(() ->  new AlertWindows().createErrorAlert("The directory contains a file with the same nam as in the parent directory"));
+                Platform.runLater(() -> new AlertWindows().createErrorAlert("The directory contains a file with the same nam as in the parent directory"));
                 return;
             }
         }
@@ -481,6 +495,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
     //------------------------------------------------------------------------------------------------------------------
     // "GC_RENAME"
     //------------------------------------------------------------------------------------------------------------------
+
     /**
      * @param iob_command expected input in gar_information:
      *                    1: new File name
@@ -526,6 +541,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
     //------------------------------------------------------------------------------------------------------------------
     // "GC_RENAME_ON_SERVER"
     //------------------------------------------------------------------------------------------------------------------
+
     /**
      * @param iob_command expected input in gar_information:
      *                    1: new File path
@@ -552,8 +568,8 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
     //------------------------------------------------------------------------------------------------------------------
     // "GC_DOWNLOAD_FROM_SERVER"
     //------------------------------------------------------------------------------------------------------------------
+
     /**
-     *
      * @param iob_command expected input in gar_information:
      *                    1: relative File Path
      */
@@ -624,8 +640,10 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
     //------------------------------------------------------------------------------------------------------------------
     // "GC_COMPARE_TREE"
     //------------------------------------------------------------------------------------------------------------------
+
     /**
      * compare the local tree to the tree on the server
+     *
      * @param iob_command expected input in gar_information:
      *                    1. tree from the client
      */
@@ -655,7 +673,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         gco_commands.remove(iob_command);
     }
 
-//----------------------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------------------
 // helper methods
 //----------------------------------------------------------------------------------------------------------------------
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")

@@ -25,7 +25,7 @@ public class DirectoryCounterThread extends Thread {
         Platform.runLater(() -> gob_content_label.setText("Files: " + countFiles + " Directories: " + countDir));
     }
 
-    private void getCount(File iob_file){
+    private void getCount(File iob_file) {
         File[] lob_files = iob_file.listFiles();
 
         if (lob_files != null) {

@@ -58,7 +58,7 @@ public class MainController {
     private MainController gob_mainController;
 
     public void initData(MainController iob_mainController) {
-      gob_mainController = iob_mainController;
+        gob_mainController = iob_mainController;
     }
 
     public void logout() {

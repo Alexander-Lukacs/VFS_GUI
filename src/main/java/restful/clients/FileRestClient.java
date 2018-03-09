@@ -14,7 +14,6 @@ import fileTree.models.TreeImpl;
 import org.apache.commons.io.IOUtils;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
-import tools.TreeTool;
 import tools.Utils;
 
 import javax.ws.rs.client.Client;
@@ -101,7 +100,7 @@ public class FileRestClient extends RestClient {
         return lob_response.getStatus() == 200;
     }
 
-// ---------------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------------------
 // Delete only a directory on the server, move all files that the directory contains to the parent directory
 // ---------------------------------------------------------------------------------------------------------------------
     public boolean deleteDirectoryOnly(File iob_file) {
@@ -114,7 +113,7 @@ public class FileRestClient extends RestClient {
         return lob_response.getStatus() == 200;
     }
 
-// ---------------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------------------
 // Move a file on the server
 // ---------------------------------------------------------------------------------------------------------------------
     public int moveFile(String iva_relativePath, String iva_newRelativePath) {
@@ -129,20 +128,24 @@ public class FileRestClient extends RestClient {
                 .post(Entity.entity(iva_newRelativePath, MediaType.TEXT_PLAIN));
 
         switch (lob_response.getStatus()) {
-            case 200: return 0;
-            case 400: return 1;
-            case 422: return 2;
-            default: return 3;
+            case 200:
+                return 0;
+            case 400:
+                return 1;
+            case 422:
+                return 2;
+            default:
+                return 3;
         }
     }
 
-// ---------------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------------------
 // Rename a file on the server
 // ---------------------------------------------------------------------------------------------------------------------
     public boolean renameFile(File iob_file, String iva_newRelativePath) {
         int lva_directoryId;
         String lva_relativePath = Utils.buildRelativeFilePath(iob_file);
-        lva_directoryId  = getDirectoryIdFromRelativePath(lva_relativePath);
+        lva_directoryId = getDirectoryIdFromRelativePath(lva_relativePath);
 
         Response lob_response = gob_webTarget.path("/auth/files/rename")
                 .queryParam("path", lva_relativePath)
@@ -152,7 +155,7 @@ public class FileRestClient extends RestClient {
         return lob_response.getStatus() == 200;
     }
 
-// ---------------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------------------
 // Rename a file on the server
 // ---------------------------------------------------------------------------------------------------------------------
     public Collection<TreeDifference> compareClientAndServerTree(Tree iob_tree) {
@@ -169,7 +172,7 @@ public class FileRestClient extends RestClient {
         return lco_differences;
     }
 
-// ---------------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------------------
 // Compare the Client the tree to the Server version
 // ---------------------------------------------------------------------------------------------------------------------
     private TreeDifference compareTreeToServer(String iva_directoryName, Tree iob_tree, int iva_directoryId) throws IOException {
@@ -193,7 +196,7 @@ public class FileRestClient extends RestClient {
         return (TreeDifference) lob_xmlParser.fromXML(lva_xmlDifferenceString);
     }
 
-// ---------------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------------------
 // download a file from the server
 // ---------------------------------------------------------------------------------------------------------------------
     public Object downloadFile(String iva_filePath) {

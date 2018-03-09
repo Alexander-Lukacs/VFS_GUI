@@ -4,7 +4,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
 
 import static controller.constants.SettingsConstants.*;
 
@@ -17,6 +16,7 @@ public class SettingsController {
     private AnchorPane gob_rootPane;
 
     private MainController gob_mainController;
+
     /**
      * Initialize of ListView
      */

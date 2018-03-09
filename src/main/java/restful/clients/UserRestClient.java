@@ -27,6 +27,7 @@ public class UserRestClient extends RestClient {
 
     /**
      * Register a new user to the database
+     *
      * @param iob_user the new user
      * @return RestResponse with the status of the request
      */
@@ -36,6 +37,7 @@ public class UserRestClient extends RestClient {
 
     /**
      * Login a user
+     *
      * @param iob_user the user to login
      * @return a complete user object
      */
@@ -72,6 +74,7 @@ public class UserRestClient extends RestClient {
 
     /**
      * Change the users password in the database
+     *
      * @param iob_user the user
      * @return RestResponse with the status of the request
      */
@@ -81,6 +84,7 @@ public class UserRestClient extends RestClient {
 
     /**
      * Get all users from the database
+     *
      * @return List of users
      */
     public List<User> getAllUser() {
@@ -88,7 +92,8 @@ public class UserRestClient extends RestClient {
 
         try {
             lli_userList = gob_webTarget.path(GC_REST_GET_ALL_USERS_PATH).request()
-                    .get(new GenericType<List<User>>() {});
+                    .get(new GenericType<List<User>>() {
+                    });
         } catch (Exception ex) {
             new AlertWindows().createExceptionAlert(ex.getMessage(), ex);
         }
@@ -98,6 +103,7 @@ public class UserRestClient extends RestClient {
 
     /**
      * Add a new admin to the database
+     *
      * @param iob_user the new admin
      * @return RestResponse with the status of the request
      */

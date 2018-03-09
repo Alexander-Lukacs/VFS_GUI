@@ -20,6 +20,7 @@ public class SharedDirectoryRestClient extends RestClient {
 
     /**
      * Add a new shared directory to the database
+     *
      * @param iob_sharedDirectory the new shared directory
      * @return RestResponse with the status of the request
      */
@@ -47,8 +48,9 @@ public class SharedDirectoryRestClient extends RestClient {
 
     /**
      * Add a new member to the shared directory
+     *
      * @param iob_sharedDirectory the shared directory
-     * @param iob_member the new member
+     * @param iob_member          the new member
      * @return RestResponse with the status of the request
      */
     public RestResponse addNewMemberToSharedDirectory(SharedDirectory iob_sharedDirectory, User iob_member) {
@@ -58,11 +60,12 @@ public class SharedDirectoryRestClient extends RestClient {
 
     /**
      * Delete a shared directory
+     *
      * @param iob_sharedDirectory the shared directory to delete
      * @return RestResponse with the status of the request
      */
     public RestResponse deleteSharedDirectory(SharedDirectory iob_sharedDirectory) {
-       RestResponse lob_restResponse = new RestResponse();
+        RestResponse lob_restResponse = new RestResponse();
         XStream lob_xmlParse = new XStream();
         XStream.setupDefaultSecurity(lob_xmlParse);
 
@@ -83,8 +86,9 @@ public class SharedDirectoryRestClient extends RestClient {
 
     /**
      * Remove a member from shared directory
+     *
      * @param iob_sharedDirectory shared directory
-     * @param iob_member the member to remove
+     * @param iob_member          the member to remove
      * @return RestResponse with the status of the request
      */
     public RestResponse removeMemberFromSharedDirectory(SharedDirectory iob_sharedDirectory, User iob_member) {
@@ -94,6 +98,7 @@ public class SharedDirectoryRestClient extends RestClient {
 
     /**
      * Get all shared directories of an user
+     *
      * @return List of all shared directories of an user
      */
     @SuppressWarnings("unchecked")
@@ -108,7 +113,7 @@ public class SharedDirectoryRestClient extends RestClient {
 
         try {
             Response response = gob_webTarget.path("sharedDirectory/auth/getAllSharedDirectories").request().get();
-            lva_sharedDirectoryXmlString  = response.readEntity(String.class);
+            lva_sharedDirectoryXmlString = response.readEntity(String.class);
             System.out.println(lva_sharedDirectoryXmlString);
             lli_userSharedDirectory = (List<SharedDirectory>) lob_xmlParser.fromXML(lva_sharedDirectoryXmlString);
         } catch (Exception ex) {

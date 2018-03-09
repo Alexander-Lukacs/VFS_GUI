@@ -65,7 +65,7 @@ public class Utils {
         return rva_absolutePath.replaceFirst("^[^\\\\]*", lva_sharedDirectoryName);
     }
 
-    public static String buildRelativeFilePath (File iob_file) {
+    public static String buildRelativeFilePath(File iob_file) {
         String lva_basePath = getRootDirectory();
         String rva_relativePath = "";
         try {

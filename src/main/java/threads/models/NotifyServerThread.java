@@ -1,6 +1,9 @@
 package threads.models;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.InterruptedIOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -50,7 +53,8 @@ public class NotifyServerThread extends Thread {
                         //TODO rename file
                     }
 
-                } catch (InterruptedIOException ignore) {}
+                } catch (InterruptedIOException ignore) {
+                }
 
                 if (lob_client != null) {
                     lob_client.close();

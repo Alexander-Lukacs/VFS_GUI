@@ -1,7 +1,5 @@
 package controller;
 
-import builder.RestClientBuilder;
-import cache.DataCache;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -10,13 +8,10 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import restful.clients.RestClient;
 import tools.AlertWindows;
 import tools.Validation;
 import tools.xmlTools.LastSessionStorage;
 
-import static cache.DataCache.GC_IP_KEY;
-import static cache.DataCache.GC_PORT_KEY;
 import static controller.constants.SettingsConstants.GC_ADMIN_ADD;
 import static controller.constants.SettingsConstants.GC_CHANGE_PW;
 import static tools.constants.AlertConstants.GC_WARNING_IP_PORT;
@@ -41,16 +36,10 @@ public class ChangeIpPortController {
     @FXML
     private Button gob_btn_connect;
 
-    @FXML
-    private Button gob_btnSettings;
-
     private MainController gob_mainController;
-
-   // private LoginController gob_loginController;
 
 
     private final controller.ListView listView = new controller.ListView();
-    private DataCache gob_userCache;
 
     public void initialize() {
         listView.loadSettingsList(gob_lvOptions);
@@ -77,8 +66,6 @@ public class ChangeIpPortController {
     }
 
     public void onClick() {
-        RestClient lob_restClient;
-        DataCache lob_dataCache = DataCache.getDataCache();
 
         String lva_ip = gob_tfServerIp.getText();
         String lva_port = gob_tfPort.getText();
@@ -93,6 +80,7 @@ public class ChangeIpPortController {
                 stage.close();
                 Platform.runLater(() -> gob_mainController.logout());
 
+
             } else {
                 new AlertWindows().createWarningAlert(GC_WARNING_PORT);
             }
@@ -100,7 +88,8 @@ public class ChangeIpPortController {
             new AlertWindows().createWarningAlert(GC_WARNING_IP_PORT);
         }
     }
-    public void initData(MainController iob_mainStage){
+
+    public void initData(MainController iob_mainStage) {
         gob_mainController = iob_mainStage;
     }
 }
