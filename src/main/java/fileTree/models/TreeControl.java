@@ -32,7 +32,7 @@ import java.util.List;
 
 import static controller.constants.ApplicationConstants.GC_APPLICATION_ICON_PATH;
 import static fileTree.constants.TreeControlConstants.*;
-import static tools.TreeTool.*;
+import static tools.TreeTool.buildFileFromItem;
 
 public class TreeControl {
     private Tree gob_tree;
@@ -77,13 +77,13 @@ public class TreeControl {
 
             gob_treeView.setOnEditCommit(event -> {
 //                try {
-                    File lob_renamedFile = buildFileFromItem(event.getTreeItem(), gob_tree);
+                File lob_renamedFile = buildFileFromItem(event.getTreeItem(), gob_tree);
 //                    System.out.println(lob_renamedFile.toPath());
 //                    gob_tree.renameFile(lob_renamedFile, event.getNewValue());
-                    TreeSingleton.getInstance().getDuplicateOperationsPrevention().putRenamed(lob_renamedFile.toPath());
+                TreeSingleton.getInstance().getDuplicateOperationsPrevention().putRenamed(lob_renamedFile.toPath());
 //                    String lva_relativePath = TreeTool.getRelativePath(lob_renamedFile.getCanonicalPath());
 //                    gob_restClient.renameFile(lva_relativePath, event.getNewValue());
-                    ThreadManager.addCommandToFileManager(lob_renamedFile, FileManagerConstants.GC_RENAME, true, event.getNewValue(), false);
+                ThreadManager.addCommandToFileManager(lob_renamedFile, FileManagerConstants.GC_RENAME, true, event.getNewValue(), false);
 //                } catch (IOException ex) {
 //                    ex.printStackTrace();
 //                }
@@ -153,10 +153,10 @@ public class TreeControl {
 
         lob_deleteDirectoryOnly = new MenuItem("Delete only Directory");
         lob_deleteDirectoryOnly.setOnAction(event -> {
-                File lob_file = buildFileFromItem(gob_treeView.getSelectionModel().getSelectedItem(), gob_tree);
-                ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_DELETE_DIR_ONLY, true);
-                TreeSingleton.getInstance().getDuplicateOperationsPrevention().putDeleted(lob_file.toPath());
-            }
+                    File lob_file = buildFileFromItem(gob_treeView.getSelectionModel().getSelectedItem(), gob_tree);
+                    ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_DELETE_DIR_ONLY, true);
+                    TreeSingleton.getInstance().getDuplicateOperationsPrevention().putDeleted(lob_file.toPath());
+                }
         );
 
         lob_renameFile = new MenuItem("Rename");

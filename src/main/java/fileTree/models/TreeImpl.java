@@ -1,6 +1,8 @@
 package fileTree.models;
 
-import fileTree.interfaces.*;
+import fileTree.interfaces.FileNode;
+import fileTree.interfaces.Tree;
+import fileTree.interfaces.TreeDifference;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -17,7 +19,7 @@ public class TreeImpl implements Tree {
     private String gva_rootDirectory;
     private FileNode gob_rootNode;
 
-    public TreeImpl(String iva_rootDirectory) throws IOException{
+    public TreeImpl(String iva_rootDirectory) throws IOException {
         this.gob_rootNode = new FileNodeImpl(new File(iva_rootDirectory));
         this.gva_rootDirectory = gob_rootNode.getFile().getCanonicalPath();
         if (gob_rootNode.getFile().createNewFile()) {
@@ -66,11 +68,11 @@ public class TreeImpl implements Tree {
             //set the parent of the new node
             lob_newNode.setParent(lob_parent);
             if (iva_isDirectory && !iob_file.exists()) {
-                if (!iob_file.mkdir()){
+                if (!iob_file.mkdir()) {
                     return false;
                 }
-            } else if (!iob_file.exists()){
-                if (!iob_file.createNewFile()){
+            } else if (!iob_file.exists()) {
+                if (!iob_file.createNewFile()) {
                     return false;
                 }
             }
@@ -98,7 +100,7 @@ public class TreeImpl implements Tree {
         //-----------------------------------------------------------------
 
         for (File lob_file : iob_fileCollection.keySet()) {
-            if(!addFile(lob_file, iob_fileCollection.get(lob_file))){
+            if (!addFile(lob_file, iob_fileCollection.get(lob_file))) {
                 lr_isNodeInsertionSuccessful = false;
             }
         }
@@ -117,7 +119,7 @@ public class TreeImpl implements Tree {
         FileNode lob_getNode;
         //-----------------------------------------------------------------------
         try {
-            lob_getNode = searchNode(this.gob_rootNode ,iva_path,0);
+            lob_getNode = searchNode(this.gob_rootNode, iva_path, 0);
 
             if (lob_getNode == null) {
                 return null;
@@ -171,7 +173,7 @@ public class TreeImpl implements Tree {
         File lob_searchedFile;
         //----------------------------------------------------------------------------------------------------------
 
-        for (String iva_path : ico_filePaths){
+        for (String iva_path : ico_filePaths) {
             lob_searchedFile = getFile(iva_path);
             if (lob_searchedFile != null) {
                 rco_foundFiles.add(lob_searchedFile);
@@ -287,7 +289,7 @@ public class TreeImpl implements Tree {
         boolean lr_isNodeInsertionSuccessful = true;
         //-------------------------------------------------------------------------------------------
         for (String lva_nodePath : ico_filePaths) {
-            if(!deleteFile(lva_nodePath)){
+            if (!deleteFile(lva_nodePath)) {
                 lr_isNodeInsertionSuccessful = false;
             }
         }
@@ -332,7 +334,7 @@ public class TreeImpl implements Tree {
         //------------------------------------------------------
 
         try {
-            lob_node  = searchNode(this.gob_rootNode, iva_path, 0);
+            lob_node = searchNode(this.gob_rootNode, iva_path, 0);
 
             if (lob_node == null) {
                 return false;
@@ -363,11 +365,12 @@ public class TreeImpl implements Tree {
 
     /**
      * move a file
-     * @param iob_file file to move
+     *
+     * @param iob_file            file to move
      * @param iva_destinationNode new file path
-     * @param iva_moveJustInTree its possible that the file was already moved by the os or the user, to prevent errors
-     *                           this parameter is used to move the file just in the tree object and not on the
-     *                           file system
+     * @param iva_moveJustInTree  its possible that the file was already moved by the os or the user, to prevent errors
+     *                            this parameter is used to move the file just in the tree object and not on the
+     *                            file system
      * @return true if the file was moved, otherwise false
      */
     @Override
@@ -403,11 +406,12 @@ public class TreeImpl implements Tree {
 
     /**
      * move a file
-     * @param iva_path file path to move
+     *
+     * @param iva_path            file path to move
      * @param iva_destinationPath new file path
-     * @param iva_moveJustInTree its possible that the file was already moved by the os or the user, to prevent errors
-     *                           this parameter is used to move the file just in the tree object and not on the
-     *                           file system
+     * @param iva_moveJustInTree  its possible that the file was already moved by the os or the user, to prevent errors
+     *                            this parameter is used to move the file just in the tree object and not on the
+     *                            file system
      * @return true if the file was moved, otherwise false
      */
     public boolean moveFile(String iva_path, String iva_destinationPath, boolean iva_moveJustInTree) {
@@ -501,12 +505,12 @@ public class TreeImpl implements Tree {
             lva_thisRootPath = this.gva_rootDirectory;
             lva_treeRootPath = iob_tree.getRoot().getCanonicalPath();
 
-            for (lob_thisFileIterator = lco_thisFiles.iterator(); lob_thisFileIterator.hasNext();) {
+            for (lob_thisFileIterator = lco_thisFiles.iterator(); lob_thisFileIterator.hasNext(); ) {
                 lob_thisFile = lob_thisFileIterator.next();
                 //remove everything including from the path including root to get a relative path
                 lva_thisFilePath = lob_thisFile.getCanonicalPath();
                 lva_thisFilePath = lva_thisFilePath.replace(lva_thisRootPath, "");
-                for(lob_treeFileIterator = lco_compareFiles.iterator(); lob_treeFileIterator.hasNext();) {
+                for (lob_treeFileIterator = lco_compareFiles.iterator(); lob_treeFileIterator.hasNext(); ) {
                     lob_treeFile = lob_treeFileIterator.next();
                     lva_treeFilePath = lob_treeFile.getCanonicalPath();
                     lva_treeFilePath = lva_treeFilePath.replace(lva_treeRootPath, "");
@@ -574,7 +578,7 @@ public class TreeImpl implements Tree {
 //        }
 //    }
 
-    private FileNode addNode(FileNode iob_parent, FileNode iob_nodeToInsert, int depth) throws IOException{
+    private FileNode addNode(FileNode iob_parent, FileNode iob_nodeToInsert, int depth) throws IOException {
         //------------------------------------Variables---------------------------------------------------------
         String[] lar_childNodePath;
         String[] lar_parentNodePath;
@@ -640,12 +644,13 @@ public class TreeImpl implements Tree {
 
     /**
      * search for a specific node and return it
+     *
      * @param iob_parent current node pointer
-     * @param iva_path path of the file to find
-     * @param depth of the tree
+     * @param iva_path   path of the file to find
+     * @param depth      of the tree
      * @return the found file node or null
      */
-    private FileNode searchNode(FileNode iob_parent, String iva_path, int depth) throws IOException{
+    private FileNode searchNode(FileNode iob_parent, String iva_path, int depth) throws IOException {
         //-------------------------------Variables------------------------------------------
         String[] lar_childPath;
         String[] lar_searchPath = convertPathToArray(iva_path);
@@ -671,7 +676,8 @@ public class TreeImpl implements Tree {
 
     /**
      * get all nodes in the tree
-     * @param iob_node pointer to the current node in the tree
+     *
+     * @param iob_node  pointer to the current node in the tree
      * @param ico_files contains all found nodes
      * @return all found nodes
      */
@@ -690,7 +696,8 @@ public class TreeImpl implements Tree {
 
     /**
      * get all nodes that contain a directory in this tree as collection
-     * @param iob_node pointer to the current node in the tree
+     *
+     * @param iob_node        pointer to the current node in the tree
      * @param ico_directories contains all found directories
      * @return all found directories
      */
@@ -708,7 +715,8 @@ public class TreeImpl implements Tree {
 
     /**
      * get all Nodes that contain a file in this tree as collection
-     * @param iob_node pointer to the current node in the tree
+     *
+     * @param iob_node  pointer to the current node in the tree
      * @param ico_nodes contains all found nodes so far
      * @return all found nodes
      */
@@ -726,6 +734,7 @@ public class TreeImpl implements Tree {
 
     /**
      * create a new directory
+     *
      * @param iob_node the file that points to the directory
      * @return true if the directory was created, otherwise false
      */
@@ -739,7 +748,7 @@ public class TreeImpl implements Tree {
         //-----------------------------------------------------------------------
 
         try {
-            lob_nodeToRemove = searchNode(this.gob_rootNode,iva_path,0);
+            lob_nodeToRemove = searchNode(this.gob_rootNode, iva_path, 0);
             if (lob_nodeToRemove == null) {
                 return false;
             }
@@ -748,7 +757,7 @@ public class TreeImpl implements Tree {
 
             //delete all children as well
             Iterator<FileNode> lob_iterator;
-            for (lob_iterator = lob_nodeToRemove.getChildren().iterator(); lob_iterator.hasNext();) {
+            for (lob_iterator = lob_nodeToRemove.getChildren().iterator(); lob_iterator.hasNext(); ) {
                 FileNode lob_file = lob_iterator.next();
                 delete(lob_file.getFile().getCanonicalPath());
                 lob_iterator.remove();
@@ -764,8 +773,9 @@ public class TreeImpl implements Tree {
 
     /**
      * this method is used to update all file paths after the file was moved
+     *
      * @param iob_basePath basePath
-     * @param iob_node node that contains the file that needs a update
+     * @param iob_node     node that contains the file that needs a update
      */
     private void updateFilePath(Path iob_basePath, FileNode iob_node) {
         String lva_newFilePath = iob_basePath.toString() + "\\" + iob_node.getFile().getName();

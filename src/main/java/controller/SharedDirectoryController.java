@@ -256,7 +256,8 @@ public class SharedDirectoryController {
         }
     }
 
-    /**GC_SHARED_DIR_CREATED
+    /**
+     * GC_SHARED_DIR_CREATED
      * Create a shared directory in the explorer and tree view
      *
      * @param iob_sharedDirectory the shared directory
@@ -372,7 +373,7 @@ public class SharedDirectoryController {
 
         lob_restClient = RestClientBuilder.buildSharedDirectoryClientWithAuth();
 
-        for (Iterator<User> lob_iterator = ili_oldMemberList.iterator(); lob_iterator.hasNext();) {
+        for (Iterator<User> lob_iterator = ili_oldMemberList.iterator(); lob_iterator.hasNext(); ) {
             lob_user = lob_iterator.next();
             lva_email = lob_user.getEmail();
 

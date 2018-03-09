@@ -17,6 +17,7 @@ public interface FileNode {
 
     /**
      * return a specific child
+     *
      * @param iob_file the file to search for
      * @return the found child, otherwise null
      */
@@ -39,6 +40,7 @@ public interface FileNode {
 
     /**
      * Set the file of this node
+     *
      * @param iob_file set this as file
      */
     void setFile(File iob_file);

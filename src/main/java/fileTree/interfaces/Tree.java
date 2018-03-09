@@ -12,6 +12,7 @@ public interface Tree {
 
     /**
      * Add a new file to the tree and create the file if it does not exist
+     *
      * @param iob_file new file
      * @return true if the file was added and created, otherwise false
      */
@@ -19,6 +20,7 @@ public interface Tree {
 
     /**
      * Add all files from a collection to the tree
+     *
      * @param iob_fileCollection contains all files to add
      * @return true if all files were added, otherwise false
      */
@@ -26,6 +28,7 @@ public interface Tree {
 
     /**
      * Search a specific file in the tree and return it
+     *
      * @param iva_path the path of the file to search for
      * @return the found file
      */
@@ -33,6 +36,7 @@ public interface Tree {
 
     /**
      * Get the tree root
+     *
      * @return root of the tree
      */
     File getRoot();
@@ -44,12 +48,14 @@ public interface Tree {
 
     /**
      * Get children from the root
+     *
      * @return all children from the root
      */
     Collection<File> getRootSubFiles();
 
     /**
      * Get all nodes by the path
+     *
      * @param ico_filePaths contains all file paths
      * @return the found file or null if the file is not in the tree
      */
@@ -72,6 +78,7 @@ public interface Tree {
 
     /**
      * delete a file in the tree and on the disk
+     *
      * @param iva_path path of the file to delete
      * @return true of the file was successfully deleted, otherwise false
      */
@@ -79,6 +86,7 @@ public interface Tree {
 
     /**
      * delete a file in the tree and on the disk
+     *
      * @param iob_file file to delete
      * @return true of the file was successfully deleted, otherwise false
      */
@@ -86,6 +94,7 @@ public interface Tree {
 
     /**
      * delete all files from a collection
+     *
      * @param ico_fileCollection contains all files to delete
      * @return true if all files were deleted, otherwise false
      */
@@ -93,6 +102,7 @@ public interface Tree {
 
     /**
      * delete all files from a collection
+     *
      * @param ico_filePaths contains all files to delete
      * @return true if all files were deleted, otherwise false
      */
@@ -101,6 +111,7 @@ public interface Tree {
     /**
      * move all files that the directory contains to the parent directory and delete
      * the directory itself
+     *
      * @param iob_directory directory to delete
      * @return true if the directory was removed, otherwise false
      */
@@ -109,6 +120,7 @@ public interface Tree {
     /**
      * move all files that the directory contains to the parent directory and delete
      * the directory itself
+     *
      * @param iva_path directory path to delete
      * @return true if the directory was removed, otherwise false
      */
@@ -116,29 +128,32 @@ public interface Tree {
 
     /**
      * move a file
-     * @param iob_file file to move
+     *
+     * @param iob_file            file to move
      * @param iva_destinationNode new file path
-     * @param iva_moveJustInTree its possible that the file was already moved by the os or the user, to prevent errors
-     *                           this parameter is used to move the file just in the tree object and not on the
-     *                           file system
+     * @param iva_moveJustInTree  its possible that the file was already moved by the os or the user, to prevent errors
+     *                            this parameter is used to move the file just in the tree object and not on the
+     *                            file system
      * @return true if the file was moved, otherwise false
      */
     boolean moveFile(File iob_file, String iva_destinationNode, boolean iva_moveJustInTree);
 
     /**
      * move a file
-     * @param iva_path file path to move
+     *
+     * @param iva_path            file path to move
      * @param iva_destinationPath new file path
-     * @param iva_moveJustInTree its possible that the file was already moved by the os or the user, to prevent errors
-     *                           this parameter is used to move the file just in the tree object and not on the
-     *                           file system
+     * @param iva_moveJustInTree  its possible that the file was already moved by the os or the user, to prevent errors
+     *                            this parameter is used to move the file just in the tree object and not on the
+     *                            file system
      * @return true if the file was moved, otherwise false
      */
     boolean moveFile(String iva_path, String iva_destinationPath, boolean iva_moveJustInTree);
 
     /**
      * rename a file
-     * @param iva_path path of the file to rename
+     *
+     * @param iva_path    path of the file to rename
      * @param iva_newName new file name
      * @return true if the file was renamed, otherwise false
      */
@@ -146,7 +161,8 @@ public interface Tree {
 
     /**
      * rename a file
-     * @param iob_file file to rename
+     *
+     * @param iob_file    file to rename
      * @param iva_newName new file name
      * @return true if the file was renamed, otherwise false
      */
@@ -154,6 +170,7 @@ public interface Tree {
 
     /**
      * compare this tree
+     *
      * @param iob_tree tree to compare to
      * @return the difference between the two trees
      */

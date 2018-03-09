@@ -44,6 +44,10 @@ public class ChangeIpPortController {
     @FXML
     private Button gob_btnSettings;
 
+    private MainController gob_mainController;
+
+   // private LoginController gob_loginController;
+
 
     private final controller.ListView listView = new controller.ListView();
     private DataCache gob_userCache;
@@ -87,25 +91,25 @@ public class ChangeIpPortController {
                 LastSessionStorage.setIp(lva_ip);
                 LastSessionStorage.setPort(lva_port);
 
-
-                Stage stage = ((Stage) gob_btn_connect.getScene().getWindow());
-                stage.close();
-
-
                 try {
                     lob_restClient = RestClientBuilder.buildRestClientWithAuth();
                     lob_restClient.unregisterClient();
-                    Platform.exit();
-                }catch (Exception ex){
+
+                    Stage stage = ((Stage) gob_btn_connect.getScene().getWindow());
+                    stage.close();
+                    Platform.runLater(() -> gob_mainController.logout());
+                } catch (Exception ex) {
                     new AlertWindows().createWarningAlert("Error while unregister client from server");
                 }
-
             } else {
                 new AlertWindows().createWarningAlert(GC_WARNING_PORT);
             }
         } else {
             new AlertWindows().createWarningAlert(GC_WARNING_IP_PORT);
         }
+    }
+    public void initData(MainController iob_mainStage){
+        gob_mainController = iob_mainStage;
     }
 }
 
