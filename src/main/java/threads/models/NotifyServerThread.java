@@ -102,8 +102,8 @@ public class NotifyServerThread extends Thread {
         String lva_actualFileLocation;
         String lva_newFileLocation;
 
-        lva_actualFileLocation = Utils.convertRelativeToAbsolutPath(iar_messageArray[1]);
-        lva_newFileLocation = Utils.convertRelativeToAbsolutPath(iar_messageArray[2]);
+        lva_actualFileLocation = Utils.convertRelativeToAbsolutePath(iar_messageArray[1]);
+        lva_newFileLocation = Utils.convertRelativeToAbsolutePath(iar_messageArray[2]);
 
         lob_file = new File(lva_actualFileLocation);
 
@@ -121,7 +121,7 @@ public class NotifyServerThread extends Thread {
     private void addFile(String[] iar_messageArray) {
         String lva_actualFilePath;
 
-        lva_actualFilePath = Utils.convertRelativeToAbsolutPath(iar_messageArray[1]);
+        lva_actualFilePath = Utils.convertRelativeToAbsolutePath(iar_messageArray[1]);
 
         ThreadManager.addCommandToFileManager(
                 null, FileManagerConstants.GC_DOWNLOAD_FROM_SERVER, true,
@@ -138,7 +138,7 @@ public class NotifyServerThread extends Thread {
         File lob_file;
         String lva_actualFilePath;
 
-        lva_actualFilePath = Utils.convertRelativeToAbsolutPath(iar_messageArray[1]);
+        lva_actualFilePath = Utils.convertRelativeToAbsolutePath(iar_messageArray[1]);
         lob_file = new File(lva_actualFilePath);
 
         ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_DELETE, false);
@@ -156,7 +156,7 @@ public class NotifyServerThread extends Thread {
         String lva_actualFilePath;
         String lva_newFileName;
 
-        lva_actualFilePath = Utils.convertRelativeToAbsolutPath(iar_messageArray[1]);
+        lva_actualFilePath = Utils.convertRelativeToAbsolutePath(iar_messageArray[1]);
         lva_newFileName = iar_messageArray[2];
 
         lob_file = new File(lva_actualFilePath);
