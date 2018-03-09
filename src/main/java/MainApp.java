@@ -1,6 +1,6 @@
 import builder.RestClientBuilder;
 import cache.DataCache;
-import controller.LoginController;
+import controller.classes.LoginController;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import restful.clients.RestClient;

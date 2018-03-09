@@ -1,4 +1,4 @@
-package controller;
+package controller.classes;
 
 import builder.RestClientBuilder;
 import models.classes.RestResponse;
@@ -21,7 +21,7 @@ import static controller.constants.SettingsConstants.GC_CHANGE_PW;
  * Created by Mesut on 31.01.2018.
  */
 public class AddAdminController {
-    private final controller.ListView listView = new controller.ListView();
+    private final controller.classes.ListView listView = new controller.classes.ListView();
     @FXML
     private ListView<String> gob_lvOptions;
     @FXML

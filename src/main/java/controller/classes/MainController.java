@@ -1,8 +1,9 @@
-package controller;
+package controller.classes;
 
 import builder.RestClientBuilder;
 import cache.DataCache;
 import cache.SharedDirectoryCache;
+import controller.classes.LoginController;
 import fileTree.classes.TreeControl;
 import fileTree.classes.TreeSingleton;
 import javafx.event.ActionEvent;

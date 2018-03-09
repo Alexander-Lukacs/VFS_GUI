@@ -1,4 +1,4 @@
-package controller;
+package controller.classes;
 
 import builder.RestClientBuilder;
 import cache.DataCache;

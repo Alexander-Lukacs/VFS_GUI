@@ -1,4 +1,4 @@
-package controller;
+package controller.classes;
 
 import builder.RestClientBuilder;
 import cache.DataCache;
@@ -45,7 +45,7 @@ public class ChangeIpPortController {
     private Button gob_btnSettings;
 
 
-    private final controller.ListView listView = new controller.ListView();
+    private final controller.classes.ListView listView = new controller.classes.ListView();
     private DataCache gob_userCache;
 
     public void initialize() {
