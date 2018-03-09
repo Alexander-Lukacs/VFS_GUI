@@ -1,5 +1,6 @@
 package threads.classes;
 
+import fileTree.models.TreeSingleton;
 import threads.constants.FileManagerConstants;
 import tools.Utils;
 
@@ -23,7 +24,7 @@ public class NotifyServerThread extends Thread {
         ServerSocket lob_notifyServer;
         Socket lob_client = null;
         BufferedReader lob_inputStream = null;
-        String lva_message;
+        String lva_message = null;
         String[] lar_messageArray;
 
         try {
@@ -120,12 +121,15 @@ public class NotifyServerThread extends Thread {
      */
     private void addFile(String[] iar_messageArray) {
         String lva_actualFilePath;
+        String lva_relativePath = iar_messageArray[1];
 
         lva_actualFilePath = Utils.convertRelativeToAbsolutePath(iar_messageArray[1], true);
 
+        TreeSingleton.getInstance().getDuplicateOperationsPrevention().putCreated(new File(lva_actualFilePath).toPath());
+
         ThreadManager.addCommandToFileManager(
                 null, FileManagerConstants.GC_DOWNLOAD_FROM_SERVER, true,
-                lva_actualFilePath);
+                lva_relativePath);
     }
 
     /**

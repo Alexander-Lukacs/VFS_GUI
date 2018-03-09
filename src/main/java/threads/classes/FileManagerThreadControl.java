@@ -265,25 +265,19 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
      *                    1. tree from the client
      */
     private void deleteLocalFile(Command iob_command) {
-        Tree lob_tree;
+        Tree lob_tree = TreeSingleton.getInstance().getTree();
         Platform.runLater(() -> TreeTool.getInstance().deleteItem(iob_command.gob_file));
 
         if (iob_command.gob_file == null) {
             gco_commands.remove(iob_command);
         }
 
-        try {
-            lob_tree = getObjectFromInformationArray(iob_command, 0, Tree.class);
-        } catch (RuntimeException ex) {
+        if (lob_tree.deleteFile(iob_command.gob_file)) {
             gco_commands.remove(iob_command);
             return;
         }
 
-        if (lob_tree.deleteFile(iob_command.gob_file)) {
-            removeCommand(iob_command);
-        } else {
-            gva_commandIndex.incrementAndGet();
-        }
+        gco_commands.remove(iob_command);
     }
 
     //------------------------------------------------------------------------------------------------------------------

@@ -25,9 +25,9 @@ public class MainApp extends Application {
             ServerSocket serverSocket = new ServerSocket(32001);
             serverSocket.close();
         } catch (Exception ex) {
+
             System.exit(1);
         }
-
         launch(args);
     }
 
