@@ -31,21 +31,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import static tools.Utils.getDirectoryIdFromRelativePath;
+
 public class FileRestClient extends RestClient {
     public FileRestClient(String iva_baseUrl, String iva_email, String iva_password) {
         super(iva_baseUrl, iva_email, iva_password);
-    }
-
-    public static int getDirectoryIdFromRelativePath(String iva_path) {
-        if (iva_path.startsWith("Shared")) {
-            return 1;
-        }
-
-        if (iva_path.startsWith("Public")) {
-            return 0;
-        }
-
-        return -1;
     }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -54,12 +44,7 @@ public class FileRestClient extends RestClient {
 
     public boolean uploadFilesToServer(File iob_filesToUpload) {
         DataCache lob_dataCache = DataCache.getDataCache();
-        String lva_relativeFilePath;
-        try {
-            lva_relativeFilePath = TreeTool.getRelativePath(iob_filesToUpload.getCanonicalPath());
-        }catch (IOException ex) {
-            return false;
-        }
+        String lva_relativeFilePath = Utils.buildRelativeFilePath(iob_filesToUpload);
         int lva_directoryId = getDirectoryIdFromRelativePath(lva_relativeFilePath);
 
         HttpAuthenticationFeature lob_authDetails = HttpAuthenticationFeature.basic(
@@ -92,15 +77,8 @@ public class FileRestClient extends RestClient {
 // ---------------------------------------------------------------------------------------------------------------------
 
     public boolean createDirectoryOnServer(File iob_file) {
-        String lva_relativePath;
-        int lva_directoryId;
-
-        try {
-            lva_relativePath = TreeTool.getRelativePath(iob_file.getCanonicalPath());
-        } catch (IOException ex) {
-            return false;
-        }
-        lva_directoryId = getDirectoryIdFromRelativePath(lva_relativePath);
+        String lva_relativePath = Utils.buildRelativeFilePath(iob_file);
+        int lva_directoryId = getDirectoryIdFromRelativePath(lva_relativePath);
 
         Response lob_response = gob_webTarget.path("/auth/files/createDirectory")
                 .queryParam("directoryId", lva_directoryId)
@@ -114,13 +92,7 @@ public class FileRestClient extends RestClient {
 // ---------------------------------------------------------------------------------------------------------------------
 
     public boolean deleteOnServer(File iob_file) {
-        String lva_relativePath;
-
-        try {
-            lva_relativePath = TreeTool.getRelativePath(iob_file.getCanonicalPath());
-        } catch (IOException ex) {
-            return false;
-        }
+        String lva_relativePath = Utils.buildRelativeFilePath(iob_file);
 
         Response lob_response = gob_webTarget.path("/auth/files/delete")
                 .queryParam("directoryId", getDirectoryIdFromRelativePath(lva_relativePath))
@@ -133,13 +105,7 @@ public class FileRestClient extends RestClient {
 // Delete only a directory on the server, move all files that the directory contains to the parent directory
 // ---------------------------------------------------------------------------------------------------------------------
     public boolean deleteDirectoryOnly(File iob_file) {
-        String lva_relativePath;
-
-        try {
-            lva_relativePath = TreeTool.getRelativePath(iob_file.getCanonicalPath());
-        } catch (IOException ex) {
-            return false;
-        }
+        String lva_relativePath = Utils.buildRelativeFilePath(iob_file);
 
         Response lob_response = gob_webTarget.path("/auth/files/removeDirectoryOnly")
                 .queryParam("directoryId", getDirectoryIdFromRelativePath(lva_relativePath))
@@ -175,13 +141,7 @@ public class FileRestClient extends RestClient {
 // ---------------------------------------------------------------------------------------------------------------------
     public boolean renameFile(File iob_file, String iva_newRelativePath) {
         int lva_directoryId;
-        String lva_relativePath;
-
-        try {
-            lva_relativePath = TreeTool.getRelativePath(iob_file.getCanonicalPath());
-        } catch (IOException ex) {
-            return false;
-        }
+        String lva_relativePath = Utils.buildRelativeFilePath(iob_file);
         lva_directoryId  = getDirectoryIdFromRelativePath(lva_relativePath);
 
         Response lob_response = gob_webTarget.path("/auth/files/rename")
@@ -248,43 +208,12 @@ public class FileRestClient extends RestClient {
         }
 
         try {
-//            String lva_newFilePath = Utils.getUserBasePath() + "\\" +
-//                    DataCache.getDataCache().get(DataCache.GC_IP_KEY) +
-//                    "_" +
-//                    DataCache.getDataCache().get(DataCache.GC_PORT_KEY) +
-//                    "\\" +
-//                    DataCache.getDataCache().get(DataCache.GC_EMAIL_KEY) +
-//                    "\\";
-//
-//            if (lva_directoryId < 0) {
-//                lva_newFilePath += "Private";
-//            } else if (lva_directoryId > 0) {
-//                lva_newFilePath += "Shared";
-//            }
-//
-//            lva_newFilePath += iva_filePath;
-
             if (lob_response.getStatus() == 204) {
                 return 0;
-//                lob_newDirectory.mkdir();
-//                return lob_newDirectory;
-//                return lob_newDirectory;
             }
 
             InputStream lob_inputStream = lob_response.readEntity(InputStream.class);
-//            byte[] lar_fileContent = IOUtils.toByteArray(lob_inputStream);
             return IOUtils.toByteArray(lob_inputStream);
-//            FileOutputStream os = new FileOutputStream(lva_newFilePath);
-//            int bytesRead;
-//            byte[] buffer = new byte[4096];
-//            while ((bytesRead = lob_inputStream.read(buffer)) != -1) {
-//                os.write(buffer, 0, bytesRead);
-//            }
-//
-//            os.close();
-//            lob_inputStream.close();
-//
-//            return new File(lva_newFilePath);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

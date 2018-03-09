@@ -398,10 +398,10 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             //get all needed information from the informationArray
             lob_oldFilePath = iob_command.gob_file;
             lob_newFilePath = getObjectFromInformationArray(iob_command, 0, File.class);
-            lva_oldRelativePath = TreeTool.getRelativePath(lob_oldFilePath.getCanonicalPath());
-            lva_newRelativePath = TreeTool.getRelativePath(lob_newFilePath.getCanonicalPath());
+            lva_oldRelativePath = Utils.buildRelativeFilePath(lob_oldFilePath);
+            lva_newRelativePath = Utils.buildRelativeFilePath(lob_newFilePath);
 
-        } catch (RuntimeException | IOException ex) {
+        } catch (RuntimeException ex) {
             ex.printStackTrace();
             gco_commands.remove(iob_command);
             return;
@@ -553,7 +553,6 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
     //------------------------------------------------------------------------------------------------------------------
     // "GC_DOWNLOAD_FROM_SERVER"
     //------------------------------------------------------------------------------------------------------------------
-
     /**
      *
      * @param iob_command expected input in gar_information:
@@ -581,23 +580,25 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             return;
         }
 
-        lva_newFilePath = Utils.getUserBasePath() + "\\" +
-                DataCache.getDataCache().get(DataCache.GC_IP_KEY) +
-                "_" +
-                DataCache.getDataCache().get(DataCache.GC_PORT_KEY) +
-                "\\" +
-                DataCache.getDataCache().get(DataCache.GC_EMAIL_KEY) +
-                "\\";
+//        lva_newFilePath = Utils.getUserBasePath() + "\\" +
+//                DataCache.getDataCache().get(DataCache.GC_IP_KEY) +
+//                "_" +
+//                DataCache.getDataCache().get(DataCache.GC_PORT_KEY) +
+//                "\\" +
+//                DataCache.getDataCache().get(DataCache.GC_EMAIL_KEY) +
+//                "\\";
+//
+//        lva_directoryId = Utils.getDirectoryIdFromRelativePath(lva_relativePath);
+//
+//        if (lva_directoryId < 0) {
+//            lva_newFilePath += "Private";
+//        } else if (lva_directoryId > 0) {
+//            lva_newFilePath += "Shared";
+//        }
+//
+//        lva_newFilePath += lva_relativePath;
 
-        lva_directoryId = FileRestClient.getDirectoryIdFromRelativePath(lva_relativePath);
-
-        if (lva_directoryId < 0) {
-            lva_newFilePath += "Private";
-        } else if (lva_directoryId > 0) {
-            lva_newFilePath += "Shared";
-        }
-
-        lva_newFilePath += lva_relativePath;
+        lva_newFilePath = Utils.convertRelativeToAbsolutPath(lva_relativePath);
 
         //the download returned a file so it must be a directory
         if (lob_downloadContent instanceof Integer) {

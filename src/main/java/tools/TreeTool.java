@@ -93,28 +93,25 @@ public class TreeTool {
         if (iob_file.equals(TreeSingleton.getInstance().getTree().getRoot())) {
             return item;
         }
-        try {
-            boolean lva_childFound;
-            String[] test = getRelativePath(iob_file.getCanonicalPath()).split("\\\\");
-            int counter = 0;
 
+        boolean lva_childFound;
+        String[] test = Utils.buildRelativeFilePath(iob_file).split("\\\\");
 
-            while (counter < test.length) {
-                lva_childFound = false;
-                for (TreeItem<String> lob_child : item.getChildren()) {
-                    if (lob_child.getValue().equals(test[counter])) {
-                        item = lob_child;
-                        lva_childFound = true;
-                        break;
-                    }
+        int counter = 0;
+
+        while (counter < test.length) {
+            lva_childFound = false;
+            for (TreeItem<String> lob_child : item.getChildren()) {
+                if (lob_child.getValue().equals(test[counter])) {
+                    item = lob_child;
+                    lva_childFound = true;
+                    break;
                 }
-                if (!lva_childFound) {
-                    return null;
-                }
-                counter++;
             }
-        } catch (IOException ex) {
-            ex.printStackTrace();
+            if (!lva_childFound) {
+                return null;
+            }
+            counter++;
         }
         return item;
     }
@@ -123,13 +120,13 @@ public class TreeTool {
         return searchTreeItem(iob_file) != null;
     }
 
-    public static String getRelativePath(String iva_filePath) throws IOException {
-        String lva_regex = TreeSingleton.getInstance().getTree().getRoot().getCanonicalPath();
-
-        lva_regex = lva_regex.replaceAll("\\\\", "\\\\\\\\");
-        String rva_return = iva_filePath.replaceFirst(lva_regex, "");
-        return rva_return.replaceFirst("^\\\\", "");
-    }
+//    public static String getRelativePath(String iva_filePath) throws IOException {
+//        String lva_regex = TreeSingleton.getInstance().getTree().getRoot().getCanonicalPath();
+//
+//        lva_regex = lva_regex.replaceAll("\\\\", "\\\\\\\\");
+//        String rva_return = iva_filePath.replaceFirst(lva_regex, "");
+//        return rva_return.replaceFirst("^\\\\", "");
+//    }
 
     public void addToTreeView(File iob_file) {
         try {
