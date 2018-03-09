@@ -98,7 +98,7 @@ public class MainController {
                 lob_stage.setResizable(false);
                 lob_stage.setScene(lob_scene);
                 SettingsController lob_settingsController = lob_loader.getController();
-                lob_settingsController.initData(gob_mainController);
+                lob_settingsController.initMainControllerData(gob_mainController);
                 lob_stage.show();
 
                 break;

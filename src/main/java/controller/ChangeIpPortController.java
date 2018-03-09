@@ -89,7 +89,7 @@ public class ChangeIpPortController {
         }
     }
 
-    public void initData(MainController iob_mainStage) {
+    public void initMainControllerData(MainController iob_mainStage) {
         gob_mainController = iob_mainStage;
     }
 }

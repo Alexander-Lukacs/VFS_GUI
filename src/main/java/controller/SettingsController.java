@@ -24,7 +24,7 @@ public class SettingsController {
         gob_listView.loadSettingsList(gob_lvOptions);
     }
 
-    public void initData(MainController iob_mainController) {
+    public void initMainControllerData(MainController iob_mainController) {
         gob_mainController = iob_mainController;
     }
 
@@ -48,7 +48,7 @@ public class SettingsController {
                 FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("views/changeIpPort.fxml"));
                 AnchorPane lob_pane = lob_loader.load();
                 ChangeIpPortController lob_controller = lob_loader.getController();
-                lob_controller.initData(gob_mainController);
+                lob_controller.initMainControllerData(gob_mainController);
                 gob_rootPane.getChildren().setAll(lob_pane);
             }
             // TODO schauen ob es evtl. eine besser Methode gibt, als ein leerer catch block
