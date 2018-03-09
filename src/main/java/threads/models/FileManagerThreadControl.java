@@ -1,7 +1,6 @@
 package threads.models;
 
 import builder.RestClientBuilder;
-import cache.DataCache;
 import fileTree.interfaces.Tree;
 import fileTree.interfaces.TreeDifference;
 import fileTree.models.TreeSingleton;
@@ -598,7 +597,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
 //
 //        lva_newFilePath += lva_relativePath;
 
-        lva_newFilePath = Utils.convertRelativeToAbsolutPath(lva_relativePath);
+        lva_newFilePath = Utils.convertRelativeToAbsolutePath(lva_relativePath);
 
         //the download returned a file so it must be a directory
         if (lob_downloadContent instanceof Integer) {

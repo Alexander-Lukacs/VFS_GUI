@@ -1,7 +1,6 @@
 package tools;
 
 import cache.DataCache;
-import fileTree.models.TreeSingleton;
 import models.classes.RestResponse;
 import tools.xmlTools.DirectoryNameMapper;
 
@@ -52,7 +51,7 @@ public class Utils {
         return -1;
     }
 
-    public static String convertRelativeToAbsolutPath(String iva_filePath) {
+    public static String convertRelativeToAbsolutePath(String iva_filePath) {
         int lva_directoryId = getDirectoryIdFromRelativePath(iva_filePath);
         String rva_absolutePath = getRootDirectory();
         String lva_sharedDirectoryName;
@@ -76,7 +75,8 @@ public class Utils {
         }
 
         lva_basePath += "\\";
-        return rva_relativePath.replace(lva_basePath, "");
+        rva_relativePath = rva_relativePath.replace(lva_basePath, "");
+        return rva_relativePath;
     }
 
     /**
@@ -88,6 +88,6 @@ public class Utils {
         DataCache lob_cache = DataCache.getDataCache();
 
         return rva_rootDirectry + "\\" + lob_cache.get(DataCache.GC_IP_KEY) + "_" + lob_cache.get(DataCache.GC_PORT_KEY) +
-                "\\" + lob_cache.get(DataCache.GC_EMAIL_KEY) + "\\";
+                "\\" + lob_cache.get(DataCache.GC_EMAIL_KEY);
     }
 }
