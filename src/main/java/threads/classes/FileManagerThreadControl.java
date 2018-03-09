@@ -1,9 +1,9 @@
-package threads.models;
+package threads.classes;
 
 import builder.RestClientBuilder;
 import fileTree.interfaces.Tree;
 import fileTree.interfaces.TreeDifference;
-import fileTree.models.TreeSingleton;
+import fileTree.classes.TreeSingleton;
 import javafx.application.Platform;
 import javafx.scene.control.TreeItem;
 import org.apache.commons.io.FileUtils;

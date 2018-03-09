@@ -9,12 +9,11 @@ import com.thoughtworks.xstream.XStream;
 import fileTree.interfaces.FileNode;
 import fileTree.interfaces.Tree;
 import fileTree.interfaces.TreeDifference;
-import fileTree.models.TreeDifferenceImpl;
-import fileTree.models.TreeImpl;
+import fileTree.classes.TreeDifferenceImpl;
+import fileTree.classes.TreeImpl;
 import org.apache.commons.io.IOUtils;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
-import tools.TreeTool;
 import tools.Utils;
 
 import javax.ws.rs.client.Client;

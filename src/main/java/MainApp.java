@@ -1,10 +1,10 @@
 import builder.RestClientBuilder;
 import cache.DataCache;
-import controller.LoginController;
+import controller.classes.LoginController;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import restful.clients.RestClient;
-import threads.models.NotifyServerThread;
+import threads.classes.NotifyServerThread;
 import tools.AlertWindows;
 
 import java.net.ServerSocket;

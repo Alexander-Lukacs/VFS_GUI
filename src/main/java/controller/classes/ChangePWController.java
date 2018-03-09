@@ -1,4 +1,4 @@
-package controller;
+package controller.classes;
 
 import builder.RestClientBuilder;
 import cache.DataCache;
@@ -25,7 +25,7 @@ import static controller.constants.SettingsConstants.GC_CHANGE_IP_PORT;
 import static tools.constants.AlertConstants.*;
 
 public class ChangePWController {
-    private final controller.ListView gob_listView = new controller.ListView();
+    private final controller.classes.ListView gob_listView = new controller.classes.ListView();
 
     @FXML
     private ListView<String> gob_lvOptions;

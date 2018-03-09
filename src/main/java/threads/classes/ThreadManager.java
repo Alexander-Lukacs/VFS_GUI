@@ -1,4 +1,4 @@
-package threads.models;
+package threads.classes;
 
 import javafx.scene.control.Label;
 import restful.clients.FileRestClient;

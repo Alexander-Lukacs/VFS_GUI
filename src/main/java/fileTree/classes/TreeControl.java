@@ -1,10 +1,10 @@
-package fileTree.models;
+package fileTree.classes;
 
 import builder.RestClientBuilder;
 import cache.DataCache;
 import cache.SharedDirectoryCache;
-import controller.MainController;
-import controller.SharedDirectoryController;
+import controller.classes.MainController;
+import controller.classes.SharedDirectoryController;
 import fileTree.interfaces.Tree;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -20,7 +20,7 @@ import restful.clients.FileRestClient;
 import restful.clients.SharedDirectoryRestClient;
 import threads.constants.FileManagerConstants;
 import threads.interfaces.ThreadControl;
-import threads.models.ThreadManager;
+import threads.classes.ThreadManager;
 import tools.TreeTool;
 import tools.Utils;
 import tools.xmlTools.DirectoryNameMapper;

@@ -1,4 +1,4 @@
-package fileTree.models;
+package fileTree.classes;
 
 import fileTree.interfaces.Tree;
 import javafx.scene.control.TextField;
@@ -10,7 +10,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.TransferMode;
 import restful.clients.FileRestClient;
 import threads.constants.FileManagerConstants;
-import threads.models.ThreadManager;
+import threads.classes.ThreadManager;
 import tools.TreeTool;
 import tools.xmlTools.DirectoryNameMapper;
 

@@ -1,7 +1,7 @@
-package threads.models;
+package threads.classes;
 
 import fileTree.interfaces.FileChangeListener;
-import fileTree.models.TreeSingleton;
+import fileTree.classes.TreeSingleton;
 import javafx.scene.control.TreeItem;
 import restful.clients.FileRestClient;
 import threads.constants.FileManagerConstants;

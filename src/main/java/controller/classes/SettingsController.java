@@ -1,4 +1,4 @@
-package controller;
+package controller.classes;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -9,7 +9,7 @@ import static controller.constants.SettingsConstants.*;
 
 
 public class SettingsController {
-    private final controller.ListView gob_listView = new controller.ListView();
+    private final controller.classes.ListView gob_listView = new controller.classes.ListView();
     @FXML
     private ListView<String> gob_lvOptions;
     @FXML
