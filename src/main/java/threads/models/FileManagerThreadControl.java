@@ -578,7 +578,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             return;
         }
 
-        lva_newFilePath = Utils.convertRelativeToAbsolutePath(lva_relativePath);
+        lva_newFilePath = Utils.convertRelativeToAbsolutePath(lva_relativePath, false);
 
         //the download returned a file so it must be a directory
         if (lob_downloadContent instanceof Integer) {
