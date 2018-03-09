@@ -2,16 +2,12 @@ import builder.RestClientBuilder;
 import cache.DataCache;
 import controller.LoginController;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.stage.Stage;
 import restful.clients.RestClient;
 import threads.models.NotifyServerThread;
 import tools.AlertWindows;
 
-import java.io.IOException;
-import java.net.BindException;
 import java.net.ServerSocket;
-import java.net.SocketException;
 
 import static cache.DataCache.GC_EMAIL_KEY;
 
@@ -24,7 +20,7 @@ public class MainApp extends Application {
 
     public static void main(String[] args) {
 
-        // Ensure that only instance of the app is running
+        // Ensure that only one instance of the app is running
         try {
             ServerSocket serverSocket = new ServerSocket(32001);
             serverSocket.close();
