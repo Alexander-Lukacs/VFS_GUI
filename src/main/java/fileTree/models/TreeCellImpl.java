@@ -33,7 +33,7 @@ public class TreeCellImpl extends TreeCell<String> {
     @Override
     public void startEdit() {
         TreeItem<String> lob_item = getTreeItem();
-        File lob_file = TreeTool.buildFileFromItem(lob_item, TreeSingleton.getInstance().getTree());
+        File lob_file = TreeTool.buildFileFromItem(lob_item, gob_tree);
 
         if (!lob_item.getValue().equals("Shared")) {
             if (lob_file.exists()) {

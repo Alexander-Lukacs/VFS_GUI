@@ -93,7 +93,7 @@ class MainDirectoryWatcher implements ThreadControl {
     }
 
     private void renameFile(Path iob_path, String iva_newName) {
-        try {
+//        try {
             if (TreeSingleton.getInstance().getDuplicateOperationsPrevention().wasFileRenamed(iob_path)) {
                 TreeSingleton.getInstance().getDuplicateOperationsPrevention().removeRenamed(iob_path);
             } else {
@@ -102,13 +102,14 @@ class MainDirectoryWatcher implements ThreadControl {
                 TreeItem<String> lob_item = TreeTool.getTreeItem(iob_path.toFile());
                 lob_item.setValue(iva_newName);
 
-                String lva_relativePath = TreeTool.getRelativePath(iob_path.toString());
+//                String lva_relativePath = TreeTool.getRelativePath(iob_path.toString());
 
-                gob_restClient.renameFile(lva_relativePath, iva_newName);
+//                gob_restClient.renameFile(lva_relativePath, iva_newName);
+                ThreadManager.addCommandToFileManager(iob_path.toFile(), FileManagerConstants.GC_RENAME, true, iva_newName, true);
             }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+//        } catch (IOException ex) {
+//            ex.printStackTrace();
+//        }
     }
 
     @Override

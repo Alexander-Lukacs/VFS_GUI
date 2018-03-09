@@ -177,15 +177,23 @@ public class FileRestClient extends RestClient {
 // ---------------------------------------------------------------------------------------------------------------------
 // Rename a file on the server
 // ---------------------------------------------------------------------------------------------------------------------
-    public void renameFile(String iva_relativePath, String iva_newRelativePath) {
-        int lva_directoryId = getDirectoryIdFromRelativePath(iva_relativePath);
+    public boolean renameFile(File iob_file, String iva_newRelativePath) {
+        int lva_directoryId;
+        String lva_relativePath;
+
+        try {
+            lva_relativePath = TreeTool.getRelativePath(iob_file.getCanonicalPath());
+        } catch (IOException ex) {
+            return false;
+        }
+        lva_directoryId  = getDirectoryIdFromRelativePath(lva_relativePath);
 
         Response lob_response = gob_webTarget.path("/auth/files/rename")
-                .queryParam("path", iva_relativePath)
+                .queryParam("path", lva_relativePath)
                 .queryParam("directoryId", lva_directoryId)
                 .request()
                 .post(Entity.entity(iva_newRelativePath, MediaType.TEXT_PLAIN));
-        System.out.println(lob_response.getStatus());
+        return lob_response.getStatus() == 200;
     }
 
 // ---------------------------------------------------------------------------------------------------------------------

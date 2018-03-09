@@ -17,8 +17,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static threads.constants.FileManagerConstants.*;
-import static tools.TreeTool.buildFileFromItem;
-import static tools.TreeTool.getRelativePath;
 
 public class FileManagerThreadControl implements ThreadControl, Runnable {
     private volatile boolean isRunning;
@@ -119,9 +117,15 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
                 deleteDirectoryOnServer(iob_command);
                 break;
 
-            case GC_RENAME: break;
+            case GC_RENAME:
+                System.out.println(GC_RENAME);
+                renameLocalFile(iob_command);
+                break;
 
-            case GC_RENAME_ON_SERVER: break;
+            case GC_RENAME_ON_SERVER:
+                System.out.println(GC_RENAME_ON_SERVER);
+                renameFileOnServer(iob_command);
+                break;
 
             case GC_DOWNLOAD_FROM_SERVER: break;
 
@@ -195,6 +199,11 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             return;
         }
 
+        if (iob_command.gva_maxTries >= GC_MAX_TRIES) {
+            gco_commands.remove(iob_command);
+            return;
+        }
+
         try {
             if (iob_command.gob_file.exists()) {
                 lva_isDirectory = iob_command.gob_file.isDirectory();
@@ -215,6 +224,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             if (gob_restClient.createDirectoryOnServer(iob_command.gob_file)) {
                 gco_commands.remove(iob_command);
             } else {
+                iob_command.gva_maxTries++;
                 gva_commandIndex.incrementAndGet();
             }
         } else {
@@ -251,20 +261,13 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         Platform.runLater(() -> TreeTool.getInstance().deleteItem(iob_command.gob_file));
 
         if (iob_command.gob_file == null) {
-            removeCommand(iob_command);
+            gco_commands.remove(iob_command);
         }
-
-//        if (iob_command.gar_fileInformation[0] instanceof Tree) {
-//            lob_tree = (Tree) iob_command.gar_fileInformation[0];
-//        } else {
-//            removeCommand(iob_command);
-//            return;
-//        }
 
         try {
             lob_tree = getObjectFromInformationArray(iob_command, 0, Tree.class);
         } catch (RuntimeException ex) {
-            removeCommand(iob_command);
+            gco_commands.remove(iob_command);
             return;
         }
 
@@ -287,9 +290,15 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             gco_commands.remove(iob_command);
         }
 
+        if (iob_command.gva_maxTries >= GC_MAX_TRIES) {
+            gco_commands.remove(iob_command);
+            return;
+        }
+
         if (gob_restClient.deleteOnServer(iob_command.gob_file)) {
             gco_commands.remove(iob_command);
         } else {
+            iob_command.gva_maxTries++;
             gva_commandIndex.incrementAndGet();
         }
     }
@@ -366,8 +375,12 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         String lva_oldRelativePath;
         String lva_newRelativePath;
 
-        System.out.println("move");
         if (iob_command.gob_file == null) {
+            gco_commands.remove(iob_command);
+            return;
+        }
+
+        if (iob_command.gva_maxTries >= GC_MAX_TRIES) {
             gco_commands.remove(iob_command);
             return;
         }
@@ -388,6 +401,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         lva_requestResult = gob_restClient.moveFile(lva_oldRelativePath, lva_newRelativePath);
 
         if (lva_requestResult > 2) {
+            iob_command.gva_maxTries++;
             gva_commandIndex.incrementAndGet();
             return;
         }
@@ -418,7 +432,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
 
         for (TreeItem<String> lob_child : lob_item.getChildren()) {
             if (!canFileBeMoved(lob_child, lob_parent)) {
-                removeCommand(iob_command);
+                gco_commands.remove(iob_command);
                 Platform.runLater(() ->  new AlertWindows().createErrorAlert("The directory contains a file with the same nam as in the parent directory"));
                 return;
             }
@@ -442,12 +456,80 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             return;
         }
 
+        if (iob_command.gva_maxTries >= GC_MAX_TRIES) {
+            gco_commands.remove(iob_command);
+            return;
+        }
+
         if (!gob_restClient.deleteDirectoryOnly(iob_command.gob_file)) {
             gva_commandIndex.incrementAndGet();
+            iob_command.gva_maxTries++;
             return;
         }
 
         gco_commands.remove(iob_command);
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // "GC_RENAME"
+    //------------------------------------------------------------------------------------------------------------------
+    private void renameLocalFile(Command iob_command) {
+        Tree lob_tree = TreeSingleton.getInstance().getTree();
+        TreeItem<String> lob_item;
+        String lva_newName;
+        boolean lva_renameTreeItem;
+
+        if (iob_command.gob_file == null) {
+            gco_commands.remove(iob_command);
+            return;
+        }
+
+        if (!iob_command.gob_file.exists()) {
+            gco_commands.remove(iob_command);
+            return;
+        }
+
+        try {
+            lva_newName = getObjectFromInformationArray(iob_command, 0, String.class);
+            lva_renameTreeItem = getObjectFromInformationArray(iob_command, 1, Boolean.class);
+        } catch (RuntimeException ex) {
+            gco_commands.remove(iob_command);
+            return;
+        }
+
+        if (lva_renameTreeItem) {
+            lob_item = TreeTool.getTreeItem(iob_command.gob_file);
+
+            if (lob_item == null) {
+                gco_commands.remove(iob_command);
+                return;
+            }
+        }
+
+        lob_tree.renameFile(iob_command.gob_file, lva_newName);
+        gco_commands.remove(iob_command);
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // "GC_RENAME_ON_SERVER"
+    //------------------------------------------------------------------------------------------------------------------
+    private void renameFileOnServer(Command iob_command) {
+        String lva_newName;
+
+        try {
+            lva_newName = getObjectFromInformationArray(iob_command, 0, String.class);
+        } catch (RuntimeException ex) {
+            gco_commands.remove(iob_command);
+            return;
+        }
+
+        if (!gob_restClient.renameFile(iob_command.gob_file, lva_newName)) {
+            iob_command.gva_maxTries++;
+            return;
+        }
+
+        gco_commands.remove(iob_command);
+
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -487,6 +569,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
 //----------------------------------------------------------------------------------------------------------------------
 // helper methods
 //----------------------------------------------------------------------------------------------------------------------
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean canFileBeMoved(TreeItem<String> iob_item, TreeItem<String> iob_newParent) {
         //check if a file with the same name already exists
         for (TreeItem<String> lob_child : iob_newParent.getChildren()) {

@@ -76,16 +76,17 @@ public class TreeControl {
             );
 
             gob_treeView.setOnEditCommit(event -> {
-                try {
+//                try {
                     File lob_renamedFile = buildFileFromItem(event.getTreeItem(), gob_tree);
-                    System.out.println(lob_renamedFile.toPath());
-                    gob_tree.renameFile(lob_renamedFile, event.getNewValue());
+//                    System.out.println(lob_renamedFile.toPath());
+//                    gob_tree.renameFile(lob_renamedFile, event.getNewValue());
                     TreeSingleton.getInstance().getDuplicateOperationsPrevention().putRenamed(lob_renamedFile.toPath());
-                    String lva_relativePath = TreeTool.getRelativePath(lob_renamedFile.getCanonicalPath());
-                    gob_restClient.renameFile(lva_relativePath, event.getNewValue());
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
+//                    String lva_relativePath = TreeTool.getRelativePath(lob_renamedFile.getCanonicalPath());
+//                    gob_restClient.renameFile(lva_relativePath, event.getNewValue());
+                    ThreadManager.addCommandToFileManager(lob_renamedFile, FileManagerConstants.GC_RENAME, true, event.getNewValue(), false);
+//                } catch (IOException ex) {
+//                    ex.printStackTrace();
+//                }
             });
         } catch (IOException ex) {
             ex.printStackTrace();
