@@ -16,6 +16,8 @@ public class NotifyServerThread extends Thread {
     private static final String GC_MESSAGE_ADD = "add";
     private static final String GC_MESSAGE_DELETE = "delete";
     private static final String GC_MESSAGE_RENAME = "rename";
+    private static final String GC_MESSAGE_DELETE_DIR = "deleteDir";
+
     private static final String GC_MESSAGE_SHARED_DIR_ADD = "addSharedDir";
     private static final String GC_MESSAGE_SHARED_DIR_DELETE = "deleteSharedDir";
 
@@ -61,6 +63,11 @@ public class NotifyServerThread extends Thread {
                             renameFile(lar_messageArray);
                             break;
 
+                        case GC_MESSAGE_DELETE_DIR:
+                            System.out.println("Delete Dir command read!");
+                            deleteDir(lar_messageArray);
+                            break;
+
                         case GC_MESSAGE_SHARED_DIR_ADD:
                             System.out.println("Add shared dir command read!");
                             addSharedDirectory(lar_messageArray);
@@ -100,6 +107,7 @@ public class NotifyServerThread extends Thread {
      */
     private void moveFile(String[] iar_messageArray) {
         File lob_file;
+        File lob_newFileLocation;
         String lva_actualFileLocation;
         String lva_newFileLocation;
 
@@ -107,10 +115,11 @@ public class NotifyServerThread extends Thread {
         lva_newFileLocation = Utils.convertRelativeToAbsolutePath(iar_messageArray[2], true);
 
         lob_file = new File(lva_actualFileLocation);
+        lob_newFileLocation = new File(lva_newFileLocation);
 
         ThreadManager.addCommandToFileManager(
                 lob_file, FileManagerConstants.GC_MOVE, false,
-                lva_newFileLocation, false);
+                lob_newFileLocation, false);
     }
 
     /**
@@ -126,7 +135,6 @@ public class NotifyServerThread extends Thread {
         lva_actualFilePath = Utils.convertRelativeToAbsolutePath(iar_messageArray[1], true);
 
         TreeSingleton.getInstance().getDuplicateOperationsPrevention().putCreated(new File(lva_actualFilePath).toPath());
-
         ThreadManager.addCommandToFileManager(
                 null, FileManagerConstants.GC_DOWNLOAD_FROM_SERVER, true,
                 lva_relativePath);
@@ -145,6 +153,7 @@ public class NotifyServerThread extends Thread {
         lva_actualFilePath = Utils.convertRelativeToAbsolutePath(iar_messageArray[1], true);
         lob_file = new File(lva_actualFilePath);
 
+        TreeSingleton.getInstance().getDuplicateOperationsPrevention().putDeleted(lob_file.toPath());
         ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_DELETE, false);
     }
 
@@ -165,8 +174,29 @@ public class NotifyServerThread extends Thread {
 
         lob_file = new File(lva_actualFilePath);
 
+        TreeSingleton.getInstance().getDuplicateOperationsPrevention().putRenamed(lob_file.toPath());
         ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_RENAME, false,
                 lva_newFileName, true);
+    }
+
+    /**
+     * Delete only the directory and move all contained files to the parent
+     *
+     * @param iar_messageArray at position 0: operation
+     *                         at position 1: relative file path
+     */
+    private void deleteDir(String[] iar_messageArray) {
+        File lob_file;
+        String lva_actualFilePath;
+        String lva_relativeFilePath;
+
+        lva_relativeFilePath = iar_messageArray[1];
+        lva_actualFilePath = Utils.convertRelativeToAbsolutePath(lva_relativeFilePath, true);
+
+        lob_file = new File(lva_actualFilePath);
+
+        TreeSingleton.getInstance().getDuplicateOperationsPrevention().putDeleted(lob_file.toPath());
+        ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_DELETE_DIR_ONLY, false);
     }
 
     private void deleteSharedDirectory(String[] iar_messageArray) {
