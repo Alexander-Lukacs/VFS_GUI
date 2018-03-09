@@ -2,13 +2,14 @@ package threads.models;
 
 import javafx.application.Platform;
 import javafx.scene.control.Label;
+import threads.interfaces.ThreadControl;
 
 import java.io.File;
 
 /**
  * Created by Mesut on 05.03.2018.
  */
-public class DirectoryCounterThread extends Thread {
+public class DirectoryCounterThread extends Thread implements ThreadControl{
     private File gob_file;
     private Label gob_content_label;
     private int countDir = 0;
@@ -39,5 +40,10 @@ public class DirectoryCounterThread extends Thread {
                 }
             }
         }
+    }
+
+    @Override
+    public void clear() {
+
     }
 }

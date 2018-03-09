@@ -1,5 +1,6 @@
 package threads.models;
 
+import javafx.scene.control.Label;
 import restful.clients.FileRestClient;
 import threads.interfaces.ThreadControl;
 
@@ -8,6 +9,7 @@ import java.io.File;
 public class ThreadManager {
     private static MainDirectoryWatcher gob_directoryWatcherInstance;
     private static FileManagerThreadControl gob_fileManagerInstance;
+    private static DirectoryCounterThread gob_directoryCounterInstance;
 
     /**
      * if no instance of the directoryWatcher exists, create a new one
@@ -42,6 +44,14 @@ public class ThreadManager {
             gob_fileManagerInstance = new FileManagerThreadControl();
         }
         gob_fileManagerInstance.addFileWithCommando(iob_file, iva_commando, iva_executeCommandOnServer, iar_fileInformation);
+    }
+
+    public static ThreadControl getDirectoryCounterThread(File iob_file, Label iob_label) {
+        if (gob_directoryCounterInstance == null) {
+            gob_directoryCounterInstance = new DirectoryCounterThread(iob_file, iob_label);
+        }
+
+        return gob_directoryCounterInstance;
     }
 
     public static void stopAndClear() {
