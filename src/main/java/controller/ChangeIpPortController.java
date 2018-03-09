@@ -76,6 +76,7 @@ public class ChangeIpPortController {
                 LastSessionStorage.setIp(lva_ip);
                 LastSessionStorage.setPort(lva_port);
 
+
                 Stage stage = ((Stage) gob_btn_connect.getScene().getWindow());
                 stage.close();
                 Platform.runLater(() -> gob_mainController.logout());
@@ -89,8 +90,10 @@ public class ChangeIpPortController {
         }
     }
 
-    public void initMainControllerData(MainController iob_mainStage) {
-        gob_mainController = iob_mainStage;
+
+    public void initMainControllerData(MainController iob_mainController) {
+        gob_mainController = iob_mainController;
     }
+
 }
 
