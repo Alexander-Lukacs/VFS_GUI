@@ -1,13 +1,12 @@
 package tools;
 
 import fileTree.interfaces.Tree;
-import fileTree.models.TreeSingleton;
+import fileTree.classes.TreeSingleton;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import restful.clients.FileRestClient;
 
 import javax.swing.filechooser.FileSystemView;
 import java.awt.image.BufferedImage;

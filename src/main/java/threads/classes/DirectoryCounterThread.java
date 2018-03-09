@@ -1,4 +1,4 @@
-package threads.models;
+package threads.classes;
 
 import javafx.application.Platform;
 import javafx.scene.control.Label;

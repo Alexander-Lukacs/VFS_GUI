@@ -1,4 +1,4 @@
-package fileTree.models;
+package fileTree.classes;
 
 import builder.RestClientBuilder;
 import cache.DataCache;
@@ -20,7 +20,7 @@ import restful.clients.FileRestClient;
 import restful.clients.SharedDirectoryRestClient;
 import threads.constants.FileManagerConstants;
 import threads.interfaces.ThreadControl;
-import threads.models.ThreadManager;
+import threads.classes.ThreadManager;
 import tools.TreeTool;
 import tools.Utils;
 import tools.xmlTools.DirectoryNameMapper;

@@ -1,4 +1,4 @@
-package fileTree.models;
+package fileTree.classes;
 
 import fileTree.interfaces.TreeDifference;
 

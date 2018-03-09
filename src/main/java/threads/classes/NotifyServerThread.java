@@ -1,4 +1,4 @@
-package threads.models;
+package threads.classes;
 
 import threads.constants.FileManagerConstants;
 import tools.Utils;

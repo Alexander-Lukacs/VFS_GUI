@@ -3,24 +3,24 @@ package controller;
 import builder.RestClientBuilder;
 import cache.DataCache;
 import cache.SharedDirectoryCache;
-import fileTree.models.TreeControl;
-import fileTree.models.TreeSingleton;
+import fileTree.classes.TreeControl;
+import fileTree.classes.TreeSingleton;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.SplitPane;
+import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.apache.commons.io.FileUtils;
 import restful.clients.RestClient;
-import threads.models.ThreadManager;
+import threads.classes.DirectoryCounterThread;
 import tools.AlertWindows;
-import threads.models.DirectoryCounterThread;
 import tools.Utils;
 
 import java.awt.*;
@@ -56,11 +56,12 @@ public class MainController {
     private DataCache gob_userCache;
     private TreeControl gob_treeControl;
 
-
     /**
-     * Beim Klicken des Buttons wird die View settings.fxml geöffnet
+     * OnClick Method
+     * @param e event
+     * @throws RuntimeException RuntimeException
+     * @throws IOException IOException
      */
-
     public void onClick(ActionEvent e) throws RuntimeException, IOException {
         RestClient lob_restClient;
         DataCache lob_dataCache = DataCache.getDataCache();
@@ -108,7 +109,9 @@ public class MainController {
 
     public void initialize() {
         gob_userCache = DataCache.getDataCache();
-        gob_treeControl = new TreeControl(gob_userCache.get(DataCache.GC_IP_KEY), gob_userCache.get(DataCache.GC_PORT_KEY), this);
+        gob_treeControl = new TreeControl(gob_userCache.get(DataCache.GC_IP_KEY),
+                gob_userCache.get(DataCache.GC_PORT_KEY), this);
+
         TreeView<String> gob_treeView = TreeSingleton.getInstance().getTreeView();
         gob_vBox.getChildren().add(gob_treeView);
     }
@@ -140,17 +143,18 @@ public class MainController {
             lob_thread = new DirectoryCounterThread(iob_file, gob_label_content);
             lob_thread.setName("FileInformationThread");
             lob_thread.start();
-        }else{
+        } else {
             gob_label_type.setText("File");
             gob_txt_label_content.setVisible(false);
             gob_label_content.setVisible(false);
         }
 
         gob_label_name.setText(iob_file.getName());
-        lva_fileSize_kb = getFileSize(iob_file) / 1024; // um aus den Bytes kB zu machen / 1024
+
+        // Bytes -> kBytes
+        lva_fileSize_kb = getFileSize(iob_file) / 1024;
+
         gob_label_size.setText(String.valueOf(lva_fileSize_kb + " KB"));
-
-
     }
 
     //TODO evtl. in einen Thread auslagern
