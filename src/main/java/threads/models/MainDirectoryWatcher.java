@@ -68,7 +68,11 @@ class MainDirectoryWatcher implements ThreadControl {
         if (TreeTool.filterRootFiles(iob_path)){
             return;
         }
-        ThreadManager.addCommandToFileManager(iob_path.toFile(), FileManagerConstants.GC_ADD, true);
+        if (TreeSingleton.getInstance().getDuplicateOperationsPrevention().wasFileCreated(iob_path)) {
+            TreeSingleton.getInstance().getDuplicateOperationsPrevention().removeCreated(iob_path);
+        } else {
+            ThreadManager.addCommandToFileManager(iob_path.toFile(), FileManagerConstants.GC_ADD, true);
+        }
     }
 
     private void deleteFile(Path iob_path) {
@@ -83,7 +87,8 @@ class MainDirectoryWatcher implements ThreadControl {
         if (TreeSingleton.getInstance().getDuplicateOperationsPrevention().wasFilesMoved(iob_oldPath)) {
             TreeSingleton.getInstance().getDuplicateOperationsPrevention().removeMoved(iob_oldPath);
         } else {
-            TreeTool.moveFile(iob_oldPath, iob_newPath.getParent(), true, gob_restClient);
+            ThreadManager.addCommandToFileManager(iob_oldPath.toFile(), FileManagerConstants.GC_MOVE, true, iob_newPath.toFile(), true);
+//            TreeTool.moveFile(iob_oldPath, iob_newPath.getParent(), true, gob_restClient);
         }
     }
 

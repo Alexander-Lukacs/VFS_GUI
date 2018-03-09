@@ -134,7 +134,6 @@ class DirectoryWatchService implements Runnable{
             }
         });
 
-
         lco_moved.keySet().removeIf(lob_file -> {
             for (File lob_renamedFile : lco_renamed.keySet()) {
                 if (lob_file.toPath().startsWith(lob_renamedFile.toPath())) {

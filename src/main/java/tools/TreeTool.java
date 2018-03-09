@@ -25,16 +25,14 @@ public class TreeTool {
     private TreeTool() {
     }
 
-    public TreeItem<String> addTreeItem(TreeItem<String> iob_parent, File iob_file) {
+    @SuppressWarnings("WeakerAccess")
+    public void addTreeItem(TreeItem<String> iob_parent, File iob_file) {
         TreeItem<String> rob_child = new TreeItem<>(iob_file.getName());
-        if (iob_file.isDirectory()) {
-            rob_child.setGraphic(getTreeIcon(iob_file.getAbsolutePath()));
-        } else {
+        if (iob_file.exists()) {
             rob_child.setGraphic(getTreeIcon(iob_file.getAbsolutePath()));
         }
 
         iob_parent.getChildren().add(rob_child);
-        return rob_child;
     }
 
     public static TreeItem<String> getTreeItem(File iob_file) {
@@ -135,6 +133,10 @@ public class TreeTool {
 
     public void addToTreeView(File iob_file) {
         try {
+            if (!iob_file.exists()) {
+                return;
+            }
+
             TreeItem<String> lob_pointer = TreeSingleton.getInstance().getTreeView().getRoot();
             String[] lar_path = removeBasePathAndConvertToArray(iob_file.getCanonicalPath());
             int depth = 0;
@@ -178,47 +180,14 @@ public class TreeTool {
      * @return return true if the file is on the same level, otherwise false
      */
     public static boolean filterRootFiles(Path iob_path) {
-        if (iob_path.endsWith("Private")) {
-            return false;
-        }
+        Path lob_rootPath = TreeSingleton.getInstance().getTree().getRoot().toPath();
+        Path lob_privatePath = new File(lob_rootPath.toString() + "\\Private").toPath();
+        Path lob_publicPath = new File(lob_rootPath.toString() + "\\Public").toPath();
+        Path lob_sharedPath = new File(lob_rootPath.toString() + "\\Shared").toPath();
 
-        if (iob_path.endsWith("Public")) {
-            return false;
-        }
+        return !iob_path.startsWith(lob_privatePath) && !iob_path.startsWith(lob_publicPath) && !iob_path.startsWith(lob_sharedPath);
 
-        if (iob_path.endsWith("Shared")) {
-            return false;
-        }
-
-        File root_file = TreeSingleton.getInstance().getTree().getRoot();
-        return root_file.equals(iob_path.getParent().toFile());
     }
-
-    public static void moveFile(Path iob_path, Path iob_destination, boolean iva_moveJustInTree, FileRestClient iob_restClient) {
-        //-------------------------Variables------------------------------------
-        TreeItem<String> lob_item = getTreeItem(iob_path.toFile());
-        TreeItem<String> lob_parent = getTreeItem(iob_destination.toFile());
-        String lva_destination = iob_destination.toString();
-        String lva_oldRelativePath;
-        String lva_newRelativePath;
-        //----------------------------------------------------------------------
-        try {
-            if (!TreeSingleton.getInstance().getTree().moveFile(iob_path.toFile(), lva_destination, iva_moveJustInTree)) {
-                new AlertWindows().createErrorAlert("File could not be moved. There is a File with the same name");
-                return;
-            }
-
-            removeFromTreeView(iob_path.toFile());
-            lob_parent.getChildren().add(lob_item);
-
-            lva_oldRelativePath = getRelativePath(iob_path.toString());
-            lva_newRelativePath = getRelativePath(lva_destination);
-            iob_restClient.moveFile(lva_oldRelativePath, lva_newRelativePath);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-    }
-
     private String[] removeBasePathAndConvertToArray(String iva_filePath) throws IOException {
         String lva_basePath = TreeSingleton.getInstance().getTree().getRoot().getCanonicalPath();
         lva_basePath = lva_basePath.replaceAll("\\\\", "\\\\\\\\");

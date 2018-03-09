@@ -5,25 +5,27 @@ import fileTree.interfaces.Tree;
 import fileTree.interfaces.TreeDifference;
 import fileTree.models.TreeSingleton;
 import javafx.application.Platform;
+import javafx.scene.control.TreeItem;
 import restful.clients.FileRestClient;
 import threads.interfaces.ThreadControl;
+import tools.AlertWindows;
 import tools.TreeTool;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static threads.constants.FileManagerConstants.*;
+import static tools.TreeTool.buildFileFromItem;
+import static tools.TreeTool.getRelativePath;
 
 public class FileManagerThreadControl implements ThreadControl, Runnable {
     private volatile boolean isRunning;
     private FileRestClient gob_restClient;
     private AtomicInteger gva_commandIndex = new AtomicInteger(0);
     private volatile List<Command> gco_commands = Collections.synchronizedList(new ArrayList<Command>());
+    private static final int GC_MAX_TRIES = 20;
 
     @Override
     public void start() {
@@ -52,9 +54,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
 
         lob_command.gob_file = iob_file;
         lob_command.gva_command = iva_commando;
-        lob_command.gva_doOnServer = false;
-        lob_command.gva_commandSuccessfulOnServer = false;
-
+        lob_command.gva_maxTries = 0;
         if (iar_fileInformation.length != 0) {
             lob_command.gar_fileInformation = iar_fileInformation;
         } else {
@@ -62,18 +62,12 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         }
         gco_commands.add(lob_command);
 
-        if (iva_executeCommandOnServer && !iva_commando.equals(GC_DOWNLOAD_FROM_SERVER) && !iva_commando.equals(GC_COMPARE_TREE)) {
+        if (iva_executeCommandOnServer && !iva_commando.endsWith("server")) {
             lob_serverCommand = new Command();
             lob_serverCommand.gob_file = iob_file;
             lob_serverCommand.gva_command = iva_commando + "_on_server";
-            lob_serverCommand.gva_doOnServer = true;
             lob_serverCommand.gar_fileInformation = iar_fileInformation;
-
-            if (iar_fileInformation.length != 0) {
-                lob_serverCommand.gar_fileInformation = iar_fileInformation;
-            } else {
-                lob_serverCommand.gar_fileInformation = null;
-            }
+            lob_serverCommand.gva_maxTries = 0;
 
             gco_commands.add(lob_serverCommand);
         }
@@ -86,28 +80,44 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
     private void executeCommand(Command iob_command) {
         switch (iob_command.gva_command) {
             case GC_ADD:
+                System.out.println(GC_ADD);
                 addLocalFile(iob_command);
                 break;
 
             case GC_UPLOAD_TO_SERVER:
+                System.out.println(GC_UPLOAD_TO_SERVER);
                 uploadFileToServer(iob_command);
                 break;
 
             case GC_DELETE:
+                System.out.println(GC_DELETE);
                 deleteLocalFile(iob_command);
                 break;
 
             case GC_DELETE_ON_SERVER:
+                System.out.println(GC_DELETE_ON_SERVER);
                 deleteFileOnServer(iob_command);
                 break;
 
-            case GC_MOVE: break;
+            case GC_MOVE:
+                System.out.println(GC_MOVE);
+                moveLocalFile(iob_command);
+                break;
 
-            case GC_MOVE_ON_SERVER: break;
+            case GC_MOVE_ON_SERVER:
+                System.out.println(GC_MOVE_ON_SERVER);
+                moveFileOnServer(iob_command);
+                break;
 
-            case GC_DELETE_DIR_ONLY: break;
+            case GC_DELETE_DIR_ONLY:
+                System.out.println(GC_DELETE_DIR_ONLY);
+                deleteLocalDirectory(iob_command);
+                break;
 
-            case GC_DELETE_DIR_ONLY_ON_SERVER: break;
+            case GC_DELETE_DIR_ONLY_ON_SERVER:
+                System.out.println(GC_DELETE_DIR_ONLY_ON_SERVER);
+                deleteDirectoryOnServer(iob_command);
+                break;
 
             case GC_RENAME: break;
 
@@ -116,28 +126,13 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             case GC_DOWNLOAD_FROM_SERVER: break;
 
             case GC_COMPARE_TREE:
+                System.out.println("GC_COMPARE_TREE");
                 compareTrees(iob_command);
                 break;
 
             default: gco_commands.remove(iob_command);
         }
     }
-
-    private void addFiles(TreeDifference iob_difference, Tree iob_tree, int iva_loopIndex) {
-        for (String lva_addFile : iob_difference.getFilesToInsert()) {
-            if (iva_loopIndex == 1) {
-                lva_addFile = "Public" + lva_addFile;
-            }
-
-            File lob_newFile = gob_restClient.downloadFile(lva_addFile);
-            if (lob_newFile != null) {
-                //add to private directory
-                Platform.runLater(() -> TreeTool.getInstance().addToTreeView(lob_newFile));
-                iob_tree.addFile(lob_newFile, lob_newFile.isDirectory());
-            }
-        }
-    }
-
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods to execute a command
@@ -152,12 +147,17 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
      *                    1. boolean is the file a directory
      *
      */
+    @SuppressWarnings("Duplicates")
     private void addLocalFile(Command iob_command) {
         boolean lva_isDirectory;
         Tree lob_tree = TreeSingleton.getInstance().getTree();
 
         try {
-            lva_isDirectory = getBooleanFromInformationArray(iob_command, 0);
+            if (iob_command.gob_file.exists()) {
+                lva_isDirectory = iob_command.gob_file.isDirectory();
+            } else {
+                lva_isDirectory = getObjectFromInformationArray(iob_command, 0, Boolean.class);
+            }
         } catch (RuntimeException ex) {
             gco_commands.remove(iob_command);
             return;
@@ -173,6 +173,278 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
 
         if (!TreeTool.isFileInTreeView(iob_command.gob_file)) {
             Platform.runLater(() -> TreeTool.getInstance().addToTreeView(iob_command.gob_file));
+        }
+
+        gco_commands.remove(iob_command);
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // "GC_UPLOAD_TO_SERVER"
+    //------------------------------------------------------------------------------------------------------------------
+    /**
+     * upload a file or a directory to the server
+     * @param iob_command expected input in gar_information if the file is a directory and not yet created:
+     *                    1. boolean is the file a directory
+     */
+    @SuppressWarnings("Duplicates")
+    private void uploadFileToServer(Command iob_command) {
+        boolean lva_isDirectory;
+
+        if (iob_command.gob_file == null) {
+            gco_commands.remove(iob_command);
+            return;
+        }
+
+        try {
+            if (iob_command.gob_file.exists()) {
+                lva_isDirectory = iob_command.gob_file.isDirectory();
+            } else {
+                lva_isDirectory = getObjectFromInformationArray(iob_command, 0, Boolean.class);
+            }
+        } catch (RuntimeException ex) {
+            gco_commands.remove(iob_command);
+            return;
+        }
+
+        if (TreeTool.filterRootFiles(iob_command.gob_file.toPath())) {
+            gco_commands.remove(iob_command);
+            return;
+        }
+
+        if (lva_isDirectory) {
+            if (gob_restClient.createDirectoryOnServer(iob_command.gob_file)) {
+                gco_commands.remove(iob_command);
+            } else {
+                gva_commandIndex.incrementAndGet();
+            }
+        } else {
+            if (!iob_command.gob_file.exists()) {
+                try {
+                    if (!iob_command.gob_file.createNewFile()) {
+                        gva_commandIndex.incrementAndGet();
+                        return;
+                    }
+                } catch (IOException ex) {
+                    gva_commandIndex.incrementAndGet();
+                    return;
+                }
+            }
+
+            if (gob_restClient.uploadFilesToServer(iob_command.gob_file)) {
+                gco_commands.remove(iob_command);
+            } else {
+                gva_commandIndex.incrementAndGet();
+            }
+        }
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // "GC_DELETE"
+    //------------------------------------------------------------------------------------------------------------------
+    /**
+     * delete file on the client
+     * @param iob_command expected input in gar_information:
+     *                    1. tree from the client
+     */
+    private void deleteLocalFile(Command iob_command) {
+        Tree lob_tree;
+        Platform.runLater(() -> TreeTool.getInstance().deleteItem(iob_command.gob_file));
+
+        if (iob_command.gob_file == null) {
+            removeCommand(iob_command);
+        }
+
+//        if (iob_command.gar_fileInformation[0] instanceof Tree) {
+//            lob_tree = (Tree) iob_command.gar_fileInformation[0];
+//        } else {
+//            removeCommand(iob_command);
+//            return;
+//        }
+
+        try {
+            lob_tree = getObjectFromInformationArray(iob_command, 0, Tree.class);
+        } catch (RuntimeException ex) {
+            removeCommand(iob_command);
+            return;
+        }
+
+        if (lob_tree.deleteFile(iob_command.gob_file)) {
+            removeCommand(iob_command);
+        } else {
+            gva_commandIndex.incrementAndGet();
+        }
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // "GC_DELETE_ON_SERVER"
+    //------------------------------------------------------------------------------------------------------------------
+    /**
+     * delete a file on the server
+     * @param iob_command file cant be null
+     */
+    private void deleteFileOnServer(Command iob_command) {
+        if (iob_command.gob_file == null) {
+            gco_commands.remove(iob_command);
+        }
+
+        if (gob_restClient.deleteOnServer(iob_command.gob_file)) {
+            gco_commands.remove(iob_command);
+        } else {
+            gva_commandIndex.incrementAndGet();
+        }
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // "GC_MOVE"
+    //------------------------------------------------------------------------------------------------------------------
+    /**
+     *
+     * @param iob_command expected input in gar_information:
+     *                    1: new File path
+     *                    2: boolean whether the file should be only moved in the tree or on the disk as well
+     */
+    private void moveLocalFile(Command iob_command) {
+//-------------------------Variables------------------------------------
+        File lob_oldFilePath;
+        File lob_newFilePath;
+        boolean lva_moveOnlyInTree;
+        TreeItem<String> lob_item;
+        TreeItem<String> lob_newParent;
+        Tree lob_tree = TreeSingleton.getInstance().getTree();
+
+        if (iob_command.gob_file == null) {
+            gco_commands.remove(iob_command);
+            return;
+        }
+
+        try {
+            //get all needed information from the informationArray
+            lob_oldFilePath = iob_command.gob_file;
+            lob_newFilePath = getObjectFromInformationArray(iob_command, 0, File.class);
+            lva_moveOnlyInTree = getObjectFromInformationArray(iob_command, 1, Boolean.class);
+
+        } catch (RuntimeException ex) {
+            ex.printStackTrace();
+            gco_commands.remove(iob_command);
+            return;
+        }
+
+        if (!iob_command.gob_file.exists() && !lva_moveOnlyInTree) {
+            gco_commands.remove(iob_command);
+            return;
+        }
+
+        lob_item = TreeTool.getTreeItem(lob_oldFilePath);
+        lob_newParent = TreeTool.getTreeItem(lob_newFilePath);
+
+        if (lob_item == null || lob_newParent == null) {
+            gco_commands.remove(iob_command);
+            return;
+        }
+
+        if (!canFileBeMoved(lob_item, lob_newParent)) {
+            Platform.runLater(() -> new AlertWindows().createErrorAlert("File could not be moved. There is a File with the same name"));
+            gco_commands.remove(iob_command);
+            return;
+        }
+
+        //move the item in the treeView
+        lob_item.getParent().getChildren().remove(lob_item);
+        lob_newParent.getChildren().add(lob_item);
+
+        lob_tree.moveFile(lob_oldFilePath, lob_newFilePath.getAbsolutePath(), lva_moveOnlyInTree);
+        gco_commands.remove(iob_command);
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // "GC_MOVE_ON_SERVER"
+    //------------------------------------------------------------------------------------------------------------------
+    private void moveFileOnServer(Command iob_command) {
+        int lva_requestResult;
+        File lob_oldFilePath;
+        File lob_newFilePath;
+        String lva_oldRelativePath;
+        String lva_newRelativePath;
+
+        System.out.println("move");
+        if (iob_command.gob_file == null) {
+            gco_commands.remove(iob_command);
+            return;
+        }
+
+        try {
+            //get all needed information from the informationArray
+            lob_oldFilePath = iob_command.gob_file;
+            lob_newFilePath = getObjectFromInformationArray(iob_command, 0, File.class);
+            lva_oldRelativePath = TreeTool.getRelativePath(lob_oldFilePath.getCanonicalPath());
+            lva_newRelativePath = TreeTool.getRelativePath(lob_newFilePath.getCanonicalPath());
+
+        } catch (RuntimeException | IOException ex) {
+            ex.printStackTrace();
+            gco_commands.remove(iob_command);
+            return;
+        }
+
+        lva_requestResult = gob_restClient.moveFile(lva_oldRelativePath, lva_newRelativePath);
+
+        if (lva_requestResult > 2) {
+            gva_commandIndex.incrementAndGet();
+            return;
+        }
+
+        gco_commands.remove(iob_command);
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // "GC_DELETE_DIR_ONLY"
+    //------------------------------------------------------------------------------------------------------------------
+    private void deleteLocalDirectory(Command iob_command) {
+        TreeItem<String> lob_item;
+        TreeItem<String> lob_parent;
+        Tree lob_tree = TreeSingleton.getInstance().getTree();
+
+        if (iob_command.gob_file == null) {
+            gco_commands.remove(iob_command);
+            return;
+        }
+
+        if (!iob_command.gob_file.isDirectory()) {
+            gco_commands.remove(iob_command);
+            return;
+        }
+
+        lob_parent = TreeTool.getTreeItem(iob_command.gob_file.getParentFile());
+        lob_item = TreeTool.getTreeItem(iob_command.gob_file);
+
+        for (TreeItem<String> lob_child : lob_item.getChildren()) {
+            if (!canFileBeMoved(lob_child, lob_parent)) {
+                removeCommand(iob_command);
+                Platform.runLater(() ->  new AlertWindows().createErrorAlert("The directory contains a file with the same nam as in the parent directory"));
+                return;
+            }
+        }
+
+        Platform.runLater(() -> {
+            lob_parent.getChildren().addAll(lob_item.getChildren());
+            lob_parent.getChildren().remove(lob_item);
+        });
+
+        lob_tree.deleteDirectoryOnly(iob_command.gob_file);
+        gco_commands.remove(iob_command);
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // "GC_DELETE_DIR_ONLY_ON_SERVER"
+    //------------------------------------------------------------------------------------------------------------------
+    private void deleteDirectoryOnServer(Command iob_command) {
+        if (iob_command.gob_file == null) {
+            gco_commands.remove(iob_command);
+            return;
+        }
+
+        if (!gob_restClient.deleteDirectoryOnly(iob_command.gob_file)) {
+            gva_commandIndex.incrementAndGet();
+            return;
         }
 
         gco_commands.remove(iob_command);
@@ -212,131 +484,47 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         gco_commands.remove(iob_command);
     }
 
-    //------------------------------------------------------------------------------------------------------------------
-    // "GC_DELETE"
-    //------------------------------------------------------------------------------------------------------------------
-    /**
-     * delete file on the client
-     * @param iob_command expected input in gar_information:
-     *                    1. tree from the client
-     */
-    private void deleteLocalFile(Command iob_command) {
-        Tree lob_tree;
-        Platform.runLater(() -> TreeTool.getInstance().deleteItem(iob_command.gob_file));
-
-        if (iob_command.gob_file == null) {
-            removeCommand(iob_command);
-        }
-
-        if (iob_command.gar_fileInformation[0] instanceof Tree) {
-            lob_tree = (Tree) iob_command.gar_fileInformation[0];
-        } else {
-            removeCommand(iob_command);
-            return;
-        }
-
-        if (lob_tree.deleteFile(iob_command.gob_file)) {
-            removeCommand(iob_command);
-        } else {
-            gva_commandIndex.incrementAndGet();
-        }
-    }
-
-    //------------------------------------------------------------------------------------------------------------------
-    // "GC_DELETE_ON_SERVER"
-    //------------------------------------------------------------------------------------------------------------------
-    /**
-     * delete a file on the server
-     * @param iob_command file cant be null
-     */
-    private void deleteFileOnServer(Command iob_command) {
-        if (iob_command.gob_file == null) {
-            gco_commands.remove(iob_command);
-        }
-
-        if (gob_restClient.deleteOnServer(iob_command.gob_file)) {
-            gco_commands.remove(iob_command);
-        } else {
-            gva_commandIndex.incrementAndGet();
-        }
-    }
-
-    //------------------------------------------------------------------------------------------------------------------
-    // "GC_DELETE_ON_SERVER"
-    //------------------------------------------------------------------------------------------------------------------
-    /**
-     * upload a file or a directory to the server
-     * @param iob_command expected input in gar_information if the file is a directory and not yet created:
-     *                    1. boolean is the file a directory
-     */
-    private void uploadFileToServer(Command iob_command) {
-        boolean lva_isDirectory;
-
-        if (iob_command.gob_file == null) {
-            gco_commands.remove(iob_command);
-            return;
-        }
-
-        try {
-            lva_isDirectory = getBooleanFromInformationArray(iob_command, 0);
-        } catch (RuntimeException ex) {
-            gco_commands.remove(iob_command);
-            return;
-        }
-
-        if (TreeTool.filterRootFiles(iob_command.gob_file.toPath())) {
-            gco_commands.remove(iob_command);
-            return;
-        }
-
-        if (lva_isDirectory) {
-            if (gob_restClient.createDirectoryOnServer(iob_command.gob_file)) {
-                gco_commands.remove(iob_command);
-            } else {
-                gva_commandIndex.incrementAndGet();
-            }
-        } else {
-            if (!iob_command.gob_file.exists()) {
-                try {
-                    if (!iob_command.gob_file.createNewFile()) {
-                        gva_commandIndex.incrementAndGet();
-                        return;
-                    }
-                } catch (IOException ex) {
-                    gva_commandIndex.incrementAndGet();
-                    return;
-                }
-            }
-
-            if (gob_restClient.uploadFilesToServer(iob_command.gob_file)) {
-                gco_commands.remove(iob_command);
-            } else {
-                gva_commandIndex.incrementAndGet();
-            }
-        }
-    }
-
 //----------------------------------------------------------------------------------------------------------------------
 // helper methods
 //----------------------------------------------------------------------------------------------------------------------
-
-    private boolean getBooleanFromInformationArray(Command iob_command, int iob_index) {
-        if (!iob_command.gob_file.exists()) {
-            if (iob_command.gar_fileInformation == null || iob_command.gar_fileInformation.length == 0) {
-                gco_commands.remove(iob_command);
-                throw new RuntimeException();
+    private boolean canFileBeMoved(TreeItem<String> iob_item, TreeItem<String> iob_newParent) {
+        //check if a file with the same name already exists
+        for (TreeItem<String> lob_child : iob_newParent.getChildren()) {
+            if (lob_child.getValue().equals(iob_item.getValue())) {
+                return false;
             }
+        }
 
-            if (iob_command.gar_fileInformation[iob_index] instanceof Boolean) {
-                return (Boolean) iob_command.gar_fileInformation[iob_index];
-            } else {
-                // the information if it was a file or directory was not provided, therefore remove the command
-                // and return
-                gco_commands.remove(iob_command);
-                throw new RuntimeException();
-            }
+        return true;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T getObjectFromInformationArray(Command iob_command, int iob_index, Class<T> iob_class) {
+        if (iob_command.gar_fileInformation == null || iob_command.gar_fileInformation.length <= iob_index) {
+            gco_commands.remove(iob_command);
+            throw new RuntimeException();
+        }
+
+        if (iob_class.isAssignableFrom(iob_command.gar_fileInformation[iob_index].getClass())) {
+            return (T) (iob_command.gar_fileInformation[iob_index]);
         } else {
-            return iob_command.gob_file.isDirectory();
+            gco_commands.remove(iob_command);
+            throw new RuntimeException();
+        }
+    }
+
+    private void addFiles(TreeDifference iob_difference, Tree iob_tree, int iva_loopIndex) {
+        for (String lva_addFile : iob_difference.getFilesToInsert()) {
+            if (iva_loopIndex == 1) {
+                lva_addFile = "Public" + lva_addFile;
+            }
+
+            File lob_newFile = gob_restClient.downloadFile(lva_addFile);
+            if (lob_newFile != null) {
+                //add to private directory
+                Platform.runLater(() -> TreeTool.getInstance().addToTreeView(lob_newFile));
+                iob_tree.addFile(lob_newFile, lob_newFile.isDirectory());
+            }
         }
     }
 
@@ -348,8 +536,8 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
 
             if (iva_loopIndex == 1) {
                 lva_deleteFile = iob_tree.getRoot().getAbsolutePath() + "\\Public" + lva_deleteFile;
-            }
 
+            }
             File lob_file = new File(lva_deleteFile);
             iob_tree.deleteFile(lva_deleteFile);
             TreeTool.getInstance().deleteItem(lob_file);
@@ -393,7 +581,6 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         private Object[] gar_fileInformation;
         private File gob_file;
         private String gva_command;
-        private boolean gva_doOnServer;
-        private boolean gva_commandSuccessfulOnServer;
+        private int gva_maxTries;
     }
 }

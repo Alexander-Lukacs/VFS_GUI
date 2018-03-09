@@ -9,6 +9,8 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.TransferMode;
 import restful.clients.FileRestClient;
+import threads.constants.FileManagerConstants;
+import threads.models.ThreadManager;
 import tools.TreeTool;
 import tools.xmlTools.DirectoryNameMapper;
 
@@ -116,7 +118,8 @@ public class TreeCellImpl extends TreeCell<String> {
             lob_fileHovered = TreeTool.buildFileFromItem(lob_treeItemHovered, gob_tree);
             lob_fileDragged = TreeTool.buildFileFromItem(lob_treeItemDragged, gob_tree);
 
-            TreeTool.moveFile(lob_fileDragged.toPath(), lob_fileHovered.toPath(), false, gob_restClient);
+//            TreeTool.moveFile(lob_fileDragged.toPath(), lob_fileHovered.toPath(), false, gob_restClient);
+            ThreadManager.addCommandToFileManager(lob_fileDragged, FileManagerConstants.GC_MOVE, true, lob_fileHovered, false);
             lob_treeSingleton.getDuplicateOperationsPrevention().putMoved(lob_fileDragged.toPath());
 
             lob_treeSingleton.getTreeView().getSelectionModel().select(lob_treeItemHovered);

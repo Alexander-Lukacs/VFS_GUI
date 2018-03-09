@@ -36,7 +36,7 @@ public class FileRestClient extends RestClient {
         super(iva_baseUrl, iva_email, iva_password);
     }
 
-    // ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
 // Upload a File to the Server
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -133,18 +133,29 @@ public class FileRestClient extends RestClient {
         return lob_response.getStatus() == 200;
     }
 
-    public void deleteDirectoryOnly(String iva_relativePath) {
+// ---------------------------------------------------------------------------------------------------------------------
+// Delete only a directory on the server, move all files that the directory contains to the parent directory
+// ---------------------------------------------------------------------------------------------------------------------
+    public boolean deleteDirectoryOnly(File iob_file) {
+        String lva_relativePath;
+
+        try {
+            lva_relativePath = TreeTool.getRelativePath(iob_file.getCanonicalPath());
+        } catch (IOException ex) {
+            return false;
+        }
+
         Response lob_response = gob_webTarget.path("/auth/files/removeDirectoryOnly")
-                .queryParam("directoryId", getDirectoryIdFromRelativePath(iva_relativePath))
+                .queryParam("directoryId", getDirectoryIdFromRelativePath(lva_relativePath))
                 .request()
-                .post(Entity.entity(iva_relativePath, MediaType.TEXT_PLAIN));
-        System.out.println(lob_response.getStatus());
+                .post(Entity.entity(lva_relativePath, MediaType.TEXT_PLAIN));
+        return lob_response.getStatus() == 200;
     }
 
-    // ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
 // Move a file on the server
 // ---------------------------------------------------------------------------------------------------------------------
-    public void moveFile(String iva_relativePath, String iva_newRelativePath) {
+    public int moveFile(String iva_relativePath, String iva_newRelativePath) {
         int lva_sourceDirectoryId = getDirectoryIdFromRelativePath(iva_relativePath);
         int lva_destinationDirectoryId = getDirectoryIdFromRelativePath(iva_newRelativePath);
 
@@ -154,10 +165,16 @@ public class FileRestClient extends RestClient {
                 .queryParam("destinationDirectoryId", lva_destinationDirectoryId)
                 .request()
                 .post(Entity.entity(iva_newRelativePath, MediaType.TEXT_PLAIN));
-        System.out.println(lob_response.getStatus());
+
+        switch (lob_response.getStatus()) {
+            case 200: return 0;
+            case 400: return 1;
+            case 422: return 2;
+            default: return 3;
+        }
     }
 
-    // ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
 // Rename a file on the server
 // ---------------------------------------------------------------------------------------------------------------------
     public void renameFile(String iva_relativePath, String iva_newRelativePath) {
@@ -171,7 +188,7 @@ public class FileRestClient extends RestClient {
         System.out.println(lob_response.getStatus());
     }
 
-    // ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
 // Rename a file on the server
 // ---------------------------------------------------------------------------------------------------------------------
     public Collection<TreeDifference> compareClientAndServerTree(Tree iob_tree) {

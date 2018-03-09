@@ -124,14 +124,6 @@ public class TreeControl {
         }
     }
 
-//    private boolean addFile(File iob_file, boolean iva_isDirectory) {
-//        if (TreeTool.filterRootFiles(iob_file.toPath())) {
-//            return false;
-//        }
-//        this.gob_tree.addFile(iob_file, iva_isDirectory);
-//        return true;
-//    }
-
     private void buildContextMenu() {
         //-----------------------Variables---------------------------------
         MenuItem lob_deleteFile;
@@ -148,11 +140,6 @@ public class TreeControl {
             File lob_selectedFile = buildFileFromItem(
                     gob_treeView.getSelectionModel().getSelectedItem(), gob_tree
             );
-            TreeItem<String> lob_selectedItem = gob_treeView.getSelectionModel().getSelectedItem();
-//            if (deleteFile(lob_selectedFile, lob_selectedItem, gob_restClient)) {
-//                System.out.println("GELÖSCHT");
-//                addAllDeleted(lob_selectedFile);
-//            }
             ThreadManager.addCommandToFileManager(lob_selectedFile, FileManagerConstants.GC_DELETE,
                     true, gob_tree);
             addAllDeleted(lob_selectedFile);
@@ -164,8 +151,11 @@ public class TreeControl {
         );
 
         lob_deleteDirectoryOnly = new MenuItem("Delete only Directory");
-        lob_deleteDirectoryOnly.setOnAction(event ->
-                deleteDirectoryOnly()
+        lob_deleteDirectoryOnly.setOnAction(event -> {
+                File lob_file = buildFileFromItem(gob_treeView.getSelectionModel().getSelectedItem(), gob_tree);
+                ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_DELETE_DIR_ONLY, true);
+                TreeSingleton.getInstance().getDuplicateOperationsPrevention().putDeleted(lob_file.toPath());
+            }
         );
 
         lob_renameFile = new MenuItem("Rename");
@@ -298,36 +288,36 @@ public class TreeControl {
         }
     }
 
-    private void deleteDirectoryOnly() {
-        //-------------------------------Variables----------------------------------------
-        File lob_selectedFile = buildFileFromItem(
-                gob_treeView.getSelectionModel().getSelectedItem(), gob_tree
-        );
-        String lva_relativePath;
-        //--------------------------------------------------------------------------------
-
-        try {
-            TreeItem<String> lob_selectedItem = gob_treeView.getSelectionModel().getSelectedItem();
-            lva_relativePath = getRelativePath(lob_selectedFile.getCanonicalPath());
-
-            for (File lob_child : lob_selectedFile.listFiles()) {
-                addAllMovedOrRenamed(lob_child);
-            }
-
-            if (!gob_tree.deleteDirectoryOnly(lob_selectedFile)) {
-                return;
-            }
-
-            TreeItem<String> lob_parentItem = lob_selectedItem.getParent();
-            lob_parentItem.getChildren().addAll(lob_selectedItem.getChildren());
-            lob_parentItem.getChildren().remove(lob_selectedItem);
-
-            TreeSingleton.getInstance().getDuplicateOperationsPrevention().putDeleted(lob_selectedFile.toPath());
-            gob_restClient.deleteDirectoryOnly(lva_relativePath);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-    }
+//    private void deleteDirectoryOnly() {
+//        //-------------------------------Variables----------------------------------------
+//        File lob_selectedFile = buildFileFromItem(
+//                gob_treeView.getSelectionModel().getSelectedItem(), gob_tree
+//        );
+//        String lva_relativePath;
+//        //--------------------------------------------------------------------------------
+//
+//        try {
+//            TreeItem<String> lob_selectedItem = gob_treeView.getSelectionModel().getSelectedItem();
+//            lva_relativePath = getRelativePath(lob_selectedFile.getCanonicalPath());
+//
+//            for (File lob_child : lob_selectedFile.listFiles()) {
+//                addAllMovedOrRenamed(lob_child);
+//            }
+//
+//            if (!gob_tree.deleteDirectoryOnly(lob_selectedFile)) {
+//                return;
+//            }
+//
+//            TreeItem<String> lob_parentItem = lob_selectedItem.getParent();
+//            lob_parentItem.getChildren().addAll(lob_selectedItem.getChildren());
+//            lob_parentItem.getChildren().remove(lob_selectedItem);
+//
+//            TreeSingleton.getInstance().getDuplicateOperationsPrevention().putDeleted(lob_selectedFile.toPath());
+//            gob_restClient.deleteDirectoryOnly(lva_relativePath);
+//        } catch (IOException ex) {
+//            ex.printStackTrace();
+//        }
+//    }
 
     private void createNewDirectory() {
         File lob_newFile = buildNewFile("\\Neuer Ordner$");
