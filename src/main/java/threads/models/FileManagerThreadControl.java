@@ -1,15 +1,18 @@
 package threads.models;
 
 import builder.RestClientBuilder;
+import cache.DataCache;
 import fileTree.interfaces.Tree;
 import fileTree.interfaces.TreeDifference;
 import fileTree.models.TreeSingleton;
 import javafx.application.Platform;
 import javafx.scene.control.TreeItem;
+import org.apache.commons.io.FileUtils;
 import restful.clients.FileRestClient;
 import threads.interfaces.ThreadControl;
 import tools.AlertWindows;
 import tools.TreeTool;
+import tools.Utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -127,7 +130,10 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
                 renameFileOnServer(iob_command);
                 break;
 
-            case GC_DOWNLOAD_FROM_SERVER: break;
+            case GC_DOWNLOAD_FROM_SERVER:
+                System.out.println(GC_DOWNLOAD_FROM_SERVER);
+                downloadFile(iob_command);
+                break;
 
             case GC_COMPARE_TREE:
                 System.out.println("GC_COMPARE_TREE");
@@ -307,7 +313,6 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
     // "GC_MOVE"
     //------------------------------------------------------------------------------------------------------------------
     /**
-     *
      * @param iob_command expected input in gar_information:
      *                    1: new File path
      *                    2: boolean whether the file should be only moved in the tree or on the disk as well
@@ -368,6 +373,10 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
     //------------------------------------------------------------------------------------------------------------------
     // "GC_MOVE_ON_SERVER"
     //------------------------------------------------------------------------------------------------------------------
+    /**
+     * @param iob_command expected input in gar_information:
+     *                    1: new File path
+     */
     private void moveFileOnServer(Command iob_command) {
         int lva_requestResult;
         File lob_oldFilePath;
@@ -473,6 +482,11 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
     //------------------------------------------------------------------------------------------------------------------
     // "GC_RENAME"
     //------------------------------------------------------------------------------------------------------------------
+    /**
+     * @param iob_command expected input in gar_information:
+     *                    1: new File name
+     *                    2: boolean whether the file should be renamed in the tree view or not
+     */
     private void renameLocalFile(Command iob_command) {
         Tree lob_tree = TreeSingleton.getInstance().getTree();
         TreeItem<String> lob_item;
@@ -513,6 +527,10 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
     //------------------------------------------------------------------------------------------------------------------
     // "GC_RENAME_ON_SERVER"
     //------------------------------------------------------------------------------------------------------------------
+    /**
+     * @param iob_command expected input in gar_information:
+     *                    1: new File path
+     */
     private void renameFileOnServer(Command iob_command) {
         String lva_newName;
 
@@ -530,6 +548,77 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
 
         gco_commands.remove(iob_command);
 
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // "GC_DOWNLOAD_FROM_SERVER"
+    //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     *
+     * @param iob_command expected input in gar_information:
+     *                    1: relative File Path
+     */
+    private void downloadFile(Command iob_command) {
+        String lva_relativePath;
+        String lva_newFilePath;
+        File lob_directory;
+        File lob_newFile;
+        byte[] lar_fileContent;
+        int lva_directoryId;
+
+        try {
+            lva_relativePath = getObjectFromInformationArray(iob_command, 0, String.class);
+        } catch (RuntimeException ex) {
+            gco_commands.remove(iob_command);
+            return;
+        }
+
+        Object lob_downloadContent = gob_restClient.downloadFile(lva_relativePath);
+
+        if (lob_downloadContent == null) {
+            gco_commands.remove(iob_command);
+            return;
+        }
+
+        lva_newFilePath = Utils.getUserBasePath() + "\\" +
+                DataCache.getDataCache().get(DataCache.GC_IP_KEY) +
+                "_" +
+                DataCache.getDataCache().get(DataCache.GC_PORT_KEY) +
+                "\\" +
+                DataCache.getDataCache().get(DataCache.GC_EMAIL_KEY) +
+                "\\";
+
+        lva_directoryId = FileRestClient.getDirectoryIdFromRelativePath(lva_relativePath);
+
+        if (lva_directoryId < 0) {
+            lva_newFilePath += "Private";
+        } else if (lva_directoryId > 0) {
+            lva_newFilePath += "Shared";
+        }
+
+        lva_newFilePath += lva_relativePath;
+
+        //the download returned a file so it must be a directory
+        if (lob_downloadContent instanceof Integer) {
+            lob_directory = new File(lva_newFilePath);
+            this.addFileWithCommando(lob_directory, GC_ADD, false, true);
+            gco_commands.remove(iob_command);
+            return;
+        }
+
+        if (lob_downloadContent instanceof byte[]) {
+            try {
+                lar_fileContent = (byte[]) lob_downloadContent;
+                lob_newFile = new File(lva_newFilePath);
+                FileUtils.writeByteArrayToFile(lob_newFile, lar_fileContent);
+                this.addFileWithCommando(lob_newFile, GC_ADD, false);
+            } catch (IOException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+
+        gco_commands.remove(iob_command);
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -558,7 +647,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
 
         Collection<TreeDifference> lco_differences = gob_restClient.compareClientAndServerTree(lob_tree);
         for (TreeDifference lob_difference : lco_differences) {
-            addFiles(lob_difference, lob_tree, lva_loopIndex);
+            addFiles(lob_difference, lva_loopIndex);
             deleteFiles(lob_difference, lob_tree, lva_loopIndex);
             lva_loopIndex++;
         }
@@ -596,18 +685,13 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         }
     }
 
-    private void addFiles(TreeDifference iob_difference, Tree iob_tree, int iva_loopIndex) {
+    private void addFiles(TreeDifference iob_difference, int iva_loopIndex) {
         for (String lva_addFile : iob_difference.getFilesToInsert()) {
             if (iva_loopIndex == 1) {
                 lva_addFile = "Public" + lva_addFile;
             }
 
-            File lob_newFile = gob_restClient.downloadFile(lva_addFile);
-            if (lob_newFile != null) {
-                //add to private directory
-                Platform.runLater(() -> TreeTool.getInstance().addToTreeView(lob_newFile));
-                iob_tree.addFile(lob_newFile, lob_newFile.isDirectory());
-            }
+            this.addFileWithCommando(null, GC_DOWNLOAD_FROM_SERVER, true, lva_addFile);
         }
     }
 

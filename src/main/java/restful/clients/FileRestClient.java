@@ -11,6 +11,7 @@ import fileTree.interfaces.Tree;
 import fileTree.interfaces.TreeDifference;
 import fileTree.models.TreeDifferenceImpl;
 import fileTree.models.TreeImpl;
+import org.apache.commons.io.IOUtils;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import tools.TreeTool;
@@ -23,7 +24,6 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -36,11 +36,7 @@ public class FileRestClient extends RestClient {
         super(iva_baseUrl, iva_email, iva_password);
     }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// Upload a File to the Server
-// ---------------------------------------------------------------------------------------------------------------------
-
-    private static int getDirectoryIdFromRelativePath(String iva_path) {
+    public static int getDirectoryIdFromRelativePath(String iva_path) {
         if (iva_path.startsWith("Shared")) {
             return 1;
         }
@@ -213,6 +209,9 @@ public class FileRestClient extends RestClient {
         return lco_differences;
     }
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Compare the Client the tree to the Server version
+// ---------------------------------------------------------------------------------------------------------------------
     private TreeDifference compareTreeToServer(String iva_directoryName, Tree iob_tree, int iva_directoryId) throws IOException {
         XStream lob_xmlParser = new XStream();
         XStream.setupDefaultSecurity(lob_xmlParser); // to be removed after 1.5
@@ -234,7 +233,10 @@ public class FileRestClient extends RestClient {
         return (TreeDifference) lob_xmlParser.fromXML(lva_xmlDifferenceString);
     }
 
-    public File downloadFile(String iva_filePath) {
+// ---------------------------------------------------------------------------------------------------------------------
+// download a file from the server
+// ---------------------------------------------------------------------------------------------------------------------
+    public Object downloadFile(String iva_filePath) {
         int lva_directoryId = getDirectoryIdFromRelativePath(iva_filePath);
 
         Response lob_response = gob_webTarget.path("/auth/files/download")
@@ -246,40 +248,43 @@ public class FileRestClient extends RestClient {
         }
 
         try {
-            String lva_newFilePath = Utils.getUserBasePath() + "\\" +
-                    DataCache.getDataCache().get(DataCache.GC_IP_KEY) +
-                    "_" +
-                    DataCache.getDataCache().get(DataCache.GC_PORT_KEY) +
-                    "\\" +
-                    DataCache.getDataCache().get(DataCache.GC_EMAIL_KEY) +
-                    "\\";
-
-            if (lva_directoryId < 0) {
-                lva_newFilePath += "Private";
-            } else if (lva_directoryId > 0) {
-                lva_newFilePath += "Shared";
-            }
-
-            lva_newFilePath += iva_filePath;
+//            String lva_newFilePath = Utils.getUserBasePath() + "\\" +
+//                    DataCache.getDataCache().get(DataCache.GC_IP_KEY) +
+//                    "_" +
+//                    DataCache.getDataCache().get(DataCache.GC_PORT_KEY) +
+//                    "\\" +
+//                    DataCache.getDataCache().get(DataCache.GC_EMAIL_KEY) +
+//                    "\\";
+//
+//            if (lva_directoryId < 0) {
+//                lva_newFilePath += "Private";
+//            } else if (lva_directoryId > 0) {
+//                lva_newFilePath += "Shared";
+//            }
+//
+//            lva_newFilePath += iva_filePath;
 
             if (lob_response.getStatus() == 204) {
-                File lob_newDirectory = new File(lva_newFilePath);
-                lob_newDirectory.mkdir();
-                return lob_newDirectory;
+                return 0;
+//                lob_newDirectory.mkdir();
+//                return lob_newDirectory;
+//                return lob_newDirectory;
             }
 
-            InputStream o = lob_response.readEntity(InputStream.class);
-            FileOutputStream os = new FileOutputStream(lva_newFilePath);
-            int bytesRead;
-            byte[] buffer = new byte[4096];
-            while ((bytesRead = o.read(buffer)) != -1) {
-                os.write(buffer, 0, bytesRead);
-            }
-
-            os.close();
-            o.close();
-
-            return new File(lva_newFilePath);
+            InputStream lob_inputStream = lob_response.readEntity(InputStream.class);
+//            byte[] lar_fileContent = IOUtils.toByteArray(lob_inputStream);
+            return IOUtils.toByteArray(lob_inputStream);
+//            FileOutputStream os = new FileOutputStream(lva_newFilePath);
+//            int bytesRead;
+//            byte[] buffer = new byte[4096];
+//            while ((bytesRead = lob_inputStream.read(buffer)) != -1) {
+//                os.write(buffer, 0, bytesRead);
+//            }
+//
+//            os.close();
+//            lob_inputStream.close();
+//
+//            return new File(lva_newFilePath);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
