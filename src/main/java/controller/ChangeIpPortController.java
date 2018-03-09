@@ -89,6 +89,10 @@ public class ChangeIpPortController {
                 LastSessionStorage.setIp(lva_ip);
                 LastSessionStorage.setPort(lva_port);
 
+                Stage stage = ((Stage) gob_btn_connect.getScene().getWindow());
+                stage.close();
+                Platform.runLater(() -> gob_mainController.logout());
+
             } else {
                 new AlertWindows().createWarningAlert(GC_WARNING_PORT);
             }
