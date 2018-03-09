@@ -58,7 +58,7 @@ public class Utils {
         int lva_sharedDirectoryId;
 
         if (lva_directoryId <= 0) {
-            return rva_absolutePath + iva_filePath;
+            return rva_absolutePath + "\\" + iva_filePath;
         } else {
             if (isPathFromServer) {
                 lva_sharedDirectoryId = Integer.parseInt(iva_filePath.substring(0, 1));

@@ -236,10 +236,12 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             if (!iob_command.gob_file.exists()) {
                 try {
                     if (!iob_command.gob_file.createNewFile()) {
+                        iob_command.gva_maxTries++;
                         gva_commandIndex.incrementAndGet();
                         return;
                     }
                 } catch (IOException ex) {
+                    iob_command.gva_maxTries++;
                     gva_commandIndex.incrementAndGet();
                     return;
                 }
@@ -248,6 +250,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             if (gob_restClient.uploadFilesToServer(iob_command.gob_file)) {
                 gco_commands.remove(iob_command);
             } else {
+                iob_command.gva_maxTries++;
                 gva_commandIndex.incrementAndGet();
             }
         }
