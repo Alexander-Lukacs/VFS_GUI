@@ -88,28 +88,18 @@ class MainDirectoryWatcher implements ThreadControl {
             TreeSingleton.getInstance().getDuplicateOperationsPrevention().removeMoved(iob_oldPath);
         } else {
             ThreadManager.addCommandToFileManager(iob_oldPath.toFile(), FileManagerConstants.GC_MOVE, true, iob_newPath.toFile(), true);
-//            TreeTool.moveFile(iob_oldPath, iob_newPath.getParent(), true, gob_restClient);
         }
     }
 
     private void renameFile(Path iob_path, String iva_newName) {
-//        try {
-            if (TreeSingleton.getInstance().getDuplicateOperationsPrevention().wasFileRenamed(iob_path)) {
-                TreeSingleton.getInstance().getDuplicateOperationsPrevention().removeRenamed(iob_path);
-            } else {
-//                System.out.println("RENAMED: " + iob_path + " TO: " + iva_newName);
-                TreeSingleton.getInstance().getTree().renameFile(iob_path.toFile(), iva_newName);
-                TreeItem<String> lob_item = TreeTool.getTreeItem(iob_path.toFile());
-                lob_item.setValue(iva_newName);
-
-//                String lva_relativePath = TreeTool.getRelativePath(iob_path.toString());
-
-//                gob_restClient.renameFile(lva_relativePath, iva_newName);
-                ThreadManager.addCommandToFileManager(iob_path.toFile(), FileManagerConstants.GC_RENAME, true, iva_newName, true);
-            }
-//        } catch (IOException ex) {
-//            ex.printStackTrace();
-//        }
+        if (TreeSingleton.getInstance().getDuplicateOperationsPrevention().wasFileRenamed(iob_path)) {
+            TreeSingleton.getInstance().getDuplicateOperationsPrevention().removeRenamed(iob_path);
+        } else {
+            TreeSingleton.getInstance().getTree().renameFile(iob_path.toFile(), iva_newName);
+            TreeItem<String> lob_item = TreeTool.getTreeItem(iob_path.toFile());
+            lob_item.setValue(iva_newName);
+            ThreadManager.addCommandToFileManager(iob_path.toFile(), FileManagerConstants.GC_RENAME, true, iva_newName, true);
+        }
     }
 
     @Override

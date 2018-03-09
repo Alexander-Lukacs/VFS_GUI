@@ -16,6 +16,6 @@ public class FileManagerConstants {
     public static final String GC_RENAME = "rename";
     public static final String GC_RENAME_ON_SERVER = "rename_on_server";
 
-    public static final String GC_DOWNLOAD_FROM_SERVER = "download_to_server";
+    public static final String GC_DOWNLOAD_FROM_SERVER = "download_from_server";
     public static final String GC_COMPARE_TREE = "compare_tree";
 }
