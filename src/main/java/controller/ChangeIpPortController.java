@@ -86,21 +86,9 @@ public class ChangeIpPortController {
         if (Validation.isIpValid(lva_ip)) {
             if (Validation.isPortValid(lva_port)) {
 
-                lob_dataCache.replaceData(GC_IP_KEY, lva_ip);
-                lob_dataCache.replaceData(GC_PORT_KEY, lva_port);
                 LastSessionStorage.setIp(lva_ip);
                 LastSessionStorage.setPort(lva_port);
 
-                try {
-                    lob_restClient = RestClientBuilder.buildRestClientWithAuth();
-                    lob_restClient.unregisterClient();
-
-                    Stage stage = ((Stage) gob_btn_connect.getScene().getWindow());
-                    stage.close();
-                    Platform.runLater(() -> gob_mainController.logout());
-                } catch (Exception ex) {
-                    new AlertWindows().createWarningAlert("Error while unregister client from server");
-                }
             } else {
                 new AlertWindows().createWarningAlert(GC_WARNING_PORT);
             }
