@@ -1,6 +1,6 @@
 package threads.classes;
 
-import fileTree.models.TreeSingleton;
+import fileTree.classes.TreeSingleton;
 import threads.constants.FileManagerConstants;
 import tools.Utils;
 
