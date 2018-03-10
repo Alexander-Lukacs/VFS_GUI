@@ -26,7 +26,7 @@ public class NotifyServerThread extends Thread {
         ServerSocket lob_notifyServer;
         Socket lob_client = null;
         BufferedReader lob_inputStream = null;
-        String lva_message = null;
+        String lva_message;
         String[] lar_messageArray;
 
         try {
@@ -74,7 +74,7 @@ public class NotifyServerThread extends Thread {
                             break;
 
                         case GC_MESSAGE_SHARED_DIR_DELETE:
-                            System.out.println("Add shared dir command read!");
+                            System.out.println("Delete shared dir command read!");
                             deleteSharedDirectory(lar_messageArray);
                             break;
                     }
