@@ -25,6 +25,8 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -45,13 +47,24 @@ public class FileRestClient extends RestClient {
         DataCache lob_dataCache = DataCache.getDataCache();
         String lva_relativeFilePath = Utils.buildRelativeFilePath(iob_filesToUpload);
         int lva_directoryId = getDirectoryIdFromRelativePath(lva_relativeFilePath);
+        long lva_lastModified = 0;
+        BasicFileAttributes lob_basicFileAttributes;
+
+        if (!iob_filesToUpload.exists()) {
+            return false;
+        }
 
         HttpAuthenticationFeature lob_authDetails = HttpAuthenticationFeature.basic(
                 lob_dataCache.get(DataCache.GC_EMAIL_KEY),
                 lob_dataCache.get(DataCache.GC_PASSWORD_KEY)
-
         );
 
+        try {
+            lob_basicFileAttributes = Files.readAttributes(iob_filesToUpload.toPath(), BasicFileAttributes.class);
+            lva_lastModified = lob_basicFileAttributes.lastModifiedTime().toMillis();
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
         ClientConfig lob_config = new ClientConfig(lob_authDetails);
         Client lob_client = ClientBuilder.newClient(lob_config);
         lob_client.register(lob_authDetails);
@@ -59,7 +72,8 @@ public class FileRestClient extends RestClient {
         WebTarget lob_target = lob_client.target("http://" + lob_dataCache.get(DataCache.GC_IP_KEY) + ":" +
                 lob_dataCache.get(DataCache.GC_PORT_KEY) + "/api/auth/files/upload")
                 .queryParam("path", lva_relativeFilePath)
-                .queryParam("directoryId", lva_directoryId);
+                .queryParam("directoryId", lva_directoryId)
+                .queryParam("lastModified", lva_lastModified);
         lob_target.register(MultiPartWriter.class);
 
         final FileDataBodyPart lob_filePart = new FileDataBodyPart("attachment", iob_filesToUpload);

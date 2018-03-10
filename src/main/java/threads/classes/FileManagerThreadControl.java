@@ -718,11 +718,6 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         }
     }
 
-    private void removeCommand(Command iob_command) {
-        gco_commands.remove(iob_command);
-        gva_commandIndex.getAndDecrement();
-    }
-
     /**
      * When an object implementing interface <code>Runnable</code> is used
      * to create a thread, starting the thread causes the object's

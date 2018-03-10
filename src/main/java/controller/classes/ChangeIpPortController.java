@@ -49,7 +49,7 @@ public class ChangeIpPortController {
     }
 
     /**
-     * Öffnet die View die ausgewählt wurde
+     * Open the selected View
      */
     public void loadView() {
         try {

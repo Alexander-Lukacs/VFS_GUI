@@ -8,7 +8,6 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.TransferMode;
-import restful.clients.FileRestClient;
 import threads.constants.FileManagerConstants;
 import threads.classes.ThreadManager;
 import tools.TreeTool;
@@ -22,11 +21,9 @@ import static tools.TreeTool.buildFileFromItem;
 public class TreeCellImpl extends TreeCell<String> {
     private TextField gob_textField;
     private Tree gob_tree;
-    private FileRestClient gob_restClient;
 
-    public TreeCellImpl(Tree iob_tree, FileRestClient iob_restClient) {
+    public TreeCellImpl(Tree iob_tree) {
         gob_tree = iob_tree;
-        gob_restClient = iob_restClient;
         setEvents();
     }
 

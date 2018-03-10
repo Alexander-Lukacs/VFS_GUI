@@ -127,7 +127,7 @@ public class ChangePWController {
             lva_validationFailure = true;
         }
 
-        if (!Validation.isPasswordValid(iva_newPassword)) {
+        if (Validation.isPasswordInvalid(iva_newPassword)) {
             lob_sb.append(GC_WARNING_PASSWORD);
             gob_tf_newPassword.setText("");
             lva_validationFailure = true;

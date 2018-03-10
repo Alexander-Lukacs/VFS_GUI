@@ -31,10 +31,10 @@ public class Validation {
         return matcher.find();
     }
 
-    public static boolean isPasswordValid(String password) {
+    public static boolean isPasswordInvalid(String password) {
         pattern = Pattern.compile(GC_VALID_PASSWORD_REGEX);
         matcher = pattern.matcher(password);
-        return matcher.find();
+        return !matcher.find();
     }
 
     public static boolean nameValidation(String iva_name) {

@@ -18,7 +18,7 @@ import static restful.constants.RestResourcesPaths.GC_REST_UNREGISTER_CLIENT;
  * Created by Mesut on 25.01.2018.
  */
 public class RestClient {
-    WebTarget gob_webTarget;
+    final WebTarget gob_webTarget;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Constructors

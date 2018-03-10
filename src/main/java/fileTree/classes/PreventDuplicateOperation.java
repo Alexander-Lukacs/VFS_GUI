@@ -176,7 +176,7 @@ public class PreventDuplicateOperation {
         }
     }
 
-    public boolean wasFileDeted(Path iob_key) {
+    public boolean wasFileDeleted(Path iob_key) {
         gob_lock.lock();
         try {
             FileDuplicateValue lob_value = gob_map.get(iob_key);

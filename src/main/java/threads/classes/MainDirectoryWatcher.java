@@ -3,7 +3,6 @@ package threads.classes;
 import fileTree.interfaces.FileChangeListener;
 import fileTree.classes.TreeSingleton;
 import javafx.scene.control.TreeItem;
-import restful.clients.FileRestClient;
 import threads.constants.FileManagerConstants;
 import threads.interfaces.ThreadControl;
 import tools.TreeTool;
@@ -16,12 +15,10 @@ import java.nio.file.Path;
  * this class contains 3 DirectoryWatchServices, one for the private, public and shared directory
  */
 class MainDirectoryWatcher implements ThreadControl {
-    private FileRestClient gob_restClient;
     private DirectoryWatchService gob_watchService;
     private File gob_rootFile;
 
-    MainDirectoryWatcher(FileRestClient iob_restClient, File iob_files) {
-        gob_restClient = iob_restClient;
+    MainDirectoryWatcher(File iob_files) {
         gob_rootFile = iob_files;
     }
 
@@ -76,7 +73,7 @@ class MainDirectoryWatcher implements ThreadControl {
     }
 
     private void deleteFile(Path iob_path) {
-        if (TreeSingleton.getInstance().getDuplicateOperationsPrevention().wasFileDeted(iob_path)) {
+        if (TreeSingleton.getInstance().getDuplicateOperationsPrevention().wasFileDeleted(iob_path)) {
             TreeSingleton.getInstance().getDuplicateOperationsPrevention().removeDeleted(iob_path);
         } else {
             ThreadManager.addCommandToFileManager(iob_path.toFile(), FileManagerConstants.GC_DELETE, true, 0);

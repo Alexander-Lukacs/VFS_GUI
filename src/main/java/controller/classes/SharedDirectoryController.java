@@ -110,7 +110,6 @@ public class SharedDirectoryController {
 
     public void onClickDelete() {
         DataCache lob_dataCache = DataCache.getDataCache();
-        SharedDirectoryCache lob_sharedDirCache = SharedDirectoryCache.getInstance();
         User lob_user;
         SharedDirectoryRestClient lob_restClient;
         RestResponse lob_restResponse;
@@ -134,7 +133,6 @@ public class SharedDirectoryController {
                     true, gob_sharedDirectory.getId());
 
         }
-
         closeWindow();
     }
 

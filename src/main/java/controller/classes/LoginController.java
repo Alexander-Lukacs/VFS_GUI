@@ -188,7 +188,7 @@ public class LoginController {
             lva_validationFailure = true;
         }
 
-        if (!Validation.isPasswordValid(iva_password)) {
+        if (Validation.isPasswordInvalid(iva_password)) {
             lob_sb.append(GC_WARNING_PASSWORD);
             gob_tf_loginPassword.setText("");
             lva_validationFailure = true;
@@ -230,7 +230,7 @@ public class LoginController {
             lva_validationFailure = true;
         }
 
-        if (!Validation.isPasswordValid(iva_password)) {
+        if (Validation.isPasswordInvalid(iva_password)) {
             lob_sb.append(GC_WARNING_PASSWORD);
             gob_tf_registerPassword.setText("");
             gob_tf_confirmPassword.setText("");

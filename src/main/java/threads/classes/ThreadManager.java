@@ -1,7 +1,6 @@
 package threads.classes;
 
 import javafx.scene.control.Label;
-import restful.clients.FileRestClient;
 import threads.interfaces.ThreadControl;
 
 import java.io.File;
@@ -13,13 +12,12 @@ public class ThreadManager {
 
     /**
      * if no instance of the directoryWatcher exists, create a new one
-     * @param iob_restClient restClient for the watchService
      * @param iob_files root file to monitor
      * @return the instance of the already existing or new directoryWatchService
      */
-    public static ThreadControl getDirectoryWatcherThread(FileRestClient iob_restClient, File iob_files) {
+    public static ThreadControl getDirectoryWatcherThread(File iob_files) {
         if (gob_directoryWatcherInstance == null) {
-            gob_directoryWatcherInstance = new MainDirectoryWatcher(iob_restClient, iob_files);
+            gob_directoryWatcherInstance = new MainDirectoryWatcher(iob_files);
         }
         return gob_directoryWatcherInstance;
     }

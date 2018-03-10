@@ -2,17 +2,16 @@ package tools;
 
 import cache.DataCache;
 import cache.SharedDirectoryCache;
+import fileTree.classes.TreeSingleton;
 import models.classes.RestResponse;
 import models.classes.SharedDirectory;
 import threads.classes.ThreadManager;
 import threads.constants.FileManagerConstants;
-import threads.interfaces.ThreadControl;
 import tools.xmlTools.DirectoryNameMapper;
 
 import java.io.File;
 import java.io.IOException;
 
-import static controller.constants.SharedDirectoryConstants.GC_COULD_NOT_CREATE_DIR;
 import static restful.constants.HttpStatusCodes.*;
 
 public class Utils {
@@ -137,11 +136,9 @@ public class Utils {
 
         lob_sharedDirectoryCache.put(iob_sharedDirectory.getId(), iob_sharedDirectory);
         DirectoryNameMapper.addNewSharedDirectory(iob_sharedDirectory.getId(), lob_file.getName());
+        TreeSingleton.getInstance().getDuplicateOperationsPrevention().putCreated(lob_file.toPath());
         ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_ADD, false, true);
 
-//        if (!lob_file.mkdir()) {
-//            new AlertWindows().createWarningAlert(GC_COULD_NOT_CREATE_DIR);
-//        }
     }
 
     /**
