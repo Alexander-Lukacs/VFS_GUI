@@ -1,6 +1,7 @@
 package threads.classes;
 
 import builder.RestClientBuilder;
+import cache.SharedDirectoryCache;
 import fileTree.interfaces.Tree;
 import fileTree.interfaces.TreeDifference;
 import fileTree.classes.TreeSingleton;
@@ -12,6 +13,7 @@ import threads.interfaces.ThreadControl;
 import tools.AlertWindows;
 import tools.TreeTool;
 import tools.Utils;
+import tools.xmlTools.DirectoryNameMapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -288,6 +290,9 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
      * @param iob_command file cant be null
      */
     private void deleteFileOnServer(Command iob_command) {
+        SharedDirectoryCache lob_sharedDirCache;
+        int lva_directoryId;
+
         if (iob_command.gob_file == null) {
             gco_commands.remove(iob_command);
         }
@@ -297,8 +302,31 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             return;
         }
 
-        if (gob_restClient.deleteOnServer(iob_command.gob_file)) {
+        try {
+            lva_directoryId = getObjectFromInformationArray(iob_command, 0, Integer.class);
+        } catch (RuntimeException ex) {
+            ex.printStackTrace();
             gco_commands.remove(iob_command);
+            return;
+        }
+
+//        if (gob_restClient.deleteOnServer(iob_command.gob_file)) {
+//            DirectoryNameMapper.removeSharedDirectory(gob_sharedDirectory.getId());
+//            lob_sharedDirCache.removeData(gob_sharedDirectory.getId());
+//            gco_commands.remove(iob_command);
+//        } else {
+//            iob_command.gva_maxTries++;
+//            gva_commandIndex.incrementAndGet();
+//        }
+
+        if (gob_restClient.deleteOnServer(iob_command.gob_file)) {
+            if (lva_directoryId <= 0) {
+                gco_commands.remove(iob_command);
+            } else {
+                lob_sharedDirCache = SharedDirectoryCache.getInstance();
+                DirectoryNameMapper.removeSharedDirectory(lva_directoryId);
+                lob_sharedDirCache.removeData(lva_directoryId);
+            }
         } else {
             iob_command.gva_maxTries++;
             gva_commandIndex.incrementAndGet();

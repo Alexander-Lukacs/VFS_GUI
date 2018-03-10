@@ -128,13 +128,11 @@ public class SharedDirectoryController {
         Utils.printResponseMessage(lob_restResponse);
 
         if (lob_restResponse.getHttpStatus() == GC_HTTP_OK) {
-            DirectoryNameMapper.removeSharedDirectory(gob_sharedDirectory.getId());
-            lob_sharedDirCache.removeData(gob_sharedDirectory.getId());
-
             ThreadManager.getFileManagerThread().start();
-            System.out.println("SHARE: " + gob_sharedDirectoryFile);
+            TreeSingleton.getInstance().getDuplicateOperationsPrevention().putDeleted(gob_sharedDirectoryFile.toPath());
             ThreadManager.addCommandToFileManager(gob_sharedDirectoryFile, FileManagerConstants.GC_DELETE,
-                    true, TreeSingleton.getInstance().getTree());
+                    true, gob_sharedDirectory.getId());
+
         }
 
         closeWindow();

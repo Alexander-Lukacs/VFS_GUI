@@ -150,7 +150,7 @@ public class Utils {
      * @param iob_sharedDirectory the shared directory
      * @return the absolute path
      */
-    private static String buildPathToSharedDirectory(SharedDirectory iob_sharedDirectory) {
+    public static String buildPathToSharedDirectory(SharedDirectory iob_sharedDirectory) {
         DataCache lob_dataCache = DataCache.getDataCache();
 
         return Utils.getRootDirectory() +

@@ -213,14 +213,14 @@ public class NotifyServerThread extends Thread {
      */
     private void deleteSharedDirectory(String[] iar_messageArray) {
         SharedDirectoryCache lob_sharedDirCache = SharedDirectoryCache.getInstance();
-        String sharedDirectoryIdString;
-        int sharedDirectoryId;
+//        String sharedDirectoryIdString;
+//        int sharedDirectoryId;
 
-        sharedDirectoryIdString = iar_messageArray[2];
-        sharedDirectoryId = Integer.parseInt(sharedDirectoryIdString);
+//        sharedDirectoryIdString = iar_messageArray[2];
+//        sharedDirectoryId = Integer.parseInt(sharedDirectoryIdString);
 
-        lob_sharedDirCache.removeData(sharedDirectoryId);
-        DirectoryNameMapper.removeSharedDirectory(sharedDirectoryId);
+//        lob_sharedDirCache.removeData(sharedDirectoryId);
+//        DirectoryNameMapper.removeSharedDirectory(sharedDirectoryId);
 
         deleteDir(iar_messageArray);
     }

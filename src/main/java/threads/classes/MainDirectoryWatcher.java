@@ -79,7 +79,7 @@ class MainDirectoryWatcher implements ThreadControl {
         if (TreeSingleton.getInstance().getDuplicateOperationsPrevention().wasFileDeted(iob_path)) {
             TreeSingleton.getInstance().getDuplicateOperationsPrevention().removeDeleted(iob_path);
         } else {
-            ThreadManager.addCommandToFileManager(iob_path.toFile(), FileManagerConstants.GC_DELETE, true);
+            ThreadManager.addCommandToFileManager(iob_path.toFile(), FileManagerConstants.GC_DELETE, true, 0);
         }
     }
 

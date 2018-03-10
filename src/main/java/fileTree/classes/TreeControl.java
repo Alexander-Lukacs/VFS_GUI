@@ -142,7 +142,7 @@ public class TreeControl {
                     gob_treeView.getSelectionModel().getSelectedItem(), gob_tree
             );
             ThreadManager.addCommandToFileManager(lob_selectedFile, FileManagerConstants.GC_DELETE,
-                    true, gob_tree);
+                    true, 0);
             addAllDeleted(lob_selectedFile);
         });
 
