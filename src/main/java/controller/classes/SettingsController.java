@@ -15,11 +15,17 @@ public class SettingsController {
     @FXML
     private AnchorPane gob_rootPane;
 
+    private MainController gob_mainController;
+
     /**
      * Initialize of ListView
      */
     public void initialize() {
         gob_listView.loadSettingsList(gob_lvOptions);
+    }
+
+    public void initMainControllerData(MainController iob_mainController) {
+        gob_mainController = iob_mainController;
     }
 
 
@@ -42,9 +48,12 @@ public class SettingsController {
             if (gob_lvOptions.getSelectionModel().getSelectedItem().equals(GC_CHANGE_IP_PORT)) {
                 FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("views/changeIpPort.fxml"));
                 AnchorPane lob_pane = lob_loader.load();
+                ChangeIpPortController lob_controller = lob_loader.getController();
+                lob_controller.initMainControllerData(gob_mainController);
                 gob_rootPane.getChildren().setAll(lob_pane);
             }
             // TODO schauen ob es evtl. eine besser Methode gibt, als ein leerer catch block
-        } catch (Exception ignore) {}
+        } catch (Exception ignore) {
+        }
     }
 }

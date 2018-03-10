@@ -514,6 +514,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
                 gco_commands.remove(iob_command);
                 return;
             }
+            Platform.runLater(() -> lob_item.setValue(lva_newName));
         }
 
         lob_tree.renameFile(iob_command.gob_file, lva_newName);

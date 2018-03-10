@@ -1,6 +1,5 @@
 package controller.classes;
 
-import builder.RestClientBuilder;
 import cache.DataCache;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -10,7 +9,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import restful.clients.RestClient;
 import tools.AlertWindows;
 import tools.Validation;
 import tools.xmlTools.LastSessionStorage;
@@ -41,12 +39,10 @@ public class ChangeIpPortController {
     @FXML
     private Button gob_btn_connect;
 
-    @FXML
-    private Button gob_btnSettings;
+    private MainController gob_mainController;
 
 
     private final controller.classes.ListView listView = new controller.classes.ListView();
-    private DataCache gob_userCache;
 
     public void initialize() {
         listView.loadSettingsList(gob_lvOptions);
@@ -73,7 +69,6 @@ public class ChangeIpPortController {
     }
 
     public void onClick() {
-        RestClient lob_restClient;
         DataCache lob_dataCache = DataCache.getDataCache();
 
         String lva_ip = gob_tfServerIp.getText();
@@ -90,15 +85,7 @@ public class ChangeIpPortController {
 
                 Stage stage = ((Stage) gob_btn_connect.getScene().getWindow());
                 stage.close();
-
-
-                try {
-                    lob_restClient = RestClientBuilder.buildRestClientWithAuth();
-                    lob_restClient.unregisterClient();
-                    Platform.exit();
-                }catch (Exception ex){
-                    new AlertWindows().createWarningAlert("Error while unregister client from server");
-                }
+                Platform.runLater(() -> gob_mainController.logout());
 
             } else {
                 new AlertWindows().createWarningAlert(GC_WARNING_PORT);
@@ -106,6 +93,10 @@ public class ChangeIpPortController {
         } else {
             new AlertWindows().createWarningAlert(GC_WARNING_IP_PORT);
         }
+    }
+
+    public void initMainControllerData(MainController iob_mainController) {
+        gob_mainController = iob_mainController;
     }
 }
 

@@ -3,7 +3,6 @@ package controller.classes;
 import builder.RestClientBuilder;
 import cache.DataCache;
 import cache.SharedDirectoryCache;
-import controller.classes.LoginController;
 import fileTree.classes.TreeControl;
 import fileTree.classes.TreeSingleton;
 import javafx.event.ActionEvent;
@@ -56,17 +55,21 @@ public class MainController {
 
     private DataCache gob_userCache;
     private TreeControl gob_treeControl;
+    private MainController gob_mainController;
+
+    public void initMainControllerData(MainController iob_mainController) {
+        gob_mainController = iob_mainController;
+    }
 
     /**
      * OnClick Method
+     *
      * @param e event
      * @throws RuntimeException RuntimeException
-     * @throws IOException IOException
+     * @throws IOException      IOException
      */
     public void onClick(ActionEvent e) throws RuntimeException, IOException {
-        RestClient lob_restClient;
         DataCache lob_dataCache = DataCache.getDataCache();
-        SharedDirectoryCache lob_sharedDirectoryCache = SharedDirectoryCache.getInstance();
 
         switch (((Button) e.getSource()).getText()) {
             case GC_SETTINGS:
@@ -78,18 +81,13 @@ public class MainController {
                 lob_stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream(GC_APPLICATION_ICON_PATH)));
                 lob_stage.setResizable(false);
                 lob_stage.setScene(lob_scene);
+                SettingsController lob_settingsController = lob_loader.getController();
+                lob_settingsController.initMainControllerData(gob_mainController);
                 lob_stage.show();
 
                 break;
             case GC_LOGOUT:
-                lob_restClient = RestClientBuilder.buildRestClientWithAuth();
-                lob_restClient.unregisterClient();
-                Stage stage = ((Stage) gob_btnSettings.getScene().getWindow());
-                stage.close();
-                gob_userCache.clearDataCache();
-                lob_sharedDirectoryCache.clearDataCache();
-                LoginController ob_x = new LoginController();
-                ob_x.start(stage);
+                logout();
                 break;
             case GC_SHOW_IN_EXPLORER:
                 if (Desktop.isDesktopSupported()) {
@@ -104,6 +102,24 @@ public class MainController {
                 }
 
                 break;
+        }
+    }
+
+    public void logout() {
+        SharedDirectoryCache lob_sharedDirectoryCache = SharedDirectoryCache.getInstance();
+        RestClient lob_restClient;
+        lob_restClient = RestClientBuilder.buildRestClientWithAuth();
+        lob_restClient.unregisterClient();
+        Stage stage = ((Stage) gob_btnSettings.getScene().getWindow());
+        stage.close();
+
+        gob_userCache.clearDataCache();
+        lob_sharedDirectoryCache.clearDataCache();
+        LoginController ob_x = new LoginController();
+        try {
+            ob_x.start(stage);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -125,6 +141,8 @@ public class MainController {
             lob_stage.setTitle(GC_VFS);
             lob_stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream(GC_APPLICATION_ICON_PATH)));
             lob_stage.setScene(lob_scene);
+            gob_mainController = lob_loader.getController();
+            gob_mainController.initMainControllerData(gob_mainController);
             lob_stage.show();
         } catch (IOException e) {
             new AlertWindows().createExceptionAlert(e.getMessage(), e);
