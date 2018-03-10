@@ -4,6 +4,9 @@ import cache.DataCache;
 import cache.SharedDirectoryCache;
 import models.classes.RestResponse;
 import models.classes.SharedDirectory;
+import threads.classes.ThreadManager;
+import threads.constants.FileManagerConstants;
+import threads.interfaces.ThreadControl;
 import tools.xmlTools.DirectoryNameMapper;
 
 import java.io.File;
@@ -134,10 +137,11 @@ public class Utils {
 
         lob_sharedDirectoryCache.put(iob_sharedDirectory.getId(), iob_sharedDirectory);
         DirectoryNameMapper.addNewSharedDirectory(iob_sharedDirectory.getId(), lob_file.getName());
+        ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_ADD, false, true);
 
-        if (!lob_file.mkdir()) {
-            new AlertWindows().createWarningAlert(GC_COULD_NOT_CREATE_DIR);
-        }
+//        if (!lob_file.mkdir()) {
+//            new AlertWindows().createWarningAlert(GC_COULD_NOT_CREATE_DIR);
+//        }
     }
 
     /**
