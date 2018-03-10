@@ -90,14 +90,6 @@ public class ChangeIpPortController {
                 stage.close();
                 Platform.runLater(() -> gob_mainController.logout());
 
-                try {
-                    lob_restClient = RestClientBuilder.buildRestClientWithAuth();
-                    lob_restClient.unregisterClient();
-                    Platform.exit();
-                } catch (Exception ex) {
-                    new AlertWindows().createWarningAlert("Error while unregister client from server");
-                }
-
             } else {
                 new AlertWindows().createWarningAlert(GC_WARNING_PORT);
             }
