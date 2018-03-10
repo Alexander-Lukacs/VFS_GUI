@@ -111,28 +111,11 @@ public class SharedDirectoryController {
     public void onClickDelete() {
         DataCache lob_dataCache = DataCache.getDataCache();
         User lob_user;
-        SharedDirectoryRestClient lob_restClient;
-        RestResponse lob_restResponse;
-
-        lob_restClient = RestClientBuilder.buildSharedDirectoryClientWithAuth();
 
         lob_user = gob_userMap.get(lob_dataCache.get(DataCache.GC_EMAIL_KEY));
 
-        if (gob_sharedDirectory.getOwner().getEmail().equals(lob_user.getEmail())) {
-            lob_restResponse = lob_restClient.deleteSharedDirectory(gob_sharedDirectory);
-        } else {
-            lob_restResponse = lob_restClient.removeMemberFromSharedDirectory(gob_sharedDirectory, lob_user);
-        }
-
-        Utils.printResponseMessage(lob_restResponse);
-
-        if (lob_restResponse.getHttpStatus() == GC_HTTP_OK) {
-            ThreadManager.getFileManagerThread().start();
-            TreeSingleton.getInstance().getDuplicateOperationsPrevention().putDeleted(gob_sharedDirectoryFile.toPath());
-            ThreadManager.addCommandToFileManager(gob_sharedDirectoryFile, FileManagerConstants.GC_DELETE,
-                    true, gob_sharedDirectory.getId());
-
-        }
+        ThreadManager.addCommandToFileManager(gob_sharedDirectoryFile, FileManagerConstants.GC_DELETE_SHARED_DIR,
+                false, gob_sharedDirectory, lob_user);
         closeWindow();
     }
 

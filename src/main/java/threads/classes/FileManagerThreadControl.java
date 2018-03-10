@@ -1,14 +1,19 @@
 package threads.classes;
 
 import builder.RestClientBuilder;
+import cache.DataCache;
 import cache.SharedDirectoryCache;
 import fileTree.interfaces.Tree;
 import fileTree.interfaces.TreeDifference;
 import fileTree.classes.TreeSingleton;
 import javafx.application.Platform;
 import javafx.scene.control.TreeItem;
+import models.classes.RestResponse;
+import models.classes.SharedDirectory;
+import models.classes.User;
 import org.apache.commons.io.FileUtils;
 import restful.clients.FileRestClient;
+import restful.clients.SharedDirectoryRestClient;
 import threads.interfaces.ThreadControl;
 import tools.AlertWindows;
 import tools.TreeTool;
@@ -20,6 +25,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static restful.constants.HttpStatusCodes.GC_HTTP_OK;
 import static threads.constants.FileManagerConstants.*;
 
 public class FileManagerThreadControl implements ThreadControl, Runnable {
@@ -134,6 +140,11 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             case GC_DOWNLOAD_FROM_SERVER:
                 System.out.println(GC_DOWNLOAD_FROM_SERVER);
                 downloadFile(iob_command);
+                break;
+
+            case GC_DELETE_SHARED_DIR:
+                System.out.println(GC_DELETE_SHARED_DIR);
+                deleteSharedDirectory(iob_command);
                 break;
 
             case GC_COMPARE_TREE:
@@ -263,8 +274,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
     //------------------------------------------------------------------------------------------------------------------
     /**
      * delete file on the client
-     * @param iob_command expected input in gar_information:
-     *                    1. tree from the client
+     * @param iob_command expected input in gar_information: none
      */
     private void deleteLocalFile(Command iob_command) {
         Tree lob_tree = TreeSingleton.getInstance().getTree();
@@ -290,8 +300,6 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
      * @param iob_command file cant be null
      */
     private void deleteFileOnServer(Command iob_command) {
-        SharedDirectoryCache lob_sharedDirCache;
-        int lva_directoryId;
 
         if (iob_command.gob_file == null) {
             gco_commands.remove(iob_command);
@@ -302,31 +310,23 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             return;
         }
 
-        try {
-            lva_directoryId = getObjectFromInformationArray(iob_command, 0, Integer.class);
-        } catch (RuntimeException ex) {
-            ex.printStackTrace();
-            gco_commands.remove(iob_command);
-            return;
-        }
-
-//        if (gob_restClient.deleteOnServer(iob_command.gob_file)) {
-//            DirectoryNameMapper.removeSharedDirectory(gob_sharedDirectory.getId());
-//            lob_sharedDirCache.removeData(gob_sharedDirectory.getId());
+//        try {
+//            lva_directoryId = getObjectFromInformationArray(iob_command, 0, Integer.class);
+//
+//        } catch (RuntimeException ex) {
+//            ex.printStackTrace();
 //            gco_commands.remove(iob_command);
-//        } else {
-//            iob_command.gva_maxTries++;
-//            gva_commandIndex.incrementAndGet();
+//            return;
 //        }
 
         if (gob_restClient.deleteOnServer(iob_command.gob_file)) {
-            if (lva_directoryId <= 0) {
+//            if (lva_directoryId <= 0) {
                 gco_commands.remove(iob_command);
-            } else {
-                lob_sharedDirCache = SharedDirectoryCache.getInstance();
-                DirectoryNameMapper.removeSharedDirectory(lva_directoryId);
-                lob_sharedDirCache.removeData(lva_directoryId);
-            }
+//            } else {
+//                lob_sharedDirCache = SharedDirectoryCache.getInstance();
+//                DirectoryNameMapper.removeSharedDirectory(lva_directoryId);
+//                lob_sharedDirCache.removeData(lva_directoryId);
+//            }
         } else {
             iob_command.gva_maxTries++;
             gva_commandIndex.incrementAndGet();
@@ -626,6 +626,66 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         }
 
         gco_commands.remove(iob_command);
+    }
+
+    /**
+     * compare the local tree to the tree on the server
+     * @param iob_command expected input in gar_information:
+     *                    1. shared directory
+     *                    2. user who wants to delete the directory
+     */
+    private void deleteSharedDirectory(Command iob_command) {
+        SharedDirectoryRestClient lob_restClient = RestClientBuilder.buildSharedDirectoryClientWithAuth();
+        SharedDirectory lob_sharedDirectory;
+        DataCache lob_dataCache = DataCache.getDataCache();
+        User lob_user;
+        RestResponse lob_response;
+        SharedDirectoryCache lob_sharedDirCache;
+
+        if (iob_command.gob_file == null ||iob_command.gva_maxTries >= GC_MAX_TRIES) {
+            gco_commands.remove(iob_command);
+            return;
+        }
+
+        try {
+            lob_sharedDirectory = getObjectFromInformationArray(iob_command, 0, SharedDirectory.class);
+            lob_user = getObjectFromInformationArray(iob_command, 1, User.class);
+        } catch (RuntimeException ex) {
+            ex.printStackTrace();
+            gco_commands.remove(iob_command);
+            return;
+        }
+
+        if (lob_sharedDirectory.getOwner().getEmail().equals(lob_user.getEmail())) {
+            TreeSingleton.getInstance().getDuplicateOperationsPrevention().putDeleted(iob_command.gob_file.toPath());
+
+            iob_command.gar_fileInformation[0] = lob_sharedDirectory.getId();
+            deleteFileOnServer(iob_command);
+            deleteLocalFile(iob_command);
+
+            lob_response = lob_restClient.deleteSharedDirectory(lob_sharedDirectory);
+
+        } else if (lob_user.getEmail().equals(lob_dataCache.get(DataCache.GC_EMAIL_KEY))) {
+            TreeSingleton.getInstance().getDuplicateOperationsPrevention().putDeleted(iob_command.gob_file.toPath());
+
+            deleteLocalFile(iob_command);
+
+            lob_response = lob_restClient.removeMemberFromSharedDirectory(lob_sharedDirectory, lob_user);
+        } else {
+            Platform.runLater(() -> new AlertWindows().createWarningAlert("You are not allowed to remove other members!"));
+            gco_commands.remove(iob_command);
+            return;
+        }
+
+        lob_sharedDirCache = SharedDirectoryCache.getInstance();
+        DirectoryNameMapper.removeSharedDirectory(lob_sharedDirectory.getId());
+        lob_sharedDirCache.removeData(lob_sharedDirectory.getId());
+
+        Platform.runLater(() -> Utils.printResponseMessage(lob_response));
+
+        if (lob_response.getHttpStatus() != GC_HTTP_OK) {
+            iob_command.gva_maxTries++;
+        }
     }
 
     //------------------------------------------------------------------------------------------------------------------

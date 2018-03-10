@@ -1,7 +1,6 @@
 package threads.classes;
 
 import builder.RestClientBuilder;
-import cache.SharedDirectoryCache;
 import fileTree.classes.TreeSingleton;
 import models.classes.SharedDirectory;
 import restful.clients.SharedDirectoryRestClient;
@@ -212,17 +211,7 @@ public class NotifyServerThread extends Thread {
      *                         at position 2: shared directory id
      */
     private void deleteSharedDirectory(String[] iar_messageArray) {
-        SharedDirectoryCache lob_sharedDirCache = SharedDirectoryCache.getInstance();
-//        String sharedDirectoryIdString;
-//        int sharedDirectoryId;
-
-//        sharedDirectoryIdString = iar_messageArray[2];
-//        sharedDirectoryId = Integer.parseInt(sharedDirectoryIdString);
-
-//        lob_sharedDirCache.removeData(sharedDirectoryId);
-//        DirectoryNameMapper.removeSharedDirectory(sharedDirectoryId);
-
-        deleteDir(iar_messageArray);
+        deleteFile(iar_messageArray);
     }
 
     /**

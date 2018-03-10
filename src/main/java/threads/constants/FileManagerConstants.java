@@ -18,4 +18,6 @@ public class FileManagerConstants {
 
     public static final String GC_DOWNLOAD_FROM_SERVER = "download_from_server";
     public static final String GC_COMPARE_TREE = "compare_tree";
+
+    public static final String GC_DELETE_SHARED_DIR = "delete_shared_dir";
 }
