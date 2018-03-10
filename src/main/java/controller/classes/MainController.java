@@ -101,7 +101,6 @@ public class MainController {
                         desktop.open(new File(Utils.getUserBasePath() + "\\" +
                                 lob_dataCache.get(DataCache.GC_IP_KEY) + "_" + lob_dataCache.get(DataCache.GC_PORT_KEY)));
                     }
-
                 }
 
                 break;

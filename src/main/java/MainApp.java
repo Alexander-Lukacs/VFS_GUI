@@ -19,7 +19,6 @@ public class MainApp extends Application {
     private Thread gob_notifyThread;
 
     public static void main(String[] args) {
-
         // Ensure that only one instance of the app is running
         try {
             ServerSocket serverSocket = new ServerSocket(32001);
