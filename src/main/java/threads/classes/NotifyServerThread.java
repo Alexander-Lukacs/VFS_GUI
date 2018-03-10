@@ -243,7 +243,11 @@ public class NotifyServerThread extends Thread {
 
         for (SharedDirectory lob_tmpSharedDirectory : lli_sharedDirectories) {
             if (lob_tmpSharedDirectory.getId() == Integer.parseInt(sharedDirectoryId)) {
-                Utils.createSharedDirectory(lob_tmpSharedDirectory);
+                try {
+                    DirectoryNameMapper.getRenamedSharedDirectoryName(Integer.parseInt(sharedDirectoryId));
+                } catch (IllegalArgumentException ex) {
+                    Utils.createSharedDirectory(lob_tmpSharedDirectory);
+                }
             }
         }
     }

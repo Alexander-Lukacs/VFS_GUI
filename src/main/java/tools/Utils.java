@@ -100,10 +100,10 @@ public class Utils {
      */
     @SuppressWarnings("WeakerAccess")
     public static String getRootDirectory() {
-        String rva_rootDirectry = getUserBasePath();
+        String rva_rootDirectory = getUserBasePath();
         DataCache lob_cache = DataCache.getDataCache();
 
-        return rva_rootDirectry + "\\" + lob_cache.get(DataCache.GC_IP_KEY) + "_" + lob_cache.get(DataCache.GC_PORT_KEY) +
+        return rva_rootDirectory + "\\" + lob_cache.get(DataCache.GC_IP_KEY) + "_" + lob_cache.get(DataCache.GC_PORT_KEY) +
                 "\\" + lob_cache.get(DataCache.GC_EMAIL_KEY);
     }
 
@@ -153,8 +153,7 @@ public class Utils {
     private static String buildPathToSharedDirectory(SharedDirectory iob_sharedDirectory) {
         DataCache lob_dataCache = DataCache.getDataCache();
 
-        return Utils.getUserBasePath() + "\\" + lob_dataCache.get(DataCache.GC_IP_KEY) + "_" +
-                lob_dataCache.get(DataCache.GC_PORT_KEY) + "\\" + lob_dataCache.get(DataCache.GC_EMAIL_KEY) +
+        return Utils.getRootDirectory() +
                 "\\" + "Shared" + "\\" + iob_sharedDirectory.getDirectoryName() + "$";
     }
 }
