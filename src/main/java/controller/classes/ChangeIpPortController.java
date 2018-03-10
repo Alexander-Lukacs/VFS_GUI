@@ -1,6 +1,5 @@
 package controller.classes;
 
-import builder.RestClientBuilder;
 import cache.DataCache;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -10,7 +9,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import restful.clients.RestClient;
 import tools.AlertWindows;
 import tools.Validation;
 import tools.xmlTools.LastSessionStorage;
@@ -71,7 +69,6 @@ public class ChangeIpPortController {
     }
 
     public void onClick() {
-        RestClient lob_restClient;
         DataCache lob_dataCache = DataCache.getDataCache();
 
         String lva_ip = gob_tfServerIp.getText();

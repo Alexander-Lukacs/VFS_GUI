@@ -163,7 +163,7 @@ public class LoginController {
 
             }
         }
-       // ist voll doof wegen Ip und port.... lol setTextFromXmlToTf();
+        // setTextFromXmlToTf(); --> ist voll doof wegen Ip und port.... lol
     }
 
     private boolean checkIfLoginDataValid(String iva_ip, String iva_port, String iva_email, String iva_password) {
