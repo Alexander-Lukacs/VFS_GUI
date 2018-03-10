@@ -1,12 +1,18 @@
 package threads.classes;
 
+import builder.RestClientBuilder;
+import cache.SharedDirectoryCache;
 import fileTree.classes.TreeSingleton;
+import models.classes.SharedDirectory;
+import restful.clients.SharedDirectoryRestClient;
 import threads.constants.FileManagerConstants;
 import tools.Utils;
+import tools.xmlTools.DirectoryNameMapper;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
 
 public class NotifyServerThread extends Thread {
     private static final int GC_ACCEPT_TIMEOUT_MILLIS = 500;
@@ -199,11 +205,46 @@ public class NotifyServerThread extends Thread {
         ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_DELETE_DIR_ONLY, false);
     }
 
+    /**
+     * Delete the shared directory in explorer and tree view
+     * @param iar_messageArray at position 0: operation
+     *                         at position 1: relative file path
+     *                         at position 2: shared directory id
+     */
     private void deleteSharedDirectory(String[] iar_messageArray) {
+        SharedDirectoryCache lob_sharedDirCache = SharedDirectoryCache.getInstance();
+        String sharedDirectoryIdString;
+        int sharedDirectoryId;
 
+        sharedDirectoryIdString = iar_messageArray[2];
+        sharedDirectoryId = Integer.parseInt(sharedDirectoryIdString);
+
+        lob_sharedDirCache.removeData(sharedDirectoryId);
+        DirectoryNameMapper.removeSharedDirectory(sharedDirectoryId);
+
+        deleteDir(iar_messageArray);
     }
 
+    /**
+     * Add new shared directory to explorer and tree view
+     * @param iar_messageArray at position 0: operation
+     *                         at position 1: relative file path
+     *                         at position 2: shared directory id
+     */
     private void addSharedDirectory(String[] iar_messageArray) {
+        SharedDirectoryRestClient lob_restClient;
+        List<SharedDirectory> lli_sharedDirectories;
+        String sharedDirectoryId;
 
+        sharedDirectoryId = iar_messageArray[2];
+
+        lob_restClient = RestClientBuilder.buildSharedDirectoryClientWithAuth();
+        lli_sharedDirectories = lob_restClient.getAllSharedDirectoriesOfUser();
+
+        for (SharedDirectory lob_tmpSharedDirectory : lli_sharedDirectories) {
+            if (lob_tmpSharedDirectory.getId() == Integer.parseInt(sharedDirectoryId)) {
+                Utils.createSharedDirectory(lob_tmpSharedDirectory);
+            }
+        }
     }
 }

@@ -247,48 +247,12 @@ public class SharedDirectoryController {
                 // If the shared directory was successfully to the server, add the shared directory
                 // to the tree view and to the explorer
                 lob_sharedDirectory.setId(Integer.parseInt(lob_restResponse.getResponseMessage()));
-                createSharedDirectory(lob_sharedDirectory);
+                Utils.createSharedDirectory(lob_sharedDirectory);
                 closeWindow();
             }
 
         } catch (IllegalArgumentException ex) {
             new AlertWindows().createWarningAlert(ex.getMessage());
-        }
-    }
-
-    /**GC_SHARED_DIR_CREATED
-     * Create a shared directory in the explorer and tree view
-     *
-     * @param iob_sharedDirectory the shared directory
-     */
-    private void createSharedDirectory(SharedDirectory iob_sharedDirectory) {
-        // Declaration block -----------------------------------------------------------------------------------------------
-
-        SharedDirectoryCache lob_sharedDirectoryCache = SharedDirectoryCache.getInstance();
-        File lob_file;
-        int lva_counter = 1;
-        String lva_filePath;
-
-        // -----------------------------------------------------------------------------------------------------------------
-
-        lva_filePath = buildPathToSharedDirectory(iob_sharedDirectory);
-
-        lob_file = new File(lva_filePath.replace("$", ""));
-
-        // if the directory already exists extend the dir name with (x).
-        // x = autoincrement integer
-        if (lob_file.exists()) {
-            do {
-                lob_file = new File(lva_filePath.replace("$", "(" + lva_counter + ")"));
-                lva_counter++;
-            } while (lob_file.exists());
-        }
-
-        lob_sharedDirectoryCache.put(iob_sharedDirectory.getId(), iob_sharedDirectory);
-        DirectoryNameMapper.addNewSharedDirectory(iob_sharedDirectory.getId(), lob_file.getName());
-
-        if (!lob_file.mkdir()) {
-            new AlertWindows().createWarningAlert(GC_COULD_NOT_CREATE_DIR);
         }
     }
 
@@ -394,19 +358,5 @@ public class SharedDirectoryController {
      */
     private void closeWindow() {
         gob_stage.close();
-    }
-
-    /**
-     * Builds the absolute path to the shared directory
-     *
-     * @param iob_sharedDirectory the shared directory
-     * @return the absolute path
-     */
-    private String buildPathToSharedDirectory(SharedDirectory iob_sharedDirectory) {
-        DataCache lob_dataCache = DataCache.getDataCache();
-
-        return Utils.getUserBasePath() + "\\" + lob_dataCache.get(DataCache.GC_IP_KEY) + "_" +
-                lob_dataCache.get(DataCache.GC_PORT_KEY) + "\\" + lob_dataCache.get(DataCache.GC_EMAIL_KEY) +
-                "\\" + "Shared" + "\\" + iob_sharedDirectory.getDirectoryName() + "$";
     }
 }
