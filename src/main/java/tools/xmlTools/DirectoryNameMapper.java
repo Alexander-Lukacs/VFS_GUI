@@ -12,6 +12,7 @@ import tools.Utils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 
 import static tools.constants.DirectoryNameMapperConstants.*;
@@ -136,6 +137,7 @@ public class DirectoryNameMapper {
         List<Element> lob_nodeList;
         Element lob_selectedElement;
         boolean hasChanged = false;
+        Element lob_element;
 
 
         if (checkIfFileNotExist()) {
@@ -152,9 +154,12 @@ public class DirectoryNameMapper {
             lob_selectedElement = lob_rootElement.getChild(GC_SHARED_DIR_ROOT_ELEMENT);
             lob_nodeList = lob_selectedElement.getChildren();
 
-            for (Element lob_element : lob_nodeList) {
+
+            for (Iterator<Element> lob_elementIterator = lob_nodeList.iterator(); lob_elementIterator.hasNext();) {
+                lob_element = lob_elementIterator.next();
                 if (lob_element.getAttributeValue(GC_ATTRIBUTE_ID).equals(iva_elementId)) {
-                    lob_selectedElement.removeContent(lob_element);
+//                    lob_selectedElement.removeContent(lob_element);
+                    lob_elementIterator.remove();
                     hasChanged = true;
                 }
             }
