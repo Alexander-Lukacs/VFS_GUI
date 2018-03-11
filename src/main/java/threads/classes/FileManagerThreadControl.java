@@ -514,6 +514,10 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         TreeItem<String> lob_item;
         String lva_newName;
         boolean lva_renameTreeItem;
+        File lob_rootFile = TreeSingleton.getInstance().getTree().getRoot();
+        File lob_privateFile = new File(lob_rootFile.toString() + "\\" + DirectoryNameMapper.getPrivateDirectoryName());
+        File lob_publicFile = new File(lob_rootFile.toString() + "\\" + DirectoryNameMapper.getPublicDirectoryName());
+        File lob_sharedFile = new File(lob_rootFile.toString() + "\\" + DirectoryNameMapper.getSharedDirectoryName());
 
         if (iob_command.gob_file == null) {
             gco_commands.remove(iob_command);
@@ -529,6 +533,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             lva_newName = getObjectFromInformationArray(iob_command, 0, String.class);
             lva_renameTreeItem = getObjectFromInformationArray(iob_command, 1, Boolean.class);
         } catch (RuntimeException ex) {
+            ex.printStackTrace();
             gco_commands.remove(iob_command);
             return;
         }
@@ -541,6 +546,18 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
                 return;
             }
             Platform.runLater(() -> lob_item.setValue(lva_newName));
+        }
+
+        if (iob_command.gob_file.equals(lob_privateFile)) {
+            DirectoryNameMapper.setPrivateDirectoryName(lva_newName);
+        }
+
+        if (iob_command.gob_file.equals(lob_publicFile)) {
+            DirectoryNameMapper.setPublicDirectoryName(lva_newName);
+        }
+
+        if (iob_command.gob_file.equals(lob_sharedFile)) {
+            DirectoryNameMapper.setSharedDirectoryName(lva_newName);
         }
 
         lob_tree.renameFile(iob_command.gob_file, lva_newName);
@@ -556,11 +573,19 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
      */
     private void renameFileOnServer(Command iob_command) {
         String lva_newName;
+        File lob_newFile;
 
         try {
             lva_newName = getObjectFromInformationArray(iob_command, 0, String.class);
         } catch (RuntimeException ex) {
             gco_commands.remove(iob_command);
+            return;
+        }
+
+        lob_newFile = new File(iob_command.gob_file.toString().replaceFirst("[^\\\\]*$", lva_newName));
+        if (TreeTool.isRootFile(lob_newFile)) {
+            gco_commands.remove(iob_command);
+            System.out.println("Filter root file");
             return;
         }
 
@@ -626,6 +651,9 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         gco_commands.remove(iob_command);
     }
 
+    //------------------------------------------------------------------------------------------------------------------
+    // "GC_DELETE_SHARED_DIR"
+    //------------------------------------------------------------------------------------------------------------------
     /**
      * compare the local tree to the tree on the server
      * @param iob_command expected input in gar_information:
@@ -752,8 +780,12 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
 
     private void addFiles(TreeDifference iob_difference, int iva_loopIndex) {
         for (String lva_addFile : iob_difference.getFilesToInsert()) {
+            if (iva_loopIndex == 0) {
+                lva_addFile = DirectoryNameMapper.getPrivateDirectoryName() + lva_addFile;
+            }
+
             if (iva_loopIndex == 1) {
-                lva_addFile = "Public" + lva_addFile;
+                lva_addFile = DirectoryNameMapper.getPublicDirectoryName() + lva_addFile;
             }
 
             this.addFileWithCommando(null, GC_DOWNLOAD_FROM_SERVER, true, lva_addFile);
@@ -763,11 +795,11 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
     private void deleteFiles(TreeDifference iob_difference, Tree iob_tree, int iva_loopIndex) {
         for (String lva_deleteFile : iob_difference.getFilesToDelete()) {
             if (iva_loopIndex == 0) {
-                lva_deleteFile = iob_tree.getRoot().getAbsolutePath() + "\\Private" + lva_deleteFile;
+                lva_deleteFile = iob_tree.getRoot().getAbsolutePath() + "\\" + DirectoryNameMapper.getPrivateDirectoryName() + lva_deleteFile;
             }
 
             if (iva_loopIndex == 1) {
-                lva_deleteFile = iob_tree.getRoot().getAbsolutePath() + "\\Public" + lva_deleteFile;
+                lva_deleteFile = iob_tree.getRoot().getAbsolutePath() + "\\" + DirectoryNameMapper.getPublicDirectoryName() + lva_deleteFile;
 
             }
             File lob_file = new File(lva_deleteFile);

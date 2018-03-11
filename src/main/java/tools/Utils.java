@@ -42,11 +42,9 @@ public class Utils {
     }
 
     public static int getDirectoryIdFromRelativePath(String iva_relativePath, boolean iva_isPathFromServer) {
-        String lva_directoryName;
         String[] lar_fileDirectories;
 
         if (iva_relativePath.startsWith("Shared")) {
-//            lva_directoryName = iva_relativePath.replaceFirst(".*\\\\", "");
             lar_fileDirectories = iva_relativePath.split("\\\\");
             if (iva_isPathFromServer) {
                 return Integer.parseInt(lar_fileDirectories[1]);

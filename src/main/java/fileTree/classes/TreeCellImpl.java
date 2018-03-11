@@ -10,6 +10,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.TransferMode;
 import threads.constants.FileManagerConstants;
 import threads.classes.ThreadManager;
+import tools.AlertWindows;
 import tools.TreeTool;
 import tools.xmlTools.DirectoryNameMapper;
 
@@ -71,6 +72,20 @@ public class TreeCellImpl extends TreeCell<String> {
         gob_textField = new TextField(getString());
         gob_textField.setOnKeyReleased(t -> {
             if (t.getCode() == KeyCode.ENTER) {
+                int lva_counter = 0;
+                String lva_newValue = gob_textField.getText();
+                for (TreeItem<String> lob_sibling : getTreeItem().getParent().getChildren()) {
+                    if (lob_sibling.getValue().equals(lva_newValue)) {
+                        lva_counter++;
+                    }
+                }
+
+                if (lva_counter >= 1) {
+                    new AlertWindows().createWarningAlert("File with the same name already exists");
+                    cancelEdit();
+                    return;
+                }
+
                 commitEdit(gob_textField.getText());
             } else if (t.getCode() == KeyCode.ESCAPE) {
                 cancelEdit();
@@ -115,7 +130,6 @@ public class TreeCellImpl extends TreeCell<String> {
             lob_fileHovered = TreeTool.buildFileFromItem(lob_treeItemHovered, gob_tree);
             lob_fileDragged = TreeTool.buildFileFromItem(lob_treeItemDragged, gob_tree);
 
-//            TreeTool.moveFile(lob_fileDragged.toPath(), lob_fileHovered.toPath(), false, gob_restClient);
             ThreadManager.addCommandToFileManager(lob_fileDragged, FileManagerConstants.GC_MOVE, true, lob_fileHovered, false);
             lob_treeSingleton.getDuplicateOperationsPrevention().putMoved(lob_fileDragged.toPath());
 

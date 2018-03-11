@@ -7,6 +7,7 @@ import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import tools.xmlTools.DirectoryNameMapper;
 
 import javax.swing.filechooser.FileSystemView;
 import java.awt.image.BufferedImage;
@@ -60,15 +61,6 @@ public class TreeTool {
         return new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("images/fileIcons/ICON_FILE.png")));
     }
 
-    public static void removeFromTreeView(File iob_file) {
-        TreeItem<String> lob_item = searchTreeItem(iob_file);
-        if (lob_item == null) {
-            return;
-        }
-        TreeItem<String> lob_parent = lob_item.getParent();
-        lob_parent.getChildren().remove(lob_item);
-    }
-
     public void createDirectory(File iob_directory) {
         int lva_tries;
         boolean lva_directoryCreated;
@@ -119,15 +111,11 @@ public class TreeTool {
         return searchTreeItem(iob_file) != null;
     }
 
-//    public static String getRelativePath(String iva_filePath) throws IOException {
-//        String lva_regex = TreeSingleton.getInstance().getTree().getRoot().getCanonicalPath();
-//
-//        lva_regex = lva_regex.replaceAll("\\\\", "\\\\\\\\");
-//        String rva_return = iva_filePath.replaceFirst(lva_regex, "");
-//        return rva_return.replaceFirst("^\\\\", "");
-//    }
-
     public void addToTreeView(File iob_file) {
+        if (searchTreeItem(iob_file) != null) {
+            return;
+        }
+
         try {
             if (!iob_file.exists()) {
                 return;
@@ -177,13 +165,23 @@ public class TreeTool {
      */
     public static boolean filterRootFiles(Path iob_path) {
         Path lob_rootPath = TreeSingleton.getInstance().getTree().getRoot().toPath();
-        Path lob_privatePath = new File(lob_rootPath.toString() + "\\Private").toPath();
-        Path lob_publicPath = new File(lob_rootPath.toString() + "\\Public").toPath();
-        Path lob_sharedPath = new File(lob_rootPath.toString() + "\\Shared").toPath();
+        Path lob_privatePath = new File(lob_rootPath.toString() + "\\" + DirectoryNameMapper.getPrivateDirectoryName()).toPath();
+        Path lob_publicPath = new File(lob_rootPath.toString() + "\\" + DirectoryNameMapper.getPublicDirectoryName()).toPath();
+        Path lob_sharedPath = new File(lob_rootPath.toString() + "\\" + DirectoryNameMapper.getSharedDirectoryName()).toPath();
 
         return !iob_path.startsWith(lob_privatePath) && !iob_path.startsWith(lob_publicPath) && !iob_path.startsWith(lob_sharedPath);
 
     }
+
+    public static boolean isRootFile(File iob_file) {
+        File lob_rootFile = TreeSingleton.getInstance().getTree().getRoot();
+        File lob_privateFile = new File(lob_rootFile.toString() + "\\" + DirectoryNameMapper.getPrivateDirectoryName());
+        File lob_publicFile = new File(lob_rootFile.toString() + "\\" + DirectoryNameMapper.getPublicDirectoryName());
+        File lob_sharedFile = new File(lob_rootFile.toString() + "\\" + DirectoryNameMapper.getSharedDirectoryName());
+
+        return lob_privateFile.equals(iob_file) || lob_publicFile.equals(iob_file) || lob_sharedFile.equals(iob_file);
+    }
+
     private String[] removeBasePathAndConvertToArray(String iva_filePath) throws IOException {
         String lva_basePath = TreeSingleton.getInstance().getTree().getRoot().getCanonicalPath();
         lva_basePath = lva_basePath.replaceAll("\\\\", "\\\\\\\\");

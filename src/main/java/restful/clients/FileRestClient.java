@@ -15,6 +15,7 @@ import org.apache.commons.io.IOUtils;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import tools.Utils;
+import tools.xmlTools.DirectoryNameMapper;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -27,10 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static tools.Utils.getDirectoryIdFromRelativePath;
 
@@ -173,8 +171,8 @@ public class FileRestClient extends RestClient {
         Collection<TreeDifference> lco_differences = new ArrayList<>();
 
         try {
-            lco_differences.add(compareTreeToServer("\\Private", iob_tree, -1));
-            lco_differences.add(compareTreeToServer("\\Public", iob_tree, 0));
+            lco_differences.add(compareTreeToServer("\\" + DirectoryNameMapper.getPrivateDirectoryName(), iob_tree, -1));
+            lco_differences.add(compareTreeToServer("\\" + DirectoryNameMapper.getPublicDirectoryName(), iob_tree, 0));
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -198,6 +196,7 @@ public class FileRestClient extends RestClient {
         FileNode lob_privateNode = iob_tree.getRootNode().getChild(lob_rootFile);
         lob_tree.addFiles(getNodeSubFiles(new HashMap<>(), lob_privateNode));
         String lva_treeXmlString = lob_xmlParser.toXML(lob_tree);
+        System.out.println(lva_treeXmlString);
 
         Response lob_privateResponse = gob_webTarget.path("/auth/files/compare").queryParam("DirectoryId", iva_directoryId).request()
                 .post(Entity.entity(lva_treeXmlString, MediaType.APPLICATION_XML));

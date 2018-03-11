@@ -30,6 +30,7 @@ public class DirectoryNameMapper {
         Element lob_publicDirectory;
         Element lob_privateDirectory;
         Element lob_sharedDirectoryRoot;
+        Element lob_sharedDirectory;
 
         XMLOutputter lob_xmlOutput;
         String lva_xmlFilePath;
@@ -47,12 +48,17 @@ public class DirectoryNameMapper {
             lob_publicDirectory = new Element(GC_PUBLIC_DIR_ELEMENT);
             lob_publicDirectory.setText("Public");
 
+            // shared directory name element
+            lob_sharedDirectory = new Element(GC_SHARED_DIR_ELEMENT);
+            lob_sharedDirectory.setText("Shared");
+
             // shared directory root element
             lob_sharedDirectoryRoot = new Element(GC_SHARED_DIR_ROOT_ELEMENT);
 
 
             lob_doc.getRootElement().addContent(lob_privateDirectory);
             lob_doc.getRootElement().addContent(lob_publicDirectory);
+            lob_doc.getRootElement().addContent(lob_sharedDirectory);
             lob_doc.getRootElement().addContent(lob_sharedDirectoryRoot);
 
             lob_xmlOutput = new XMLOutputter();
@@ -106,6 +112,22 @@ public class DirectoryNameMapper {
         }
 
         modify(GC_PUBLIC_DIR_ELEMENT, iva_dirName, GC_FILE_NAME);
+    }
+
+    public static String getSharedDirectoryName() {
+        if (checkIfFileNotExist()) {
+            createXmlFile();
+        }
+
+        return readXml(GC_SHARED_DIR_ELEMENT, GC_FILE_NAME);
+    }
+
+    public static void setSharedDirectoryName(String iva_dirName) {
+        if (checkIfFileNotExist()) {
+            createXmlFile();
+        }
+
+        modify(GC_SHARED_DIR_ELEMENT, iva_dirName, GC_FILE_NAME);
     }
 
     public static String getRenamedSharedDirectoryName(int iva_originalDirId) {
