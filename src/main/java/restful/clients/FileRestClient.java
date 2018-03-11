@@ -46,7 +46,7 @@ public class FileRestClient extends RestClient {
     public boolean uploadFilesToServer(File iob_filesToUpload) {
         DataCache lob_dataCache = DataCache.getDataCache();
         String lva_relativeFilePath = Utils.buildRelativeFilePath(iob_filesToUpload);
-        int lva_directoryId = getDirectoryIdFromRelativePath(lva_relativeFilePath);
+        int lva_directoryId = getDirectoryIdFromRelativePath(lva_relativeFilePath, false);
         long lva_lastModified = 0;
         BasicFileAttributes lob_basicFileAttributes;
 
@@ -91,7 +91,7 @@ public class FileRestClient extends RestClient {
 
     public boolean createDirectoryOnServer(File iob_file) {
         String lva_relativePath = Utils.buildRelativeFilePath(iob_file);
-        int lva_directoryId = getDirectoryIdFromRelativePath(lva_relativePath);
+        int lva_directoryId = getDirectoryIdFromRelativePath(lva_relativePath, false);
 
         Response lob_response = gob_webTarget.path("/auth/files/createDirectory")
                 .queryParam("directoryId", lva_directoryId)
@@ -106,7 +106,7 @@ public class FileRestClient extends RestClient {
 
     public boolean deleteOnServer(File iob_file) {
         String lva_relativePath = Utils.buildRelativeFilePath(iob_file);
-        int lva_directoryId = getDirectoryIdFromRelativePath(lva_relativePath);
+        int lva_directoryId = getDirectoryIdFromRelativePath(lva_relativePath, false);
 
         Response lob_response = gob_webTarget.path("/auth/files/delete")
                 .queryParam("directoryId", lva_directoryId)
@@ -122,7 +122,7 @@ public class FileRestClient extends RestClient {
         String lva_relativePath = Utils.buildRelativeFilePath(iob_file);
 
         Response lob_response = gob_webTarget.path("/auth/files/removeDirectoryOnly")
-                .queryParam("directoryId", getDirectoryIdFromRelativePath(lva_relativePath))
+                .queryParam("directoryId", getDirectoryIdFromRelativePath(lva_relativePath, false))
                 .request()
                 .post(Entity.entity(lva_relativePath, MediaType.TEXT_PLAIN));
         return lob_response.getStatus() == 200;
@@ -132,8 +132,8 @@ public class FileRestClient extends RestClient {
 // Move a file on the server
 // ---------------------------------------------------------------------------------------------------------------------
     public int moveFile(String iva_relativePath, String iva_newRelativePath) {
-        int lva_sourceDirectoryId = getDirectoryIdFromRelativePath(iva_relativePath);
-        int lva_destinationDirectoryId = getDirectoryIdFromRelativePath(iva_newRelativePath);
+        int lva_sourceDirectoryId = getDirectoryIdFromRelativePath(iva_relativePath, false);
+        int lva_destinationDirectoryId = getDirectoryIdFromRelativePath(iva_newRelativePath, false);
 
         Response lob_response = gob_webTarget.path("/auth/files/move")
                 .queryParam("path", iva_relativePath)
@@ -156,7 +156,7 @@ public class FileRestClient extends RestClient {
     public boolean renameFile(File iob_file, String iva_newRelativePath) {
         int lva_directoryId;
         String lva_relativePath = Utils.buildRelativeFilePath(iob_file);
-        lva_directoryId  = getDirectoryIdFromRelativePath(lva_relativePath);
+        lva_directoryId  = getDirectoryIdFromRelativePath(lva_relativePath, false);
 
         Response lob_response = gob_webTarget.path("/auth/files/rename")
                 .queryParam("path", lva_relativePath)
@@ -211,7 +211,7 @@ public class FileRestClient extends RestClient {
 // download a file from the server
 // ---------------------------------------------------------------------------------------------------------------------
     public Object downloadFile(String iva_filePath) {
-        int lva_directoryId = getDirectoryIdFromRelativePath(iva_filePath);
+        int lva_directoryId = getDirectoryIdFromRelativePath(iva_filePath, false);
 
         Response lob_response = gob_webTarget.path("/auth/files/download")
                 .queryParam("directoryId", lva_directoryId)

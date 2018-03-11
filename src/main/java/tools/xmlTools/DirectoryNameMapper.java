@@ -12,6 +12,7 @@ import tools.Utils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Iterator;
 import java.util.List;
 
@@ -64,6 +65,8 @@ public class DirectoryNameMapper {
             if (!lob_file.exists()) {
                 lob_file.mkdir();
             }
+
+            Files.setAttribute(lob_file.toPath(), "dos:hidden", true);
 
             lva_xmlFilePath = getXmlFilePath();
             lob_xmlOutput.output(lob_doc, new FileWriter(lva_xmlFilePath));

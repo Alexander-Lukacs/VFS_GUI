@@ -274,17 +274,28 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
     //------------------------------------------------------------------------------------------------------------------
     /**
      * delete file on the client
-     * @param iob_command expected input in gar_information: none
+     * @param iob_command expected input in gar_information
      */
     private void deleteLocalFile(Command iob_command) {
         Tree lob_tree = TreeSingleton.getInstance().getTree();
         Platform.runLater(() -> TreeTool.getInstance().deleteItem(iob_command.gob_file));
+        String lva_relativeFilePath;
+        int lva_directoryId;
+        SharedDirectoryCache lob_sharedDirCache;
 
         if (iob_command.gob_file == null) {
             gco_commands.remove(iob_command);
         }
 
+        lva_relativeFilePath = Utils.buildRelativeFilePath(iob_command.gob_file);
+        lva_directoryId = Utils.getDirectoryIdFromRelativePath(lva_relativeFilePath, false);
+
         if (lob_tree.deleteFile(iob_command.gob_file)) {
+            if (lva_directoryId > 0) {
+                lob_sharedDirCache = SharedDirectoryCache.getInstance();
+                DirectoryNameMapper.removeSharedDirectory(lva_directoryId);
+                lob_sharedDirCache.removeData(lva_directoryId);
+            }
             gco_commands.remove(iob_command);
             return;
         }
