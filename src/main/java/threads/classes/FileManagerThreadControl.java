@@ -292,9 +292,11 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
 
         if (lob_tree.deleteFile(iob_command.gob_file)) {
             if (lva_directoryId > 0) {
-                lob_sharedDirCache = SharedDirectoryCache.getInstance();
-                DirectoryNameMapper.removeSharedDirectory(lva_directoryId);
-                lob_sharedDirCache.removeData(lva_directoryId);
+                if (lva_relativeFilePath.split("\\\\").length == 2) {
+                    lob_sharedDirCache = SharedDirectoryCache.getInstance();
+                    DirectoryNameMapper.removeSharedDirectory(lva_directoryId);
+                    lob_sharedDirCache.removeData(lva_directoryId);
+                }
             }
             gco_commands.remove(iob_command);
             return;
@@ -321,23 +323,8 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             return;
         }
 
-//        try {
-//            lva_directoryId = getObjectFromInformationArray(iob_command, 0, Integer.class);
-//
-//        } catch (RuntimeException ex) {
-//            ex.printStackTrace();
-//            gco_commands.remove(iob_command);
-//            return;
-//        }
-
         if (gob_restClient.deleteOnServer(iob_command.gob_file)) {
-//            if (lva_directoryId <= 0) {
-                gco_commands.remove(iob_command);
-//            } else {
-//                lob_sharedDirCache = SharedDirectoryCache.getInstance();
-//                DirectoryNameMapper.removeSharedDirectory(lva_directoryId);
-//                lob_sharedDirCache.removeData(lva_directoryId);
-//            }
+            gco_commands.remove(iob_command);
         } else {
             iob_command.gva_maxTries++;
             gva_commandIndex.incrementAndGet();
@@ -802,17 +789,23 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
      */
     @Override
     public void run() {
+        Command lob_command;
         while (isRunning) {
-            if (!(gva_commandIndex.get() >= gco_commands.size() || gva_commandIndex.get() < 0)) {
-                Command lob_command = gco_commands.get(gva_commandIndex.get());
-                executeCommand(lob_command);
-            } else {
-                gva_commandIndex.set(0);
-                try {
-                    java.lang.Thread.sleep(100);
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
+            try {
+                if (!(gva_commandIndex.get() >= gco_commands.size() || gva_commandIndex.get() < 0)) {
+                    lob_command = gco_commands.get(gva_commandIndex.get());
+                    executeCommand(lob_command);
+                } else {
+                    gva_commandIndex.set(0);
+                    try {
+                        java.lang.Thread.sleep(100);
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
                 }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                gco_commands.remove(gco_commands.get(gva_commandIndex.get()));
             }
         }
     }

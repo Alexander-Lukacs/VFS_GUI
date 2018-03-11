@@ -311,7 +311,7 @@ public class TreeControl {
 //    }
 
     private void createNewDirectory() {
-        File lob_newFile = buildNewFile("\\new Directory");
+        File lob_newFile = buildNewFile("\\new Directory$");
 //        createFileOrDirectory(lob_newFile, true, gob_restClient);
         ThreadManager.addCommandToFileManager(lob_newFile, FileManagerConstants.GC_ADD,
                 true, true);
@@ -319,7 +319,7 @@ public class TreeControl {
     }
 
     private void createNewFile() {
-        File lob_newFile = buildNewFile("\\new File.txt");
+        File lob_newFile = buildNewFile("\\new File$.txt");
 //        createFileOrDirectory(lob_newFile, false, gob_restClient);
         ThreadManager.addCommandToFileManager(lob_newFile, FileManagerConstants.GC_ADD,
                 true, false);
