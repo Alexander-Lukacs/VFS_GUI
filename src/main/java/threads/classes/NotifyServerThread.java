@@ -11,6 +11,7 @@ import tools.xmlTools.DirectoryNameMapper;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Base64;
 import java.util.List;
 
 public class NotifyServerThread extends Thread {
@@ -45,6 +46,7 @@ public class NotifyServerThread extends Thread {
                     lob_inputStream = new BufferedReader(new InputStreamReader(lob_client.getInputStream()));
 
                     lva_message = lob_inputStream.readLine();
+                    lva_message = decodeBase64(lva_message);
                     lar_messageArray = lva_message.split("_");
 
                     switch (lar_messageArray[0]) {
@@ -242,5 +244,9 @@ public class NotifyServerThread extends Thread {
                 }
             }
         }
+    }
+
+    public String decodeBase64(String iob_encodedString) {
+        return new String(Base64.getDecoder().decode(iob_encodedString.getBytes()));
     }
 }
