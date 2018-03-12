@@ -9,16 +9,16 @@ public class SharedDirectoryCache {
     private static Map<Integer, SharedDirectory> gob_dataCacheMap;
     private static SharedDirectoryCache gob_dataCache;
 
+    private SharedDirectoryCache() {
+        gob_dataCacheMap = new HashMap<>();
+    }
+
     public static SharedDirectoryCache getInstance() {
         if (gob_dataCache == null) {
             gob_dataCache = new SharedDirectoryCache();
         }
 
         return gob_dataCache;
-    }
-
-    private SharedDirectoryCache() {
-        gob_dataCacheMap = new HashMap<>();
     }
 
     /**
@@ -60,5 +60,21 @@ public class SharedDirectoryCache {
 
     public void removeData(Integer iva_key) {
         gob_dataCacheMap.remove(iva_key);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder lob_stringBuilder = new StringBuilder();
+
+        for (Map.Entry<Integer, SharedDirectory> lob_entry : gob_dataCacheMap.entrySet()) {
+            lob_stringBuilder
+                    .append("Key: ")
+                    .append(lob_entry.getKey())
+                    .append(" Value: ")
+                    .append(lob_entry.getValue())
+                    .append("\n");
+        }
+
+        return lob_stringBuilder.toString();
     }
 }
