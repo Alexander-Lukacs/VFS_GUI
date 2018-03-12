@@ -171,11 +171,11 @@ class DirectoryWatchService implements Runnable{
         if (!gob_isRunning) {
             return;
         }
-        System.out.println("----------------------------------------------------------");
-        for (Map.Entry<Path, FileTime> lob_entry : gob_registeredPaths.entrySet()) {
-            System.out.println(lob_entry.getKey());
-        }
-        System.out.println("----------------------------------------------------------");
+//        System.out.println("----------------------------------------------------------");
+//        for (Map.Entry<Path, FileTime> lob_entry : gob_registeredPaths.entrySet()) {
+//            System.out.println(lob_entry.getKey());
+//        }
+//        System.out.println("----------------------------------------------------------");
     }
 
     private void filesRenamed(ArrayList<File> ili_files, HashMap<File, File> ico_renamed) {

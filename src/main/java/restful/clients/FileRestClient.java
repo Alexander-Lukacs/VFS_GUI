@@ -196,7 +196,7 @@ public class FileRestClient extends RestClient {
         FileNode lob_privateNode = iob_tree.getRootNode().getChild(lob_rootFile);
         lob_tree.addFiles(getNodeSubFiles(new HashMap<>(), lob_privateNode));
         String lva_treeXmlString = lob_xmlParser.toXML(lob_tree);
-        System.out.println(lva_treeXmlString);
+//        System.out.println(lva_treeXmlString);
 
         Response lob_privateResponse = gob_webTarget.path("/auth/files/compare").queryParam("DirectoryId", iva_directoryId).request()
                 .post(Entity.entity(lva_treeXmlString, MediaType.APPLICATION_XML));

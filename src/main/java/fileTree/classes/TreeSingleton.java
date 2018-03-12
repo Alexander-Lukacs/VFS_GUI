@@ -43,6 +43,7 @@ public class TreeSingleton {
         gob_preventOperationDuplicates = null;
         gob_tree = null;
         gob_treeView = null;
+        gob_instance = null;
     }
 
     private TreeSingleton() throws IOException{
