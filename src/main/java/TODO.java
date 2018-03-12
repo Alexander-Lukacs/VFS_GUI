@@ -9,5 +9,6 @@ public abstract class TODO {
     TODO Bug: Inhalte der Unterordner der Ordner in Public Directorys werden nicht synchronisiert
     TODO Bug: wenn man das Public Directory umbenennt werden Daten nicht mehr sync
     TODO Bug: Private Directory ist nicht sync
+    TODO Bug: beim Verschieben will Client B mit Account A die Daten auf dem Server löschen,,
      */
 }
