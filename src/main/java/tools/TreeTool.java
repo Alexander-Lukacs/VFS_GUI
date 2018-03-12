@@ -177,7 +177,7 @@ public class TreeTool {
         Path lob_rootPath = TreeSingleton.getInstance().getTree().getRoot().toPath();
         Path lob_sharedPath = new File(lob_rootPath.toString() + "\\" + DirectoryNameMapper.getSharedDirectoryName()).toPath();
 
-        return lob_sharedPath.startsWith(lob_sharedPath);
+        return iob_path.startsWith(lob_sharedPath);
     }
 
     public static boolean isRootFile(File iob_file) {
