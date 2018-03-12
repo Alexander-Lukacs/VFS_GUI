@@ -9,7 +9,7 @@ import java.util.Collection;
 public class FileNodeImpl implements FileNode {
     private File gob_file;
     private FileNode gob_parentNode = null;
-    private Collection<FileNode> gco_children;
+    private final Collection<FileNode> gco_children;
 
     public FileNodeImpl(File iob_file) {
         this.gco_children = new ArrayList<>();

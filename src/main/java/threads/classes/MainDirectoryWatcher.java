@@ -3,7 +3,6 @@ package threads.classes;
 import fileTree.interfaces.FileChangeListener;
 import fileTree.classes.TreeSingleton;
 import javafx.scene.control.TreeItem;
-import restful.clients.FileRestClient;
 import threads.constants.FileManagerConstants;
 import threads.interfaces.ThreadControl;
 import tools.TreeTool;
@@ -16,12 +15,11 @@ import java.nio.file.Path;
  * this class contains 3 DirectoryWatchServices, one for the private, public and shared directory
  */
 class MainDirectoryWatcher implements ThreadControl {
-    private FileRestClient gob_restClient;
     private DirectoryWatchService gob_watchService;
     private File gob_rootFile;
+    private boolean gva_isRunning = false;
 
-    MainDirectoryWatcher(FileRestClient iob_restClient, File iob_files) {
-        gob_restClient = iob_restClient;
+    MainDirectoryWatcher(File iob_files) {
         gob_rootFile = iob_files;
     }
 
@@ -71,14 +69,20 @@ class MainDirectoryWatcher implements ThreadControl {
         if (TreeSingleton.getInstance().getDuplicateOperationsPrevention().wasFileCreated(iob_path)) {
             TreeSingleton.getInstance().getDuplicateOperationsPrevention().removeCreated(iob_path);
         } else {
+            if (!gva_isRunning) {
+                return;
+            }
             ThreadManager.addCommandToFileManager(iob_path.toFile(), FileManagerConstants.GC_ADD, true);
         }
     }
 
     private void deleteFile(Path iob_path) {
-        if (TreeSingleton.getInstance().getDuplicateOperationsPrevention().wasFileDeted(iob_path)) {
+        if (TreeSingleton.getInstance().getDuplicateOperationsPrevention().wasFileDeleted(iob_path)) {
             TreeSingleton.getInstance().getDuplicateOperationsPrevention().removeDeleted(iob_path);
         } else {
+            if (!gva_isRunning) {
+                return;
+            }
             ThreadManager.addCommandToFileManager(iob_path.toFile(), FileManagerConstants.GC_DELETE, true, 0);
         }
     }
@@ -87,6 +91,9 @@ class MainDirectoryWatcher implements ThreadControl {
         if (TreeSingleton.getInstance().getDuplicateOperationsPrevention().wasFilesMoved(iob_oldPath)) {
             TreeSingleton.getInstance().getDuplicateOperationsPrevention().removeMoved(iob_oldPath);
         } else {
+            if (!gva_isRunning) {
+                return;
+            }
             ThreadManager.addCommandToFileManager(iob_oldPath.toFile(), FileManagerConstants.GC_MOVE, true, iob_newPath.toFile(), true);
         }
     }
@@ -98,17 +105,22 @@ class MainDirectoryWatcher implements ThreadControl {
             TreeSingleton.getInstance().getTree().renameFile(iob_path.toFile(), iva_newName);
             TreeItem<String> lob_item = TreeTool.getTreeItem(iob_path.toFile());
             lob_item.setValue(iva_newName);
+            if (!gva_isRunning) {
+                return;
+            }
             ThreadManager.addCommandToFileManager(iob_path.toFile(), FileManagerConstants.GC_RENAME, true, iva_newName, true);
         }
     }
 
     @Override
     public void start() {
+        gva_isRunning = true;
         init(gob_rootFile);
     }
 
     @Override
     public void stop() {
+        gva_isRunning = false;
         gob_watchService.stop();
     }
 

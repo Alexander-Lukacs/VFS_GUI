@@ -17,6 +17,7 @@ class DirectoryWatchService implements Runnable{
     private Path gob_root;
     private FileChangeListener gob_listener;
     private static boolean gob_isRunning = false;
+    private static Thread gob_thread;
 
     /**
      * Register the WatchService on the root directory. Scan at the same time all children of the root directory and
@@ -65,6 +66,10 @@ class DirectoryWatchService implements Runnable{
         //scan the complete fileTree that is watched
         lco_scanned = scan(gob_root.toFile(), new HashMap<>());
 
+        if (!gob_isRunning) {
+            return;
+        }
+
         //create a copy of the paths that are registered
         lco_tmp = new HashMap<>(gob_registeredPaths);
 
@@ -75,9 +80,15 @@ class DirectoryWatchService implements Runnable{
         boolean wasFileRenamedOrMoved = false;
 
         for (Map.Entry<Path, FileTime> lob_entry : lco_tmp.entrySet()) {
+            if (!gob_isRunning) {
+                return;
+            }
 
             //iterate over the scanned files
             for (Iterator<Map.Entry<Path, FileTime>> lob_scannedIterator = lco_scanned.entrySet().iterator(); lob_scannedIterator.hasNext();) {
+                if (!gob_isRunning) {
+                    return;
+                }
                 Map.Entry<Path, FileTime> lob_scannedEntry = lob_scannedIterator.next();
 
                 //the file was moved if the creation time of the file that was "added" is the same as the one that was "deleted"
@@ -157,16 +168,22 @@ class DirectoryWatchService implements Runnable{
         test.sort(PathFileComparator.PATH_COMPARATOR);
         filesAdded(test);
 
-        System.out.println("----------------------------------------------------------");
-        for (Map.Entry<Path, FileTime> lob_entry : gob_registeredPaths.entrySet()) {
-            System.out.println(lob_entry.getKey());
+        if (!gob_isRunning) {
+            return;
         }
-        System.out.println("----------------------------------------------------------");
+//        System.out.println("----------------------------------------------------------");
+//        for (Map.Entry<Path, FileTime> lob_entry : gob_registeredPaths.entrySet()) {
+//            System.out.println(lob_entry.getKey());
+//        }
+//        System.out.println("----------------------------------------------------------");
     }
 
     private void filesRenamed(ArrayList<File> ili_files, HashMap<File, File> ico_renamed) {
         filterChildren(ili_files);
         for (File lob_file: ili_files) {
+            if (!gob_isRunning) {
+                return;
+            }
             System.out.println("OLD: " + lob_file.getAbsolutePath() + " NEW: " + ico_renamed.get(lob_file));
             gob_listener.fileRenamed(lob_file.toPath(), ico_renamed.get(lob_file).getName());
         }
@@ -181,6 +198,9 @@ class DirectoryWatchService implements Runnable{
     private void filesMoved(ArrayList<File> ili_files, HashMap<File, File> ico_moved) {
         filterChildren(ili_files);
         for (File lob_file : ili_files) {
+            if (!gob_isRunning) {
+                return;
+            }
             System.out.println("MOVED: " + lob_file.toPath() + " TO " + ico_moved.get(lob_file).toPath());
             gob_listener.fileMoved(lob_file.toPath(), ico_moved.get(lob_file).toPath());
         }
@@ -194,6 +214,9 @@ class DirectoryWatchService implements Runnable{
         filterChildren(ili_files);
 
         for (File lob_file : ili_files) {
+            if (!gob_isRunning) {
+                return;
+            }
             System.out.println("DELETED: " + lob_file.toPath());
             gob_listener.fileDeleted(lob_file.toPath());
         }
@@ -206,6 +229,9 @@ class DirectoryWatchService implements Runnable{
     private void filesAdded(Collection<File> ico_files) {
         for (File lob_file : ico_files) {
             try {
+                if (!gob_isRunning) {
+                    return;
+                }
                 System.out.println("ADDED: " + lob_file.toPath());
                 register(lob_file.toPath());
                 gob_listener.fileAdded(lob_file.toPath());
@@ -265,10 +291,12 @@ class DirectoryWatchService implements Runnable{
     @Override
     public void run() {
         try {
-            while(gob_isRunning) {
+            while (gob_isRunning) {
                 Thread.sleep(10000);
                 scanRootAndCompare();
             }
+        } catch (InterruptedException ignore) {
+
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -278,9 +306,9 @@ class DirectoryWatchService implements Runnable{
      * start the scan routine in a new ThreadControl
      */
     public void start() {
-        Thread lob_runnerThread = new Thread(this, DirectoryWatchService.class.getSimpleName());
-        lob_runnerThread.setDaemon(true);
-        lob_runnerThread.start();
+        gob_thread = new Thread(this, DirectoryWatchService.class.getSimpleName());
+        gob_thread.setDaemon(true);
+        gob_thread.start();
     }
 
     /**
@@ -288,6 +316,7 @@ class DirectoryWatchService implements Runnable{
      */
     public void stop() {
         gob_isRunning = false;
+        gob_thread.interrupt();
     }
 
     public void clear() {

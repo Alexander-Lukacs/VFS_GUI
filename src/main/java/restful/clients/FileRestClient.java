@@ -15,6 +15,7 @@ import org.apache.commons.io.IOUtils;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import tools.Utils;
+import tools.xmlTools.DirectoryNameMapper;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -25,10 +26,9 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.*;
 
 import static tools.Utils.getDirectoryIdFromRelativePath;
 
@@ -44,14 +44,25 @@ public class FileRestClient extends RestClient {
     public boolean uploadFilesToServer(File iob_filesToUpload) {
         DataCache lob_dataCache = DataCache.getDataCache();
         String lva_relativeFilePath = Utils.buildRelativeFilePath(iob_filesToUpload);
-        int lva_directoryId = getDirectoryIdFromRelativePath(lva_relativeFilePath);
+        int lva_directoryId = getDirectoryIdFromRelativePath(lva_relativeFilePath, false);
+        long lva_lastModified = 0;
+        BasicFileAttributes lob_basicFileAttributes;
+
+        if (!iob_filesToUpload.exists()) {
+            return false;
+        }
 
         HttpAuthenticationFeature lob_authDetails = HttpAuthenticationFeature.basic(
                 lob_dataCache.get(DataCache.GC_EMAIL_KEY),
                 lob_dataCache.get(DataCache.GC_PASSWORD_KEY)
-
         );
 
+        try {
+            lob_basicFileAttributes = Files.readAttributes(iob_filesToUpload.toPath(), BasicFileAttributes.class);
+            lva_lastModified = lob_basicFileAttributes.lastModifiedTime().toMillis();
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
         ClientConfig lob_config = new ClientConfig(lob_authDetails);
         Client lob_client = ClientBuilder.newClient(lob_config);
         lob_client.register(lob_authDetails);
@@ -59,7 +70,8 @@ public class FileRestClient extends RestClient {
         WebTarget lob_target = lob_client.target("http://" + lob_dataCache.get(DataCache.GC_IP_KEY) + ":" +
                 lob_dataCache.get(DataCache.GC_PORT_KEY) + "/api/auth/files/upload")
                 .queryParam("path", lva_relativeFilePath)
-                .queryParam("directoryId", lva_directoryId);
+                .queryParam("directoryId", lva_directoryId)
+                .queryParam("lastModified", lva_lastModified);
         lob_target.register(MultiPartWriter.class);
 
         final FileDataBodyPart lob_filePart = new FileDataBodyPart("attachment", iob_filesToUpload);
@@ -77,7 +89,7 @@ public class FileRestClient extends RestClient {
 
     public boolean createDirectoryOnServer(File iob_file) {
         String lva_relativePath = Utils.buildRelativeFilePath(iob_file);
-        int lva_directoryId = getDirectoryIdFromRelativePath(lva_relativePath);
+        int lva_directoryId = getDirectoryIdFromRelativePath(lva_relativePath, false);
 
         Response lob_response = gob_webTarget.path("/auth/files/createDirectory")
                 .queryParam("directoryId", lva_directoryId)
@@ -92,7 +104,7 @@ public class FileRestClient extends RestClient {
 
     public boolean deleteOnServer(File iob_file) {
         String lva_relativePath = Utils.buildRelativeFilePath(iob_file);
-        int lva_directoryId = getDirectoryIdFromRelativePath(lva_relativePath);
+        int lva_directoryId = getDirectoryIdFromRelativePath(lva_relativePath, false);
 
         Response lob_response = gob_webTarget.path("/auth/files/delete")
                 .queryParam("directoryId", lva_directoryId)
@@ -108,7 +120,7 @@ public class FileRestClient extends RestClient {
         String lva_relativePath = Utils.buildRelativeFilePath(iob_file);
 
         Response lob_response = gob_webTarget.path("/auth/files/removeDirectoryOnly")
-                .queryParam("directoryId", getDirectoryIdFromRelativePath(lva_relativePath))
+                .queryParam("directoryId", getDirectoryIdFromRelativePath(lva_relativePath, false))
                 .request()
                 .post(Entity.entity(lva_relativePath, MediaType.TEXT_PLAIN));
         return lob_response.getStatus() == 200;
@@ -118,8 +130,8 @@ public class FileRestClient extends RestClient {
 // Move a file on the server
 // ---------------------------------------------------------------------------------------------------------------------
     public int moveFile(String iva_relativePath, String iva_newRelativePath) {
-        int lva_sourceDirectoryId = getDirectoryIdFromRelativePath(iva_relativePath);
-        int lva_destinationDirectoryId = getDirectoryIdFromRelativePath(iva_newRelativePath);
+        int lva_sourceDirectoryId = getDirectoryIdFromRelativePath(iva_relativePath, false);
+        int lva_destinationDirectoryId = getDirectoryIdFromRelativePath(iva_newRelativePath, false);
 
         Response lob_response = gob_webTarget.path("/auth/files/move")
                 .queryParam("path", iva_relativePath)
@@ -142,7 +154,7 @@ public class FileRestClient extends RestClient {
     public boolean renameFile(File iob_file, String iva_newRelativePath) {
         int lva_directoryId;
         String lva_relativePath = Utils.buildRelativeFilePath(iob_file);
-        lva_directoryId  = getDirectoryIdFromRelativePath(lva_relativePath);
+        lva_directoryId  = getDirectoryIdFromRelativePath(lva_relativePath, false);
 
         Response lob_response = gob_webTarget.path("/auth/files/rename")
                 .queryParam("path", lva_relativePath)
@@ -159,8 +171,8 @@ public class FileRestClient extends RestClient {
         Collection<TreeDifference> lco_differences = new ArrayList<>();
 
         try {
-            lco_differences.add(compareTreeToServer("\\Private", iob_tree, -1));
-            lco_differences.add(compareTreeToServer("\\Public", iob_tree, 0));
+            lco_differences.add(compareTreeToServer("\\" + DirectoryNameMapper.getPrivateDirectoryName(), iob_tree, -1));
+            lco_differences.add(compareTreeToServer("\\" + DirectoryNameMapper.getPublicDirectoryName(), iob_tree, 0));
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -184,6 +196,7 @@ public class FileRestClient extends RestClient {
         FileNode lob_privateNode = iob_tree.getRootNode().getChild(lob_rootFile);
         lob_tree.addFiles(getNodeSubFiles(new HashMap<>(), lob_privateNode));
         String lva_treeXmlString = lob_xmlParser.toXML(lob_tree);
+//        System.out.println(lva_treeXmlString);
 
         Response lob_privateResponse = gob_webTarget.path("/auth/files/compare").queryParam("DirectoryId", iva_directoryId).request()
                 .post(Entity.entity(lva_treeXmlString, MediaType.APPLICATION_XML));
@@ -197,7 +210,7 @@ public class FileRestClient extends RestClient {
 // download a file from the server
 // ---------------------------------------------------------------------------------------------------------------------
     public Object downloadFile(String iva_filePath) {
-        int lva_directoryId = getDirectoryIdFromRelativePath(iva_filePath);
+        int lva_directoryId = getDirectoryIdFromRelativePath(iva_filePath, false);
 
         Response lob_response = gob_webTarget.path("/auth/files/download")
                 .queryParam("directoryId", lva_directoryId)

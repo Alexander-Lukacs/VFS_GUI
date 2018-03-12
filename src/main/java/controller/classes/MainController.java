@@ -20,6 +20,7 @@ import javafx.stage.Stage;
 import org.apache.commons.io.FileUtils;
 import restful.clients.RestClient;
 import threads.classes.DirectoryCounterThread;
+import threads.classes.ThreadManager;
 import tools.AlertWindows;
 import tools.Utils;
 
@@ -117,6 +118,7 @@ public class MainController {
         lob_sharedDirectoryCache.clearDataCache();
         LoginController ob_x = new LoginController();
         try {
+            ThreadManager.stopAndClear();
             ob_x.start(stage);
         } catch (Exception e) {
             e.printStackTrace();

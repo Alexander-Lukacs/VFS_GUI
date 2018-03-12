@@ -2,17 +2,16 @@ package tools;
 
 import cache.DataCache;
 import cache.SharedDirectoryCache;
+import fileTree.classes.TreeSingleton;
 import models.classes.RestResponse;
 import models.classes.SharedDirectory;
 import threads.classes.ThreadManager;
 import threads.constants.FileManagerConstants;
-import threads.interfaces.ThreadControl;
 import tools.xmlTools.DirectoryNameMapper;
 
 import java.io.File;
 import java.io.IOException;
 
-import static controller.constants.SharedDirectoryConstants.GC_COULD_NOT_CREATE_DIR;
 import static restful.constants.HttpStatusCodes.*;
 
 public class Utils {
@@ -42,12 +41,17 @@ public class Utils {
         }
     }
 
-    public static int getDirectoryIdFromRelativePath(String iva_relativePath) {
-        String lva_directoryName;
+    public static int getDirectoryIdFromRelativePath(String iva_relativePath, boolean iva_isPathFromServer) {
+        String[] lar_fileDirectories;
 
         if (iva_relativePath.startsWith("Shared")) {
-            lva_directoryName = iva_relativePath.replaceFirst(".*\\\\", "");
-            return DirectoryNameMapper.getIdOfSharedDirectory(lva_directoryName);
+            lar_fileDirectories = iva_relativePath.split("\\\\");
+//            if (iva_isPathFromServer) {
+//
+//                return Integer.parseInt(lar_fileDirectories[1]);
+//            } else {
+                return DirectoryNameMapper.getIdOfSharedDirectory(lar_fileDirectories[1]);
+//            }
         }
 
         if (iva_relativePath.startsWith("Public")) {
@@ -58,24 +62,27 @@ public class Utils {
     }
 
     public static String convertRelativeToAbsolutePath(String iva_filePath, boolean isPathFromServer) {
-        int lva_directoryId = getDirectoryIdFromRelativePath(iva_filePath);
+        int lva_directoryId = getDirectoryIdFromRelativePath(iva_filePath, isPathFromServer);
         String rva_absolutePath = getRootDirectory();
         String lva_sharedDirectoryName;
-        int lva_sharedDirectoryId;
         int lva_index;
 
         if (lva_directoryId <= 0) {
             return rva_absolutePath + "\\" + iva_filePath;
         } else {
-            if (isPathFromServer) {
-                lva_index = iva_filePath.indexOf("\\");
-                lva_sharedDirectoryId = Integer.parseInt(iva_filePath.substring(0, lva_index));
-                lva_sharedDirectoryName = DirectoryNameMapper.getRenamedSharedDirectoryName(lva_sharedDirectoryId);
-                rva_absolutePath = rva_absolutePath.replaceFirst("^[^\\\\]*", lva_sharedDirectoryName);
-            } else {
+//            if (isPathFromServer) {
                 lva_sharedDirectoryName = DirectoryNameMapper.getRenamedSharedDirectoryName(lva_directoryId);
-                rva_absolutePath = rva_absolutePath.replaceFirst("^[^\\\\]*", lva_sharedDirectoryName);
-            }
+//                rva_absolutePath += "\\" + iva_filePath;
+//                rva_absolutePath = rva_absolutePath.replaceFirst("[^\\\\]*$", lva_sharedDirectoryName);
+//            } else {
+//                lva_sharedDirectoryName = DirectoryNameMapper.getRenamedSharedDirectoryName(lva_directoryId);
+//                rva_absolutePath += "\\" + iva_filePath;
+//                rva_absolutePath = rva_absolutePath.replaceFirst("[^\\\\]*$", lva_sharedDirectoryName);
+//            }
+//            rva_absolutePath += "\\" + iva_filePath;
+            lva_sharedDirectoryName = "\\\\" + lva_sharedDirectoryName;
+            iva_filePath = iva_filePath.replaceFirst("\\\\[^\\\\]*", lva_sharedDirectoryName);
+            rva_absolutePath += "\\" + iva_filePath;
         }
 
         return rva_absolutePath;
@@ -137,11 +144,9 @@ public class Utils {
 
         lob_sharedDirectoryCache.put(iob_sharedDirectory.getId(), iob_sharedDirectory);
         DirectoryNameMapper.addNewSharedDirectory(iob_sharedDirectory.getId(), lob_file.getName());
+        TreeSingleton.getInstance().getDuplicateOperationsPrevention().putCreated(lob_file.toPath());
         ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_ADD, false, true);
 
-//        if (!lob_file.mkdir()) {
-//            new AlertWindows().createWarningAlert(GC_COULD_NOT_CREATE_DIR);
-//        }
     }
 
     /**
@@ -150,9 +155,8 @@ public class Utils {
      * @param iob_sharedDirectory the shared directory
      * @return the absolute path
      */
+    @SuppressWarnings("WeakerAccess")
     public static String buildPathToSharedDirectory(SharedDirectory iob_sharedDirectory) {
-        DataCache lob_dataCache = DataCache.getDataCache();
-
         return Utils.getRootDirectory() +
                 "\\" + "Shared" + "\\" + iob_sharedDirectory.getDirectoryName() + "$";
     }

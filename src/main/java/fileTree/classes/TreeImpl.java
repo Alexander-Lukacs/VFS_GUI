@@ -305,11 +305,8 @@ public class TreeImpl implements Tree {
     @Override
     public boolean deleteDirectoryOnly(File iob_directory) {
         try {
-            if (!iob_directory.isDirectory()) {
-                return false;
-            }
+            return iob_directory.isDirectory() && deleteDirectoryOnly(iob_directory.getCanonicalPath());
 
-            return deleteDirectoryOnly(iob_directory.getCanonicalPath());
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -352,7 +349,10 @@ public class TreeImpl implements Tree {
                     }
                 }
                 lob_parent.removeChild(lob_node.getFile());
-                lob_node.getFile().delete();
+
+                if (lob_node.getFile().exists()) {
+                    return lob_node.getFile().delete();
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -727,7 +727,6 @@ public class TreeImpl implements Tree {
     /**
      * create a new directory
      * @param iob_node the file that points to the directory
-     * @return true if the directory was created, otherwise false
      */
     private boolean createDirectory(FileNode iob_node) {
         return iob_node.getFile().mkdir();
