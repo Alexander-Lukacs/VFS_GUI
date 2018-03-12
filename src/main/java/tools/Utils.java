@@ -65,6 +65,7 @@ public class Utils {
         int lva_directoryId = getDirectoryIdFromRelativePath(iva_filePath, isPathFromServer);
         String rva_absolutePath = getRootDirectory();
         String lva_sharedDirectoryName;
+        int lva_index;
 
         if (lva_directoryId <= 0) {
             return rva_absolutePath + "\\" + iva_filePath;
@@ -79,7 +80,9 @@ public class Utils {
 //                rva_absolutePath = rva_absolutePath.replaceFirst("[^\\\\]*$", lva_sharedDirectoryName);
 //            }
 //            rva_absolutePath += "\\" + iva_filePath;
-            rva_absolutePath += "\\" + iva_filePath.replaceFirst("\\\\{1}[^\\\\]*", "\\" + lva_sharedDirectoryName);
+            lva_sharedDirectoryName = "\\\\" + lva_sharedDirectoryName;
+            iva_filePath = iva_filePath.replaceFirst("\\\\[^\\\\]*", lva_sharedDirectoryName);
+            rva_absolutePath += "\\" + iva_filePath;
         }
 
         return rva_absolutePath;
