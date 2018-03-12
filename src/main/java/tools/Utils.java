@@ -69,15 +69,17 @@ public class Utils {
         if (lva_directoryId <= 0) {
             return rva_absolutePath + "\\" + iva_filePath;
         } else {
-            if (isPathFromServer) {
+//            if (isPathFromServer) {
                 lva_sharedDirectoryName = DirectoryNameMapper.getRenamedSharedDirectoryName(lva_directoryId);
-                rva_absolutePath += "\\" + iva_filePath;
-                rva_absolutePath = rva_absolutePath.replaceFirst("[^\\\\]*$", lva_sharedDirectoryName);
-            } else {
-                lva_sharedDirectoryName = DirectoryNameMapper.getRenamedSharedDirectoryName(lva_directoryId);
-                rva_absolutePath += "\\" + iva_filePath;
-                rva_absolutePath = rva_absolutePath.replaceFirst("[^\\\\]*$", lva_sharedDirectoryName);
-            }
+//                rva_absolutePath += "\\" + iva_filePath;
+//                rva_absolutePath = rva_absolutePath.replaceFirst("[^\\\\]*$", lva_sharedDirectoryName);
+//            } else {
+//                lva_sharedDirectoryName = DirectoryNameMapper.getRenamedSharedDirectoryName(lva_directoryId);
+//                rva_absolutePath += "\\" + iva_filePath;
+//                rva_absolutePath = rva_absolutePath.replaceFirst("[^\\\\]*$", lva_sharedDirectoryName);
+//            }
+//            rva_absolutePath += "\\" + iva_filePath;
+            rva_absolutePath += "\\" + iva_filePath.replaceFirst("\\\\{1}[^\\\\]*", "\\" + lva_sharedDirectoryName);
         }
 
         return rva_absolutePath;
