@@ -246,7 +246,7 @@ public class NotifyServerThread extends Thread {
         }
     }
 
-    public String decodeBase64(String iob_encodedString) {
+    private String decodeBase64(String iob_encodedString) {
         return new String(Base64.getDecoder().decode(iob_encodedString.getBytes()));
     }
 }
