@@ -46,11 +46,12 @@ public class Utils {
 
         if (iva_relativePath.startsWith("Shared")) {
             lar_fileDirectories = iva_relativePath.split("\\\\");
-            if (iva_isPathFromServer) {
-                return Integer.parseInt(lar_fileDirectories[1]);
-            } else {
+//            if (iva_isPathFromServer) {
+//
+//                return Integer.parseInt(lar_fileDirectories[1]);
+//            } else {
                 return DirectoryNameMapper.getIdOfSharedDirectory(lar_fileDirectories[1]);
-            }
+//            }
         }
 
         if (iva_relativePath.startsWith("Public")) {
