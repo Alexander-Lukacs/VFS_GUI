@@ -125,6 +125,9 @@ public class TreeTool {
                 return;
             }
 
+            if (TreeSingleton.getInstance().getTreeView() == null) {
+                return;
+            }
             TreeItem<String> lob_pointer = TreeSingleton.getInstance().getTreeView().getRoot();
             String[] lar_path = removeBasePathAndConvertToArray(iob_file.getCanonicalPath());
             int depth = 0;
