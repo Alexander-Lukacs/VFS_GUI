@@ -7,5 +7,8 @@ public abstract class TODO {
     TODO Feature: Shared DIrectory muss entsprechende Addfunktion aufrufen wenn es über den Explorer hinzugefügt wird
     TODO Bug: Inhalte der Unterordner der Ordner in Shared Directorys werden nicht synchronisiert
     TODO Bug: Inhalte der Unterordner der Ordner in Public Directorys werden nicht synchronisiert
+    TODO Bug?: User Directories auf dem Server haben 0 als ID
+    TODO Bug: wenn man das Public Directory umbenennt werden Daten nicht mehr sync
+    TODO Bug: Private Directory ist nicht sync
      */
 }
