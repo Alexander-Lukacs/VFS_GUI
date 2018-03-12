@@ -291,10 +291,12 @@ class DirectoryWatchService implements Runnable{
     @Override
     public void run() {
         try {
-            while(gob_isRunning) {
+            while (gob_isRunning) {
                 Thread.sleep(10000);
                 scanRootAndCompare();
             }
+        } catch (InterruptedException ignore) {
+
         } catch (Exception ex) {
             ex.printStackTrace();
         }
