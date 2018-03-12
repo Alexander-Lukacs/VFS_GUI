@@ -46,7 +46,7 @@ public class NotifyServerThread extends Thread {
                     lob_inputStream = new BufferedReader(new InputStreamReader(lob_client.getInputStream()));
 
                     lva_message = lob_inputStream.readLine();
-                    lar_messageArray = lva_message.split("|");
+                    lar_messageArray = lva_message.split("\\|");
 
                     switch (lar_messageArray[0]) {
                         case GC_MESSAGE_ADD:
