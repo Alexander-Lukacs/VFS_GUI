@@ -79,9 +79,15 @@ class DirectoryWatchService implements Runnable{
         boolean wasFileRenamedOrMoved = false;
 
         for (Map.Entry<Path, FileTime> lob_entry : lco_tmp.entrySet()) {
+            if (!gob_isRunning) {
+                return;
+            }
 
             //iterate over the scanned files
             for (Iterator<Map.Entry<Path, FileTime>> lob_scannedIterator = lco_scanned.entrySet().iterator(); lob_scannedIterator.hasNext();) {
+                if (!gob_isRunning) {
+                    return;
+                }
                 Map.Entry<Path, FileTime> lob_scannedEntry = lob_scannedIterator.next();
 
                 //the file was moved if the creation time of the file that was "added" is the same as the one that was "deleted"
@@ -161,6 +167,9 @@ class DirectoryWatchService implements Runnable{
         test.sort(PathFileComparator.PATH_COMPARATOR);
         filesAdded(test);
 
+        if (!gob_isRunning) {
+            return;
+        }
         System.out.println("----------------------------------------------------------");
         for (Map.Entry<Path, FileTime> lob_entry : gob_registeredPaths.entrySet()) {
             System.out.println(lob_entry.getKey());
@@ -171,6 +180,9 @@ class DirectoryWatchService implements Runnable{
     private void filesRenamed(ArrayList<File> ili_files, HashMap<File, File> ico_renamed) {
         filterChildren(ili_files);
         for (File lob_file: ili_files) {
+            if (!gob_isRunning) {
+                return;
+            }
             System.out.println("OLD: " + lob_file.getAbsolutePath() + " NEW: " + ico_renamed.get(lob_file));
             gob_listener.fileRenamed(lob_file.toPath(), ico_renamed.get(lob_file).getName());
         }
@@ -185,6 +197,9 @@ class DirectoryWatchService implements Runnable{
     private void filesMoved(ArrayList<File> ili_files, HashMap<File, File> ico_moved) {
         filterChildren(ili_files);
         for (File lob_file : ili_files) {
+            if (!gob_isRunning) {
+                return;
+            }
             System.out.println("MOVED: " + lob_file.toPath() + " TO " + ico_moved.get(lob_file).toPath());
             gob_listener.fileMoved(lob_file.toPath(), ico_moved.get(lob_file).toPath());
         }
@@ -198,6 +213,9 @@ class DirectoryWatchService implements Runnable{
         filterChildren(ili_files);
 
         for (File lob_file : ili_files) {
+            if (!gob_isRunning) {
+                return;
+            }
             System.out.println("DELETED: " + lob_file.toPath());
             gob_listener.fileDeleted(lob_file.toPath());
         }
@@ -210,6 +228,9 @@ class DirectoryWatchService implements Runnable{
     private void filesAdded(Collection<File> ico_files) {
         for (File lob_file : ico_files) {
             try {
+                if (!gob_isRunning) {
+                    return;
+                }
                 System.out.println("ADDED: " + lob_file.toPath());
                 register(lob_file.toPath());
                 gob_listener.fileAdded(lob_file.toPath());
