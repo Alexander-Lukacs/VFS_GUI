@@ -17,6 +17,7 @@ class DirectoryWatchService implements Runnable{
     private Path gob_root;
     private FileChangeListener gob_listener;
     private static boolean gob_isRunning = false;
+    private static Thread gob_thread;
 
     /**
      * Register the WatchService on the root directory. Scan at the same time all children of the root directory and
@@ -303,9 +304,9 @@ class DirectoryWatchService implements Runnable{
      * start the scan routine in a new ThreadControl
      */
     public void start() {
-        Thread lob_runnerThread = new Thread(this, DirectoryWatchService.class.getSimpleName());
-        lob_runnerThread.setDaemon(true);
-        lob_runnerThread.start();
+        gob_thread = new Thread(this, DirectoryWatchService.class.getSimpleName());
+        gob_thread.setDaemon(true);
+        gob_thread.start();
     }
 
     /**
@@ -313,6 +314,7 @@ class DirectoryWatchService implements Runnable{
      */
     public void stop() {
         gob_isRunning = false;
+        gob_thread.interrupt();
     }
 
     public void clear() {
