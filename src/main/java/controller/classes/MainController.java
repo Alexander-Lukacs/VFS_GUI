@@ -109,7 +109,6 @@ public class MainController {
     public void logout() {
         SharedDirectoryCache lob_sharedDirectoryCache = SharedDirectoryCache.getInstance();
         ThreadManager.stopAndClear();
-        TreeSingleton.getInstance().reset();
         RestClient lob_restClient;
         lob_restClient = RestClientBuilder.buildRestClientWithAuth();
         lob_restClient.unregisterClient();

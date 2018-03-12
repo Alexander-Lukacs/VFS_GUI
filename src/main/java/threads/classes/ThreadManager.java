@@ -1,5 +1,6 @@
 package threads.classes;
 
+import fileTree.classes.TreeSingleton;
 import javafx.scene.control.Label;
 import threads.interfaces.ThreadControl;
 
@@ -62,5 +63,7 @@ public class ThreadManager {
             gob_fileManagerInstance.stop();
             gob_fileManagerInstance.clear();
         }
+
+        TreeSingleton.getInstance().reset();
     }
 }
