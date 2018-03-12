@@ -80,6 +80,10 @@ public class TreeTool {
     }
 
     private static TreeItem<String> searchTreeItem(File iob_file) {
+        if (TreeSingleton.getInstance().getTreeView() == null) {
+            return null;
+        }
+
         TreeItem<String> item = TreeSingleton.getInstance().getTreeView().getRoot();
         if (iob_file.equals(TreeSingleton.getInstance().getTree().getRoot())) {
             return item;
