@@ -80,33 +80,35 @@ public class TreeTool {
     }
 
     private static TreeItem<String> searchTreeItem(File iob_file) {
-        if (TreeSingleton.getInstance().getTreeView() == null) {
-            return null;
-        }
+        TreeItem<String> item;
+        try {
+            item = TreeSingleton.getInstance().getTreeView().getRoot();
+            if (iob_file.equals(TreeSingleton.getInstance().getTree().getRoot())) {
+                return item;
+            }
 
-        TreeItem<String> item = TreeSingleton.getInstance().getTreeView().getRoot();
-        if (iob_file.equals(TreeSingleton.getInstance().getTree().getRoot())) {
-            return item;
-        }
+            boolean lva_childFound;
+            String[] test = Utils.buildRelativeFilePath(iob_file).split("\\\\");
 
-        boolean lva_childFound;
-        String[] test = Utils.buildRelativeFilePath(iob_file).split("\\\\");
+            int counter = 0;
 
-        int counter = 0;
-
-        while (counter < test.length) {
-            lva_childFound = false;
-            for (TreeItem<String> lob_child : item.getChildren()) {
-                if (lob_child.getValue().equals(test[counter])) {
-                    item = lob_child;
-                    lva_childFound = true;
-                    break;
+            while (counter < test.length) {
+                lva_childFound = false;
+                for (TreeItem<String> lob_child : item.getChildren()) {
+                    if (lob_child.getValue().equals(test[counter])) {
+                        item = lob_child;
+                        lva_childFound = true;
+                        break;
+                    }
                 }
+                if (!lva_childFound) {
+                    return null;
+                }
+                counter++;
             }
-            if (!lva_childFound) {
-                return null;
-            }
-            counter++;
+        } catch (NullPointerException ex) {
+            System.out.println();
+            return null;
         }
         return item;
     }
@@ -116,10 +118,6 @@ public class TreeTool {
     }
 
     public void addToTreeView(File iob_file) {
-        if (searchTreeItem(iob_file) != null) {
-            return;
-        }
-
         try {
             if (!iob_file.exists()) {
                 return;
@@ -145,7 +143,7 @@ public class TreeTool {
             addTreeItem(lob_pointer, iob_file);
 
         } catch (Exception ex) {
-            ex.printStackTrace();
+            System.out.println();
         }
     }
 
