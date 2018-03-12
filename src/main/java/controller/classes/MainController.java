@@ -108,7 +108,6 @@ public class MainController {
 
     public void logout() {
         SharedDirectoryCache lob_sharedDirectoryCache = SharedDirectoryCache.getInstance();
-        ThreadManager.stopAndClear();
         RestClient lob_restClient;
         lob_restClient = RestClientBuilder.buildRestClientWithAuth();
         lob_restClient.unregisterClient();
@@ -119,6 +118,7 @@ public class MainController {
         lob_sharedDirectoryCache.clearDataCache();
         LoginController ob_x = new LoginController();
         try {
+            ThreadManager.stopAndClear();
             ob_x.start(stage);
         } catch (Exception e) {
             e.printStackTrace();
