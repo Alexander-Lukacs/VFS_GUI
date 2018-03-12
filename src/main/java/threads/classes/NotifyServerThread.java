@@ -46,7 +46,6 @@ public class NotifyServerThread extends Thread {
                     lob_inputStream = new BufferedReader(new InputStreamReader(lob_client.getInputStream()));
 
                     lva_message = lob_inputStream.readLine();
-                    lva_message = decodeBase64(lva_message);
                     lar_messageArray = lva_message.split("_");
 
                     switch (lar_messageArray[0]) {
@@ -244,9 +243,5 @@ public class NotifyServerThread extends Thread {
                 }
             }
         }
-    }
-
-    private String decodeBase64(String iob_encodedString) {
-        return new String(Base64.getDecoder().decode(iob_encodedString.getBytes()));
     }
 }
