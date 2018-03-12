@@ -58,11 +58,13 @@ public class ThreadManager {
             gob_directoryWatcherInstance.stop();
             gob_directoryWatcherInstance.clear();
         }
+        gob_directoryWatcherInstance = null;
 
         if (gob_fileManagerInstance != null) {
             gob_fileManagerInstance.stop();
             gob_fileManagerInstance.clear();
         }
+        gob_fileManagerInstance = null;
 
         TreeSingleton.getInstance().reset();
     }

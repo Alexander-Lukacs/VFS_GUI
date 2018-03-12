@@ -48,7 +48,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
 
     @Override
     public void stop() {
-        isRunning = true;
+        isRunning = false;
     }
 
     @Override
