@@ -65,6 +65,10 @@ class DirectoryWatchService implements Runnable{
         //scan the complete fileTree that is watched
         lco_scanned = scan(gob_root.toFile(), new HashMap<>());
 
+        if (!gob_isRunning) {
+            return;
+        }
+
         //create a copy of the paths that are registered
         lco_tmp = new HashMap<>(gob_registeredPaths);
 
