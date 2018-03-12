@@ -173,6 +173,13 @@ public class TreeTool {
 
     }
 
+    public static boolean isSharedDirectory(Path iob_path) {
+        Path lob_rootPath = TreeSingleton.getInstance().getTree().getRoot().toPath();
+        Path lob_sharedPath = new File(lob_rootPath.toString() + "\\" + DirectoryNameMapper.getSharedDirectoryName()).toPath();
+
+        return lob_sharedPath.startsWith(lob_sharedPath);
+    }
+
     public static boolean isRootFile(File iob_file) {
         File lob_rootFile = TreeSingleton.getInstance().getTree().getRoot();
         File lob_privateFile = new File(lob_rootFile.toString() + "\\" + DirectoryNameMapper.getPrivateDirectoryName());

@@ -560,6 +560,15 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             DirectoryNameMapper.setSharedDirectoryName(lva_newName);
         }
 
+        if (TreeTool.isSharedDirectory(iob_command.gob_file.toPath())) {
+            String lva_relativeFilePath = Utils.buildRelativeFilePath(iob_command.gob_file);
+            String[] lar_relativePathArray = lva_relativeFilePath.split("\\\\");
+            if (lar_relativePathArray.length == 2) {
+                int lva_sharedDirectoryId = DirectoryNameMapper.getIdOfSharedDirectory(lar_relativePathArray[1]);
+                DirectoryNameMapper.setNameOfSharedDirectory(lva_sharedDirectoryId, lva_newName);
+            }
+        }
+
         lob_tree.renameFile(iob_command.gob_file, lva_newName);
         gco_commands.remove(iob_command);
     }
@@ -583,7 +592,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         }
 
         lob_newFile = new File(iob_command.gob_file.toString().replaceFirst("[^\\\\]*$", lva_newName));
-        if (TreeTool.isRootFile(lob_newFile)) {
+        if (TreeTool.isRootFile(lob_newFile) || TreeTool.isSharedDirectory(lob_newFile.toPath())) {
             gco_commands.remove(iob_command);
             System.out.println("Filter root file");
             return;
