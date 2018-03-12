@@ -39,6 +39,12 @@ public class TreeSingleton {
         return this.gob_preventOperationDuplicates;
     }
 
+    public void reset() {
+        gob_preventOperationDuplicates = null;
+        gob_tree = null;
+        gob_treeView = null;
+    }
+
     private TreeSingleton() throws IOException{
         gob_tree = new TreeImpl(gva_treeRoot);
         gob_treeView = new TreeView<>();
