@@ -135,11 +135,14 @@ public class NotifyServerThread extends Thread {
      */
     private void addFile(String[] iar_messageArray) {
         String lva_actualFilePath;
-        String lva_relativePath = iar_messageArray[1];
+        String lva_relativePath;
+        File lob_newFile;
 
         lva_actualFilePath = Utils.convertRelativeToAbsolutePath(iar_messageArray[1], true);
+        lob_newFile = new File(lva_actualFilePath);
+        lva_relativePath = Utils.buildRelativeFilePath(lob_newFile);
 
-        TreeSingleton.getInstance().getDuplicateOperationsPrevention().putCreated(new File(lva_actualFilePath).toPath());
+        TreeSingleton.getInstance().getDuplicateOperationsPrevention().putCreated(lob_newFile.toPath());
         ThreadManager.addCommandToFileManager(
                 null, FileManagerConstants.GC_DOWNLOAD_FROM_SERVER, true,
                 lva_relativePath);
