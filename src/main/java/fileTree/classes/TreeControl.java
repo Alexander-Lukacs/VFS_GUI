@@ -42,6 +42,7 @@ public class TreeControl {
     public TreeControl(String iva_ip, String iva_port, MainController iob_mainController) {
         gob_mainController = iob_mainController;
         File lob_userDirectory = initDirectories(iva_ip, iva_port);
+        initSharedDirectoryCache();
 
         try {
             TreeSingleton.setTreeRootPath(lob_userDirectory.getCanonicalPath());
@@ -52,6 +53,8 @@ public class TreeControl {
             TreeItem<String> lob_root = new TreeItem<>(gob_tree.getRoot().getName());
             lob_root.setGraphic(TreeTool.getInstance().getTreeIcon(gob_tree.getRoot().getCanonicalPath()));
             gob_treeView.setRoot(lob_root);
+
+
             ThreadManager.getFileManagerThread().start();
             addFilesToTree(gob_tree.getRoot());
             ThreadManager.addCommandToFileManager(null, FileManagerConstants.GC_COMPARE_TREE, false, gob_tree);
@@ -98,9 +101,7 @@ public class TreeControl {
         gob_treeView.getSelectionModel().selectedItemProperty()
                 .addListener((observable, old_val, new_val) ->
                         gob_mainController.setTypeLabel(buildFileFromItem(new_val, gob_tree))
-                );
-
-        initSharedDirectoryCache();
+        );
     }
 
     private void addFilesToTree(File iob_file) {
@@ -181,7 +182,7 @@ public class TreeControl {
                 lob_newDirectory,
                 lob_newFile,
                 lob_deleteDirectoryOnly,
-                lob_renameFile,
+                 lob_renameFile,
                 lob_sharedDirectory);
     }
 
@@ -419,9 +420,9 @@ public class TreeControl {
         File lob_rootDirectory = new File(Utils.getUserBasePath());
         File lob_serverDirectory = new File(Utils.getUserBasePath() + "\\" + iva_ip + "_" + iva_port);
         File lob_userDirectory = new File(lob_serverDirectory.getAbsolutePath() + "\\" + DataCache.getDataCache().get(DataCache.GC_EMAIL_KEY));
-        File lob_publicDirectory = new File(lob_userDirectory.getAbsolutePath() + "\\" + DirectoryNameMapper.getPublicDirectoryName());
-        File lob_privateDirectory = new File(lob_userDirectory.getAbsolutePath() + "\\" + DirectoryNameMapper.getPrivateDirectoryName());
-        File lob_sharedDirectories = new File(lob_userDirectory.getAbsolutePath() + "\\" + DirectoryNameMapper.getSharedDirectoryName());
+        File lob_publicDirectory;
+        File lob_privateDirectory;
+        File lob_sharedDirectories;
 
         //create the root directory if it does not exist
         TreeTool.getInstance().createDirectory(lob_rootDirectory);
@@ -431,6 +432,10 @@ public class TreeControl {
 
         //create the user directory if it does not exist
         TreeTool.getInstance().createDirectory(lob_userDirectory);
+
+        lob_publicDirectory = new File(lob_userDirectory.getAbsolutePath() + "\\" + DirectoryNameMapper.getPublicDirectoryName());
+        lob_privateDirectory = new File(lob_userDirectory.getAbsolutePath() + "\\" + DirectoryNameMapper.getPrivateDirectoryName());
+        lob_sharedDirectories = new File(lob_userDirectory.getAbsolutePath() + "\\" + DirectoryNameMapper.getSharedDirectoryName());
 
         //create the public directory
         TreeTool.getInstance().createDirectory(lob_publicDirectory);
