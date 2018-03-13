@@ -1,5 +1,6 @@
 package tools;
 
+import cache.DirectoryCache;
 import fileTree.interfaces.Tree;
 import fileTree.classes.TreeSingleton;
 import javafx.embed.swing.SwingFXUtils;
@@ -61,7 +62,7 @@ public class TreeTool {
         return new ImageView(new Image(TreeTool.class.getClassLoader().getResourceAsStream("images/fileIcons/ICON_FILE.png")));
     }
 
-    public void createDirectory(File iob_directory) {
+    public static void createDirectory(File iob_directory) {
         int lva_tries;
         boolean lva_directoryCreated;
         if (!iob_directory.exists() || !iob_directory.isDirectory()) {
@@ -83,7 +84,7 @@ public class TreeTool {
         TreeItem<String> item;
         try {
             item = TreeSingleton.getInstance().getTreeView().getRoot();
-            if (iob_file.equals(TreeSingleton.getInstance().getTree().getRoot())) {
+            if (iob_file.equals(DirectoryCache.getDirectoryCache().getUserDirectory())) {
                 return item;
             }
 
@@ -134,20 +135,6 @@ public class TreeTool {
                 return false;
             }
 
-//            TreeItem<String> lob_pointer = TreeSingleton.getInstance().getTreeView().getRoot();
-//            String[] lar_path = removeBasePathAndConvertToArray(iob_file.getCanonicalPath());
-//            int depth = 0;
-
-//            while (lar_path.length > depth) {
-//                for (TreeItem<String> lob_item : lob_pointer.getChildren()) {
-//
-//                    if (lob_item.getValue().equals(lar_path[depth])) {
-//                        lob_pointer = lob_item;
-//                        break;
-//                    }
-//                }
-//                depth++;
-//            }
             addTreeItem(lob_parent, iob_file);
 
         } catch (Exception ex) {
@@ -178,7 +165,7 @@ public class TreeTool {
      * @return return true if the file is on the same level, otherwise false
      */
     public static boolean filterRootFiles(Path iob_path) {
-        Path lob_rootPath = TreeSingleton.getInstance().getTree().getRoot().toPath();
+        Path lob_rootPath = DirectoryCache.getDirectoryCache().getUserDirectory().toPath();
         Path lob_privatePath = new File(lob_rootPath.toString() + "\\" + DirectoryNameMapper.getPrivateDirectoryName()).toPath();
         Path lob_publicPath = new File(lob_rootPath.toString() + "\\" + DirectoryNameMapper.getPublicDirectoryName()).toPath();
         Path lob_sharedPath = new File(lob_rootPath.toString() + "\\" + DirectoryNameMapper.getSharedDirectoryName()).toPath();

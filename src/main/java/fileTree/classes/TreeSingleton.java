@@ -47,7 +47,7 @@ public class TreeSingleton {
     }
 
     private TreeSingleton() throws IOException{
-        gob_tree = new TreeImpl(gva_treeRoot);
+//        gob_tree = new TreeImpl(gva_treeRoot);
         gob_treeView = new TreeView<>();
         gob_preventOperationDuplicates = new PreventDuplicateOperation();
     }

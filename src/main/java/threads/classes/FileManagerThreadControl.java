@@ -195,12 +195,12 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
 
         if (TreeTool.filterRootFiles(iob_command.gob_file.toPath())) {
             gco_commands.remove(iob_command);
-            System.err.println("Command removed");
+            System.err.println("Command removed: rootFile filtered");
             return;
         }
 
         //add the file to the tree
-        lob_tree.addFile(iob_command.gob_file, lva_isDirectory);
+//        lob_tree.addFile(iob_command.gob_file, lva_isDirectory);
 
         if (lva_addToPrevention) {
             TreeSingleton.getInstance().getDuplicateOperationsPrevention().putCreated(iob_command.gob_file.toPath());

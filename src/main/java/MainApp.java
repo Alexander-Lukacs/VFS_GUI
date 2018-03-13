@@ -1,12 +1,16 @@
 import builder.RestClientBuilder;
 import cache.DataCache;
+import cache.FileMapperCache;
 import controller.classes.LoginController;
 import javafx.application.Application;
 import javafx.stage.Stage;
+import models.classes.MappedFile;
 import restful.clients.RestClient;
 import threads.classes.NotifyServerThread;
 import tools.AlertWindows;
+import tools.xmlTools.FileMapper;
 
+import java.io.FileNotFoundException;
 import java.net.ServerSocket;
 
 import static cache.DataCache.GC_EMAIL_KEY;
@@ -61,6 +65,19 @@ public class MainApp extends Application {
         // Stops the NotifyServerThread
         gob_notifyThread.interrupt();
 
+        try {
+            for (MappedFile lob_mappedFile : FileMapper.getAllFiles()) {
+                FileMapper.removeFile(lob_mappedFile.getFilePath().toString());
+            }
+
+            for (MappedFile lob_mappedFile : FileMapperCache.getFileMapperCache().getAll()) {
+//            FileMapper.removeFile(lob_mappedFile.getFilePath().toString());
+                FileMapper.addFile(lob_mappedFile);
+            }
+
+        } catch (RuntimeException ignore) {
+
+        }
         super.stop();
     }
 }

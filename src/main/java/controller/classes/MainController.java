@@ -17,6 +17,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import models.classes.TreeControlVersionTwo;
 import org.apache.commons.io.FileUtils;
 import restful.clients.RestClient;
 import threads.classes.DirectoryCounterThread;
@@ -140,9 +141,10 @@ public class MainController {
 
     public void initialize() {
         gob_userCache = DataCache.getDataCache();
-        gob_treeControl = new TreeControl(gob_userCache.get(DataCache.GC_IP_KEY),
-                gob_userCache.get(DataCache.GC_PORT_KEY), this);
+//        gob_treeControl = new TreeControl(gob_userCache.get(DataCache.GC_IP_KEY),
+//                gob_userCache.get(DataCache.GC_PORT_KEY), this);
 
+        TreeControlVersionTwo t = new TreeControlVersionTwo();
         TreeView<String> gob_treeView = TreeSingleton.getInstance().getTreeView();
         gob_vBox.getChildren().add(gob_treeView);
     }
