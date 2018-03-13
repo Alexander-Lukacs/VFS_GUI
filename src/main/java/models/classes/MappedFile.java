@@ -1,24 +1,26 @@
 package models.classes;
 
+import java.nio.file.Path;
+
 public class MappedFile {
-    private String filePath;
+    private Path filePath;
     private int version;
     private long lastModified;
 
     public MappedFile() {
     }
 
-    public MappedFile(String filePath, int version, long lastModified) {
+    public MappedFile(Path filePath, int version, long lastModified) {
         this.filePath = filePath;
         this.version = version;
         this.lastModified = lastModified;
     }
 
-    public String getFilePath() {
+    public Path getFilePath() {
         return filePath;
     }
 
-    public void setFilePath(String filePath) {
+    public void setFilePath(Path filePath) {
         this.filePath = filePath;
     }
 
