@@ -9,25 +9,23 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane fx:id="gob_rootPane" prefWidth="550.0" xmlns="http://javafx.com/javafx/8.0.112"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.classes.ChangeIpPortController">
-    <HBox alignment="CENTER_LEFT" prefHeight="400.0" prefWidth="550.0" AnchorPane.bottomAnchor="0.0"
-          AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-        <ListView fx:id="gob_lvOptions" onMouseClicked="#loadView" prefHeight="400.0" prefWidth="209.0"/>
+<AnchorPane fx:id="gob_rootPane" prefWidth="550.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.classes.ChangeIpPortController">
+    <HBox alignment="CENTER_LEFT" prefHeight="400.0" prefWidth="550.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <ListView fx:id="gob_lvOptions" minHeight="-Infinity" onMouseClicked="#loadView" prefHeight="412.0" prefWidth="214.0" />
         <VBox alignment="CENTER" prefHeight="400.0" prefWidth="454.0" spacing="20.0">
-            <Label text="New Server-IP"/>
+            <Label text="New Server-IP" />
             <TextField fx:id="gob_tfServerIp">
                 <VBox.margin>
-                    <Insets left="50.0" right="50.0"/>
+                    <Insets left="50.0" right="50.0" />
                 </VBox.margin>
             </TextField>
-            <Label text="New Port"/>
+            <Label text="New Port" />
             <TextField fx:id="gob_tfPort" prefHeight="31.0" prefWidth="307.0">
                 <VBox.margin>
-                    <Insets left="150.0" right="150.0"/>
+                    <Insets left="150.0" right="150.0" />
                 </VBox.margin>
             </TextField>
-            <Button fx:id="gob_btn_connect" mnemonicParsing="false" onAction="#onClick" text="Connect"/>
+            <Button fx:id="gob_btn_connect" mnemonicParsing="false" onAction="#onClick" text="Connect" />
         </VBox>
     </HBox>
 </AnchorPane>
