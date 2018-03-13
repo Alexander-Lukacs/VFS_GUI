@@ -3,7 +3,6 @@ package controller.classes;
 import builder.RestClientBuilder;
 import cache.DataCache;
 import cache.SharedDirectoryCache;
-import fileTree.classes.TreeSingleton;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -15,8 +14,8 @@ import models.classes.SharedDirectory;
 import models.classes.User;
 import restful.clients.SharedDirectoryRestClient;
 import restful.clients.UserRestClient;
-import threads.constants.FileManagerConstants;
 import threads.classes.ThreadManager;
+import threads.constants.FileManagerConstants;
 import tools.AlertWindows;
 import tools.Utils;
 import tools.Validation;
@@ -316,7 +315,7 @@ public class SharedDirectoryController {
 
         lob_restClient = RestClientBuilder.buildSharedDirectoryClientWithAuth();
 
-        for (Iterator<User> lob_iterator = ili_oldMemberList.iterator(); lob_iterator.hasNext();) {
+        for (Iterator<User> lob_iterator = ili_oldMemberList.iterator(); lob_iterator.hasNext(); ) {
             lob_user = lob_iterator.next();
             lva_email = lob_user.getEmail();
 

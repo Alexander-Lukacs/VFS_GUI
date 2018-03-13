@@ -180,9 +180,9 @@ public class LoginController {
     /**
      * test if User inputs are Valid for Login
      *
-     * @param iva_ip contains the server ip
-     * @param iva_port contains the server port
-     * @param iva_email contains the Users email address
+     * @param iva_ip       contains the server ip
+     * @param iva_port     contains the server port
+     * @param iva_email    contains the Users email address
      * @param iva_password contains the Users passowrd
      * @return true if the inputs are valid
      */
@@ -225,11 +225,11 @@ public class LoginController {
     /**
      * test if User inputs are Valid for register
      *
-     * @param iva_ip contains the server ip
-     * @param iva_port contains the server port
-     * @param iva_name contains the User name
-     * @param iva_email contains the Users email address
-     * @param iva_password contains the Users passowrd
+     * @param iva_ip              contains the server ip
+     * @param iva_port            contains the server port
+     * @param iva_name            contains the User name
+     * @param iva_email           contains the Users email address
+     * @param iva_password        contains the Users passowrd
      * @param iva_confirmPassword contains the confirmed passowrd
      * @return true if the inputs are valid
      */

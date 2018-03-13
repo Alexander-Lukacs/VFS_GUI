@@ -2,15 +2,15 @@ package controller.classes;
 
 import builder.RestClientBuilder;
 import cache.DataCache;
-import javafx.scene.control.Button;
-import javafx.scene.input.KeyCode;
-import javafx.stage.Stage;
-import models.classes.RestResponse;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
+import models.classes.RestResponse;
 import models.classes.User;
 import restful.clients.UserRestClient;
 import tools.AlertWindows;
@@ -18,10 +18,11 @@ import tools.Utils;
 import tools.Validation;
 import tools.xmlTools.LastSessionStorage;
 
-import static cache.DataCache.*;
-import static restful.constants.HttpStatusCodes.GC_HTTP_OK;
+import static cache.DataCache.GC_EMAIL_KEY;
+import static cache.DataCache.GC_PASSWORD_KEY;
 import static controller.constants.SettingsConstants.GC_ADMIN_ADD;
 import static controller.constants.SettingsConstants.GC_CHANGE_IP_PORT;
+import static restful.constants.HttpStatusCodes.GC_HTTP_OK;
 import static tools.constants.AlertConstants.*;
 
 /**
@@ -74,7 +75,8 @@ public class ChangePWController {
                 gob_rootPane.getChildren().setAll(lob_pane);
             }
             // TODO schauen ob es eine besser Methode gibt, als ein leerer catch block
-        } catch (Exception ignore) {}
+        } catch (Exception ignore) {
+        }
 
     }
 
@@ -114,11 +116,10 @@ public class ChangePWController {
     }
 
     /**
-     *
-     * @param iva_oldPassword contains the old Password to validate the User
+     * @param iva_oldPassword       contains the old Password to validate the User
      * @param iva_oldCachedPassword contains the input of the User to check if input equals old Password
-     * @param iva_newPassword contains the new Password of the User
-     * @param iva_confirmPassword contains the confirm of the new password
+     * @param iva_newPassword       contains the new Password of the User
+     * @param iva_confirmPassword   contains the confirm of the new password
      * @return true if input of old Password is equal with old password and the new Password is valid
      */
     private boolean isPasswordDataValid(String iva_oldPassword, String iva_oldCachedPassword, String iva_newPassword,
@@ -158,7 +159,7 @@ public class ChangePWController {
      * Adds Key Listener to the TextFields
      * to react on key pressed ENTER
      */
-    private void addKeyListener(){
+    private void addKeyListener() {
         gob_tf_oldPassword.setOnKeyPressed(ke -> {
             if (ke.getCode().equals(KeyCode.ENTER)) {
                 onClickChangePassword();
