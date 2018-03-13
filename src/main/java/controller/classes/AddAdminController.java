@@ -18,6 +18,7 @@ import static controller.constants.SettingsConstants.GC_CHANGE_IP_PORT;
 import static controller.constants.SettingsConstants.GC_CHANGE_PW;
 
 /**
+ * Created by Mesut on 10.02.2018.
  * This Controller applies Admins to add other Addmins
  */
 public class AddAdminController {

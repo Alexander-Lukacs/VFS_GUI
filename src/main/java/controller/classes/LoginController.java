@@ -31,6 +31,12 @@ import static controller.constants.SettingsConstants.GC_VFS;
 import static restful.constants.HttpStatusCodes.GC_HTTP_OK;
 import static tools.constants.AlertConstants.*;
 
+/**
+ * Created by Mesut on 01.03.2018.
+ * LoginController
+ * Controlls the Login Scene
+ * allows the User to Login
+ */
 public class LoginController {
     private final Stage gob_stage = new Stage();
     private final MainController mainController = new MainController();

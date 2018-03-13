@@ -34,6 +34,7 @@ import static restful.constants.HttpStatusCodes.GC_HTTP_OK;
 /**
  * Created by Mesut on 01.03.2018.
  * SharedDirectory Scene
+ * the Controller of the Shared Directory Scene
  */
 public class SharedDirectoryController {
     private final ObservableList<String> gli_memberList = FXCollections.observableArrayList();

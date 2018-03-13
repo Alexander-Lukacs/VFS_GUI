@@ -7,6 +7,11 @@ import javafx.scene.layout.AnchorPane;
 
 import static controller.constants.SettingsConstants.*;
 
+/**
+ * Created by Mesut on 01.03.2018.
+ * Settings Controller
+ * Controlls the selected Settings options
+ */
 
 public class SettingsController {
     private final controller.classes.ListView gob_listView = new controller.classes.ListView();

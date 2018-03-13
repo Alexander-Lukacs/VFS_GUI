@@ -25,6 +25,7 @@ import static controller.constants.SettingsConstants.GC_CHANGE_IP_PORT;
 import static tools.constants.AlertConstants.*;
 
 /**
+ * Created by Mesut on 08.02.2018.
  * this class applies to change the Password of the User
  */
 

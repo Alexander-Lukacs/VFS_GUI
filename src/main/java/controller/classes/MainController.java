@@ -31,6 +31,12 @@ import java.io.IOException;
 import static controller.constants.ApplicationConstants.GC_APPLICATION_ICON_PATH;
 import static controller.constants.SettingsConstants.*;
 
+/**
+ * Created by Mesut on 01.03.2018.
+ * MainController+
+ * the Controller of the Main Scene
+ * loads Tree View
+ */
 public class MainController {
 
     @FXML
