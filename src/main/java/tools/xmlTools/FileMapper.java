@@ -1,5 +1,6 @@
 package tools.xmlTools;
 
+import models.classes.MappedFile;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -20,11 +21,11 @@ public abstract class FileMapper {
     private static final String GC_ATTRIBUTE_VERSION = "version";
     private static final String GC_ATTRIBUTE_LAST_MODIFIED = "lastModified";
 
-    public static void addFile(File iob_file, String iob_version, String iob_lastModified) {
+    public static void addFile(MappedFile iob_file) {
         Element lob_newFile = new Element(GC_FILE);
-        lob_newFile.setAttribute(GC_ATTRIBUTE_PATH, iob_file.getPath());
-        lob_newFile.setAttribute(GC_ATTRIBUTE_VERSION, iob_version);
-        lob_newFile.setAttribute(GC_ATTRIBUTE_LAST_MODIFIED, iob_lastModified);
+        lob_newFile.setAttribute(GC_ATTRIBUTE_PATH, iob_file.getFilePath());
+        lob_newFile.setAttribute(GC_ATTRIBUTE_VERSION, String.valueOf(iob_file.getVersion()));
+        lob_newFile.setAttribute(GC_ATTRIBUTE_LAST_MODIFIED, String.valueOf(iob_file.getLastModified()));
 
         XMLOutputter lob_xmlOutput;
         String lva_xmlFilePath;
@@ -57,24 +58,45 @@ public abstract class FileMapper {
         }
     }
 
-    public static void setPath(File iob_file, String iva_newPath) {
-        changeAttribute(GC_ATTRIBUTE_PATH, iva_newPath, iob_file.getPath());
+    public static void setPath(MappedFile iob_file, String iva_newPath) {
+        changeAttribute(GC_ATTRIBUTE_PATH, iva_newPath, iob_file.getFilePath());
     }
 
-    public static void setVersion(File iob_file, int iva_version) {
-        changeAttribute(GC_ATTRIBUTE_VERSION, String.valueOf(iva_version), iob_file.getPath());
+    public static void setVersion(MappedFile iob_file, int iva_version) {
+        changeAttribute(GC_ATTRIBUTE_VERSION, String.valueOf(iva_version), iob_file.getFilePath());
     }
 
-    public static void setLastModified(File iob_file, long iva_lastModified) {
-        changeAttribute(GC_ATTRIBUTE_LAST_MODIFIED, String.valueOf(iva_lastModified), iob_file.getPath());
+    public static void setLastModified(MappedFile iob_file, long iva_lastModified) {
+        changeAttribute(GC_ATTRIBUTE_LAST_MODIFIED, String.valueOf(iva_lastModified), iob_file.getFilePath());
     }
 
-    public static File getFile(String filePath) {
+    public static MappedFile getFile(String filePath) {
+        MappedFile lob_file = new MappedFile();
+        String lva_version;
+        String lva_lastModified;
+
+        lob_file.setFilePath(getAttribute(filePath, GC_ATTRIBUTE_PATH));
+
+        if ((lva_version = getAttribute(filePath, GC_ATTRIBUTE_VERSION)) != null) {
+            lob_file.setVersion(Integer.parseInt(lva_version));
+        } else {
+            lob_file.setVersion(0);
+        }
+
+        if ((lva_lastModified = getAttribute(filePath, GC_ATTRIBUTE_LAST_MODIFIED)) != null) {
+            lob_file.setVersion(Integer.parseInt(lva_lastModified));
+        } else {
+            lob_file.setLastModified(0L);
+        }
+
+        return lob_file;
+    }
+
+    private static String getAttribute(String iva_path, String iva_attribute) {
         File lob_inputFile;
         SAXBuilder lob_saxBuilder;
         Document lob_doc;
         Element lob_rootElement;
-        File lob_file;
 
         if (!fileExists()) {
             createXml();
@@ -87,10 +109,8 @@ public abstract class FileMapper {
             lob_rootElement = lob_doc.getRootElement();
 
             for (Element lob_element : lob_rootElement.getChildren()) {
-                if (lob_element.getAttributeValue(GC_ATTRIBUTE_PATH).equals(filePath)) {
-                    lob_file = new File(lob_element.getAttributeValue(GC_ATTRIBUTE_PATH));
-                    lob_file.setLastModified(Long.parseLong(lob_element.getAttributeValue(GC_ATTRIBUTE_LAST_MODIFIED)));
-                    return lob_file;
+                if (lob_element.getAttributeValue(GC_ATTRIBUTE_PATH).equals(iva_path)) {
+                    return lob_element.getAttributeValue(iva_attribute);
                 }
             }
 
