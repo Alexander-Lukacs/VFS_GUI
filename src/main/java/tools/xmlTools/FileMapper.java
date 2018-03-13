@@ -11,6 +11,8 @@ import org.jdom2.output.XMLOutputter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public abstract class FileMapper {
@@ -44,7 +46,6 @@ public abstract class FileMapper {
             lob_doc = lob_saxBuilder.build(lob_inputFile);
 
             lob_rootElement = lob_doc.getRootElement();
-
             lob_rootElement.addContent(lob_newFile);
 
             lob_xmlOutput = new XMLOutputter();
@@ -68,6 +69,39 @@ public abstract class FileMapper {
 
     public static void setLastModified(MappedFile iob_file) {
         changeAttribute(GC_ATTRIBUTE_LAST_MODIFIED, String.valueOf(iob_file.getLastModified()), iob_file.getFilePath());
+    }
+
+    public static List<MappedFile> getAllFiles() {
+        List<MappedFile> mappedFileList = new ArrayList<>();
+        File lob_inputFile;
+        SAXBuilder lob_saxBuilder;
+        Document lob_doc;
+        Element lob_rootElement;
+        MappedFile lob_mappedFile;
+
+        if (!fileExists()) {
+            createXml();
+        }
+
+        try {
+            lob_inputFile = new File(getXmlPath());
+            lob_saxBuilder = new SAXBuilder();
+            lob_doc = lob_saxBuilder.build(lob_inputFile);
+            lob_rootElement = lob_doc.getRootElement();
+
+            for (Element lob_element : lob_rootElement.getChildren()) {
+                lob_mappedFile = new MappedFile();
+                lob_mappedFile.setFilePath(lob_element.getAttributeValue(GC_ATTRIBUTE_PATH));
+                lob_mappedFile.setVersion(Integer.parseInt(lob_element.getAttributeValue(GC_ATTRIBUTE_VERSION)));
+                lob_mappedFile.setLastModified(Long.parseLong(lob_element.getAttributeValue(GC_ATTRIBUTE_LAST_MODIFIED)));
+
+                mappedFileList.add(lob_mappedFile);
+            }
+        } catch (JDOMException | IOException ex) {
+            ex.printStackTrace();
+        }
+
+        return mappedFileList;
     }
 
     public static MappedFile getFile(String filePath) {
