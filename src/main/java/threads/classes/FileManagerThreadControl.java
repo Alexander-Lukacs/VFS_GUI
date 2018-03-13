@@ -487,13 +487,13 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             }
         }
 
-//        Platform.runLater(() ->
-            lob_parent.getChildren().addAll(lob_item.getChildren());
-//        );
+        Platform.runLater(() ->
+            lob_parent.getChildren().addAll(lob_item.getChildren())
+        );
 
-//        Platform.runLater(() ->
-            lob_parent.getChildren().remove(lob_item);
-//        );
+        Platform.runLater(() ->
+            lob_parent.getChildren().remove(lob_item)
+        );
 
         lob_tree.deleteDirectoryOnly(iob_command.gob_file);
         gco_commands.remove(iob_command);
