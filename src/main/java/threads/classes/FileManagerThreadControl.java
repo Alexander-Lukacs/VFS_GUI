@@ -461,8 +461,20 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             return;
         }
 
-        lob_parent = TreeTool.getTreeItem(iob_command.gob_file.getParentFile());
+//        lob_parent = TreeTool.getTreeItem(iob_command.gob_file.getParentFile());
         lob_item = TreeTool.getTreeItem(iob_command.gob_file);
+
+        if (lob_item == null) {
+            gco_commands.remove(iob_command);
+            return;
+        }
+
+        lob_parent = lob_item.getParent();
+
+        if (lob_parent == null) {
+            gco_commands.remove(iob_command);
+            return;
+        }
 
         for (TreeItem<String> lob_child : lob_item.getChildren()) {
             if (!canFileBeMoved(lob_child, lob_parent)) {
@@ -472,10 +484,13 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             }
         }
 
-        Platform.runLater(() -> {
-            lob_parent.getChildren().addAll(lob_item.getChildren());
-            lob_parent.getChildren().remove(lob_item);
-        });
+        Platform.runLater(() ->
+            lob_parent.getChildren().addAll(lob_item.getChildren())
+        );
+
+        Platform.runLater(() ->
+            lob_parent.getChildren().remove(lob_item)
+        );
 
         lob_tree.deleteDirectoryOnly(iob_command.gob_file);
         gco_commands.remove(iob_command);
