@@ -60,6 +60,7 @@ public class MainController {
     @FXML
     private Label gob_txt_label_content;
 
+
     private DataCache gob_userCache;
     private TreeControl gob_treeControl;
     private MainController gob_mainController;
@@ -151,6 +152,7 @@ public class MainController {
 
         try {
             SplitPane lob_pane = lob_loader.load();
+            lob_pane.setDividerPosition(0, 0.55);
             Scene lob_scene = new Scene(lob_pane);
             lob_stage.setTitle(GC_VFS);
             lob_stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream(GC_APPLICATION_ICON_PATH)));
