@@ -15,6 +15,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -135,6 +136,42 @@ public abstract class FileMapper {
         }
 
         return lob_file;
+    }
+
+    public static void removeFile(String iva_filePath) {
+        File lob_inputFile;
+        SAXBuilder lob_saxBuilder;
+        Document lob_doc;
+        Element lob_rootElement;
+        Element lob_element;
+
+        if (!fileExists()) {
+            createXml();
+        }
+
+        try {
+            lob_inputFile = new File(getXmlPath());
+            lob_saxBuilder = new SAXBuilder();
+            lob_doc = lob_saxBuilder.build(lob_inputFile);
+            lob_rootElement = lob_doc.getRootElement();
+
+            for (Iterator<Element> lob_elementIterator = lob_rootElement.getChildren().iterator() ;
+                 lob_elementIterator.hasNext();) {
+
+                lob_element = lob_elementIterator.next();
+
+                if (lob_element.getAttributeValue(GC_ATTRIBUTE_PATH).equals(iva_filePath)) {
+                    lob_elementIterator.remove();
+                }
+            }
+
+            XMLOutputter xmlOutput = new XMLOutputter();
+            xmlOutput.setFormat(Format.getPrettyFormat());
+            xmlOutput.output(lob_doc, new FileWriter(getXmlPath()));
+
+        } catch (JDOMException | IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     private static String getAttribute(String iva_path, String iva_attribute) {
