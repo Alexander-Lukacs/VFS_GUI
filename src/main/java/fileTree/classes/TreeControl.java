@@ -52,7 +52,7 @@ public class TreeControl {
             gob_treeView.setShowRoot(false);
 
             TreeItem<String> lob_root = new TreeItem<>(gob_tree.getRoot().getName());
-            lob_root.setGraphic(TreeTool.getInstance().getTreeIcon(gob_tree.getRoot().getCanonicalPath()));
+            lob_root.setGraphic(TreeTool.getTreeIcon(gob_tree.getRoot().getCanonicalPath()));
             gob_treeView.setRoot(lob_root);
 
 

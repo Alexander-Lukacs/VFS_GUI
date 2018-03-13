@@ -196,7 +196,11 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         lob_tree.addFile(iob_command.gob_file, lva_isDirectory);
 
         if (!TreeTool.isFileInTreeView(iob_command.gob_file)) {
-            Platform.runLater(() -> TreeTool.getInstance().addToTreeView(iob_command.gob_file));
+//            Platform.runLater(() -> TreeTool.addToTreeView(iob_command.gob_file));
+            if (!TreeTool.addToTreeView(iob_command.gob_file)) {
+                gva_commandIndex.incrementAndGet();
+                return;
+            }
         }
 
         gco_commands.remove(iob_command);

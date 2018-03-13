@@ -26,7 +26,7 @@ public class TreeTool {
     }
 
     @SuppressWarnings("WeakerAccess")
-    public void addTreeItem(TreeItem<String> iob_parent, File iob_file) {
+    public static void addTreeItem(TreeItem<String> iob_parent, File iob_file) {
         TreeItem<String> rob_child = new TreeItem<>(iob_file.getName());
         if (iob_file.exists()) {
             rob_child.setGraphic(getTreeIcon(iob_file.getAbsolutePath()));
@@ -39,7 +39,7 @@ public class TreeTool {
         return searchTreeItem(iob_file);
     }
 
-    public Node getTreeIcon(String iva_iconName) {
+    public static Node getTreeIcon(String iva_iconName) {
         javax.swing.Icon icon = FileSystemView.getFileSystemView().getSystemIcon(new File(iva_iconName));
         try {
             BufferedImage bufferedImage = new BufferedImage(
@@ -58,7 +58,7 @@ public class TreeTool {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        return new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("images/fileIcons/ICON_FILE.png")));
+        return new ImageView(new Image(TreeTool.class.getClassLoader().getResourceAsStream("images/fileIcons/ICON_FILE.png")));
     }
 
     public void createDirectory(File iob_directory) {
@@ -117,34 +117,43 @@ public class TreeTool {
         return searchTreeItem(iob_file) != null;
     }
 
-    public void addToTreeView(File iob_file) {
+    public static boolean addToTreeView(File iob_file) {
+        TreeItem<String> lob_parent;
         try {
             if (!iob_file.exists()) {
-                return;
+                return true;
             }
 
             if (TreeSingleton.getInstance().getTreeView() == null) {
-                return;
+                return false;
             }
-            TreeItem<String> lob_pointer = TreeSingleton.getInstance().getTreeView().getRoot();
-            String[] lar_path = removeBasePathAndConvertToArray(iob_file.getCanonicalPath());
-            int depth = 0;
 
-            while (lar_path.length > depth) {
-                for (TreeItem<String> lob_item : lob_pointer.getChildren()) {
+            lob_parent = searchTreeItem(iob_file.getParentFile());
 
-                    if (lob_item.getValue().equals(lar_path[depth])) {
-                        lob_pointer = lob_item;
-                        break;
-                    }
-                }
-                depth++;
+            if (lob_parent == null) {
+                return false;
             }
-            addTreeItem(lob_pointer, iob_file);
+
+//            TreeItem<String> lob_pointer = TreeSingleton.getInstance().getTreeView().getRoot();
+//            String[] lar_path = removeBasePathAndConvertToArray(iob_file.getCanonicalPath());
+//            int depth = 0;
+
+//            while (lar_path.length > depth) {
+//                for (TreeItem<String> lob_item : lob_pointer.getChildren()) {
+//
+//                    if (lob_item.getValue().equals(lar_path[depth])) {
+//                        lob_pointer = lob_item;
+//                        break;
+//                    }
+//                }
+//                depth++;
+//            }
+            addTreeItem(lob_parent, iob_file);
 
         } catch (Exception ex) {
             System.out.println();
         }
+        return true;
     }
 
     public static File buildFileFromItem(TreeItem iob_treeItem, Tree iob_tree) {
@@ -194,11 +203,11 @@ public class TreeTool {
         return lob_privateFile.equals(iob_file) || lob_publicFile.equals(iob_file) || lob_sharedFile.equals(iob_file);
     }
 
-    private String[] removeBasePathAndConvertToArray(String iva_filePath) throws IOException {
-        String lva_basePath = TreeSingleton.getInstance().getTree().getRoot().getCanonicalPath();
-        lva_basePath = lva_basePath.replaceAll("\\\\", "\\\\\\\\");
-        iva_filePath = iva_filePath.replaceFirst(lva_basePath, "");
-        iva_filePath = iva_filePath.replaceFirst("\\\\", "");
-        return iva_filePath.split("\\\\");
-    }
+//    private String[] removeBasePathAndConvertToArray(String iva_filePath) throws IOException {
+//        String lva_basePath = TreeSingleton.getInstance().getTree().getRoot().getCanonicalPath();
+//        lva_basePath = lva_basePath.replaceAll("\\\\", "\\\\\\\\");
+//        iva_filePath = iva_filePath.replaceFirst(lva_basePath, "");
+//        iva_filePath = iva_filePath.replaceFirst("\\\\", "");
+//        return iva_filePath.split("\\\\");
+//    }
 }
