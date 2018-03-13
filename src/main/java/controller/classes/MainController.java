@@ -43,7 +43,7 @@ public class MainController {
     private Button gob_btnSettings;
 
     @FXML
-    private VBox gob_vBox = new VBox();
+    private VBox gob_vBox;
 
     @FXML
     private Label gob_label_type;
