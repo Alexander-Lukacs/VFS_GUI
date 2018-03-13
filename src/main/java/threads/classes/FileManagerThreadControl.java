@@ -692,7 +692,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         //the download returned a file so it must be a directory
         if (lob_downloadContent instanceof Integer) {
             lob_directory = new File(lva_newFilePath);
-            this.addFileWithCommando(lob_directory, GC_ADD, false, true);
+            this.addFileWithCommando(lob_directory, GC_ADD, false, true, true);
             gco_commands.remove(iob_command);
             return;
         }
@@ -702,7 +702,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
                 lar_fileContent = (byte[]) lob_downloadContent;
                 lob_newFile = new File(lva_newFilePath);
                 FileUtils.writeByteArrayToFile(lob_newFile, lar_fileContent);
-                this.addFileWithCommando(lob_newFile, GC_ADD, false);
+                this.addFileWithCommando(lob_newFile, GC_ADD, false, false, true);
             } catch (IOException ex) {
                 System.out.println(ex.getMessage());
                 System.err.println("Command removed");
