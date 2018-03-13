@@ -79,14 +79,10 @@ public abstract class FileMapper {
 
         if ((lva_version = getAttribute(filePath, GC_ATTRIBUTE_VERSION)) != null) {
             lob_file.setVersion(Integer.parseInt(lva_version));
-        } else {
-            lob_file.setVersion(0);
         }
 
         if ((lva_lastModified = getAttribute(filePath, GC_ATTRIBUTE_LAST_MODIFIED)) != null) {
             lob_file.setVersion(Integer.parseInt(lva_lastModified));
-        } else {
-            lob_file.setLastModified(0L);
         }
 
         return lob_file;
