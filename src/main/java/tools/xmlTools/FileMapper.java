@@ -62,12 +62,12 @@ public abstract class FileMapper {
         changeAttribute(GC_ATTRIBUTE_PATH, iva_newPath, iob_file.getFilePath());
     }
 
-    public static void setVersion(MappedFile iob_file, int iva_version) {
-        changeAttribute(GC_ATTRIBUTE_VERSION, String.valueOf(iva_version), iob_file.getFilePath());
+    public static void setVersion(MappedFile iob_file) {
+        changeAttribute(GC_ATTRIBUTE_VERSION, String.valueOf(iob_file.getVersion()), iob_file.getFilePath());
     }
 
-    public static void setLastModified(MappedFile iob_file, long iva_lastModified) {
-        changeAttribute(GC_ATTRIBUTE_LAST_MODIFIED, String.valueOf(iva_lastModified), iob_file.getFilePath());
+    public static void setLastModified(MappedFile iob_file) {
+        changeAttribute(GC_ATTRIBUTE_LAST_MODIFIED, String.valueOf(iob_file.getLastModified()), iob_file.getFilePath());
     }
 
     public static MappedFile getFile(String filePath) {
