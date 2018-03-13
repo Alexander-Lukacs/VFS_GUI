@@ -172,6 +172,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
     @SuppressWarnings("Duplicates")
     private void addLocalFile(Command iob_command) {
         boolean lva_isDirectory;
+        boolean lva_addToPrevention = false;
         Tree lob_tree = TreeSingleton.getInstance().getTree();
 
         try {
@@ -186,6 +187,12 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             return;
         }
 
+        try {
+            lva_addToPrevention = getObjectFromInformationArray(iob_command, 1, Boolean.class);
+        } catch(RuntimeException ignore) {
+
+        }
+
         if (TreeTool.filterRootFiles(iob_command.gob_file.toPath())) {
             gco_commands.remove(iob_command);
             System.err.println("Command removed");
@@ -194,6 +201,10 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
 
         //add the file to the tree
         lob_tree.addFile(iob_command.gob_file, lva_isDirectory);
+
+        if (lva_addToPrevention) {
+            TreeSingleton.getInstance().getDuplicateOperationsPrevention().putCreated(iob_command.gob_file.toPath());
+        }
 
         if (!TreeTool.isFileInTreeView(iob_command.gob_file)) {
 //            Platform.runLater(() -> TreeTool.addToTreeView(iob_command.gob_file));
@@ -681,7 +692,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         //the download returned a file so it must be a directory
         if (lob_downloadContent instanceof Integer) {
             lob_directory = new File(lva_newFilePath);
-            this.addFileWithCommando(lob_directory, GC_ADD, false, true);
+            this.addFileWithCommando(lob_directory, GC_ADD, false, true, true);
             gco_commands.remove(iob_command);
             return;
         }
@@ -691,7 +702,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
                 lar_fileContent = (byte[]) lob_downloadContent;
                 lob_newFile = new File(lva_newFilePath);
                 FileUtils.writeByteArrayToFile(lob_newFile, lar_fileContent);
-                this.addFileWithCommando(lob_newFile, GC_ADD, false);
+                this.addFileWithCommando(lob_newFile, GC_ADD, false, false, true);
             } catch (IOException ex) {
                 System.out.println(ex.getMessage());
                 System.err.println("Command removed");
