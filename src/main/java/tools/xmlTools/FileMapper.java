@@ -13,6 +13,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.nio.file.Path;
 import java.util.Objects;
 
 public abstract class FileMapper {
@@ -25,7 +26,7 @@ public abstract class FileMapper {
 
     public static void addFile(MappedFile iob_file) {
         Element lob_newFile = new Element(GC_FILE);
-        lob_newFile.setAttribute(GC_ATTRIBUTE_PATH, iob_file.getFilePath());
+        lob_newFile.setAttribute(GC_ATTRIBUTE_PATH, iob_file.getFilePath().toString());
         lob_newFile.setAttribute(GC_ATTRIBUTE_VERSION, String.valueOf(iob_file.getVersion()));
         lob_newFile.setAttribute(GC_ATTRIBUTE_LAST_MODIFIED, String.valueOf(iob_file.getLastModified()));
 
@@ -60,15 +61,15 @@ public abstract class FileMapper {
     }
 
     public static void setPath(MappedFile iob_file, String iva_newPath) {
-        changeAttribute(GC_ATTRIBUTE_PATH, iva_newPath, iob_file.getFilePath());
+        changeAttribute(GC_ATTRIBUTE_PATH, iva_newPath, iob_file.getFilePath().toString());
     }
 
     public static void setVersion(MappedFile iob_file) {
-        changeAttribute(GC_ATTRIBUTE_VERSION, String.valueOf(iob_file.getVersion()), iob_file.getFilePath());
+        changeAttribute(GC_ATTRIBUTE_VERSION, String.valueOf(iob_file.getVersion()), iob_file.getFilePath().toString());
     }
 
     public static void setLastModified(MappedFile iob_file) {
-        changeAttribute(GC_ATTRIBUTE_LAST_MODIFIED, String.valueOf(iob_file.getLastModified()), iob_file.getFilePath());
+        changeAttribute(GC_ATTRIBUTE_LAST_MODIFIED, String.valueOf(iob_file.getLastModified()), iob_file.getFilePath().toString());
     }
 
     public static List<MappedFile> getAllFiles() {
@@ -108,15 +109,24 @@ public abstract class FileMapper {
         MappedFile lob_file = new MappedFile();
         String lva_version;
         String lva_lastModified;
+        String lva_filePath;
+        Path lob_path;
 
-        lob_file.setFilePath(getAttribute(filePath, GC_ATTRIBUTE_PATH));
+//        lob_file.setFilePath(getAttribute(filePath, GC_ATTRIBUTE_PATH));
+
+        lva_filePath = getAttribute(filePath, GC_ATTRIBUTE_PATH);
+
+        if (lva_filePath != null) {
+            lob_path = new File(lva_filePath).toPath();
+            lob_file.setFilePath(lob_path);
+        }
 
         if ((lva_version = getAttribute(filePath, GC_ATTRIBUTE_VERSION)) != null) {
             lob_file.setVersion(Integer.parseInt(lva_version));
         }
 
         if ((lva_lastModified = getAttribute(filePath, GC_ATTRIBUTE_LAST_MODIFIED)) != null) {
-            lob_file.setVersion(Integer.parseInt(lva_lastModified));
+            lob_file.setLastModified(Long.parseLong(lva_lastModified));
         }
 
         return lob_file;
