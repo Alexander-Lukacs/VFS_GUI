@@ -15,6 +15,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.apache.commons.io.FileUtils;
@@ -59,6 +60,12 @@ public class MainController {
 
     @FXML
     private Label gob_txt_label_content;
+
+    @FXML
+    private StackPane gob_leftStackPane;
+
+    @FXML
+    private StackPane gob_rightStackPane;
 
 
     private DataCache gob_userCache;
