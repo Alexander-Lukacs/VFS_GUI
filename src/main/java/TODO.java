@@ -7,7 +7,8 @@ public abstract class TODO {
     TODO Bug: Inhalte der Unterordner der Ordner in Shared Directorys werden nicht synchronisiert
     TODO Bug: Inhalte der Unterordner der Ordner in Public Directorys werden nicht synchronisiert
     TODO Bug: wenn man das Public Directory umbenennt werden Daten nicht mehr sync
-    TODO Bug: beim Verschieben will Client B mit Account A die Daten auf dem Server löschen,,
+    TODO Bug: beim Verschieben will Client B mit Account A die Daten auf dem Server löschen
+    TODO BUG: beim Verschieben von Ordnern die sich in einem Ordner befinden wird eine StackOverflow Exception geworfen
      */
 
     /*
