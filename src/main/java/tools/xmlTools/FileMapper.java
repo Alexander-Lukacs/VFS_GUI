@@ -1,5 +1,6 @@
 package tools.xmlTools;
 
+import cache.DataCache;
 import models.classes.MappedFile;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -7,6 +8,7 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import tools.Utils;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -79,6 +81,7 @@ public abstract class FileMapper {
         Document lob_doc;
         Element lob_rootElement;
         MappedFile lob_mappedFile;
+        File lob_file;
 
         if (!fileExists()) {
             createXml();
@@ -92,7 +95,8 @@ public abstract class FileMapper {
 
             for (Element lob_element : lob_rootElement.getChildren()) {
                 lob_mappedFile = new MappedFile();
-                lob_mappedFile.setFilePath(lob_element.getAttributeValue(GC_ATTRIBUTE_PATH));
+                lob_file = new File(lob_element.getAttributeValue(GC_ATTRIBUTE_PATH));
+                lob_mappedFile.setFilePath(lob_file.toPath());
                 lob_mappedFile.setVersion(Integer.parseInt(lob_element.getAttributeValue(GC_ATTRIBUTE_VERSION)));
                 lob_mappedFile.setLastModified(Long.parseLong(lob_element.getAttributeValue(GC_ATTRIBUTE_LAST_MODIFIED)));
 
@@ -221,7 +225,11 @@ public abstract class FileMapper {
     }
 
     private static String getXmlPath() {
-        return Objects.requireNonNull(FileMapper.class.getClassLoader().getResource(GC_FILE_NAME)).getPath();
+        DataCache lob_dataCache = DataCache.getDataCache();
+
+        return Utils.getUserBasePath() + "\\" + lob_dataCache.get(DataCache.GC_IP_KEY) + "_" +
+                lob_dataCache.get(DataCache.GC_PORT_KEY) + "\\" + lob_dataCache.get(DataCache.GC_EMAIL_KEY)
+                + "\\config\\" + GC_FILE_NAME;
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
