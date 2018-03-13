@@ -106,6 +106,12 @@ public class MainController {
         }
     }
 
+    /**
+     * close connection to server,
+     * clear cache and close Main Scene.
+     * starts Login Scene
+     */
+
     public void logout() {
         SharedDirectoryCache lob_sharedDirectoryCache = SharedDirectoryCache.getInstance();
         RestClient lob_restClient;

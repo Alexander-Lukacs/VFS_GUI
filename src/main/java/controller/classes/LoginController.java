@@ -127,6 +127,11 @@ public class LoginController {
         }
     }
 
+    /**
+     * reads the text fields on Button Click
+     * Validate inputs
+     * sends inputs to Server, to Register.
+     */
     public void onClickRegister() {
         String lva_ip = gob_tf_ipAddress.getText();
         String lva_port = gob_tf_port.getText();
@@ -166,6 +171,15 @@ public class LoginController {
         // setTextFromXmlToTf(); --> ist voll doof wegen Ip und port.... lol
     }
 
+    /**
+     * test if User inputs are Valid for Login
+     *
+     * @param iva_ip contains the server ip
+     * @param iva_port contains the server port
+     * @param iva_email contains the Users email address
+     * @param iva_password contains the Users passowrd
+     * @return true if the inputs are valid
+     */
     private boolean checkIfLoginDataValid(String iva_ip, String iva_port, String iva_email, String iva_password) {
         StringBuilder lob_sb = new StringBuilder();
         boolean lva_validationFailure = false;
@@ -202,6 +216,17 @@ public class LoginController {
         return true;
     }
 
+    /**
+     * test if User inputs are Valid for register
+     *
+     * @param iva_ip contains the server ip
+     * @param iva_port contains the server port
+     * @param iva_name contains the User name
+     * @param iva_email contains the Users email address
+     * @param iva_password contains the Users passowrd
+     * @param iva_confirmPassword contains the confirmed passowrd
+     * @return true if the inputs are valid
+     */
     private boolean checkIfRegisterDataValid(String iva_ip, String iva_port, String iva_name, String iva_email,
                                              String iva_password, String iva_confirmPassword) {
         StringBuilder lob_sb = new StringBuilder();
@@ -252,6 +277,11 @@ public class LoginController {
         return true;
     }
 
+    /**
+     * saves User data in Cache
+     *
+     * @param iob_user a User object, contains the USer data (name, email, adminId, id, admin(boolean))
+     */
     private void cacheUser(User iob_user) {
         gob_dataCache.put(GC_EMAIL_KEY, iob_user.getEmail());
         gob_dataCache.put(GC_NAME_KEY, iob_user.getName());

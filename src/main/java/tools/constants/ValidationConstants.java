@@ -2,6 +2,8 @@ package tools.constants;
 
 /**
  * Created by Mesut on 07.02.2018.
+ *
+ * regex to validate the inputs of the User
  */
 public abstract class ValidationConstants {
 

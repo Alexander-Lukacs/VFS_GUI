@@ -24,6 +24,10 @@ import static controller.constants.SettingsConstants.GC_ADMIN_ADD;
 import static controller.constants.SettingsConstants.GC_CHANGE_IP_PORT;
 import static tools.constants.AlertConstants.*;
 
+/**
+ * this class applies to change the Password of the User
+ */
+
 public class ChangePWController {
     private final controller.classes.ListView gob_listView = new controller.classes.ListView();
 
@@ -108,6 +112,14 @@ public class ChangePWController {
         }
     }
 
+    /**
+     *
+     * @param iva_oldPassword contains the old Password to validate the User
+     * @param iva_oldCachedPassword contains the input of the User to check if input equals old Password
+     * @param iva_newPassword contains the new Password of the User
+     * @param iva_confirmPassword contains the confirm of the new password
+     * @return true if input of old Password is equal with old password and the new Password is valid
+     */
     private boolean isPasswordDataValid(String iva_oldPassword, String iva_oldCachedPassword, String iva_newPassword,
                                         String iva_confirmPassword) {
 

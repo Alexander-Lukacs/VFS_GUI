@@ -15,6 +15,8 @@ import java.io.StringWriter;
 import static controller.constants.ApplicationConstants.GC_APPLICATION_ICON_PATH;
 
 /**
+ * this class creates Alert Windows to show warnings to the User
+ *
  * Created by Mesut on 08.02.2018.
  */
 

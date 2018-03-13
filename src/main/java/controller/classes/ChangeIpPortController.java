@@ -21,7 +21,8 @@ import static tools.constants.AlertConstants.GC_WARNING_IP_PORT;
 import static tools.constants.AlertConstants.GC_WARNING_PORT;
 
 /**
- * Created by Mesut on 31.01.2018.
+ * this class applies to change the Server.
+ * will close the connection to the current server.
  */
 public class ChangeIpPortController {
     @FXML
