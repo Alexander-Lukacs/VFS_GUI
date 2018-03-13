@@ -352,6 +352,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         boolean lva_moveOnlyInTree;
         TreeItem<String> lob_item;
         TreeItem<String> lob_newParent;
+        TreeItem<String> lob_parent;
         Tree lob_tree = TreeSingleton.getInstance().getTree();
 
         if (iob_command.gob_file == null) {
@@ -384,6 +385,13 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             return;
         }
 
+        lob_parent = lob_item.getParent();
+
+        if (lob_parent == null) {
+            gco_commands.remove(iob_command);
+            return;
+        }
+
         if (!canFileBeMoved(lob_item, lob_newParent)) {
             Platform.runLater(() -> new AlertWindows().createErrorAlert("File could not be moved. There is a File with the same name"));
             gco_commands.remove(iob_command);
@@ -391,8 +399,10 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         }
 
         //move the item in the treeView
-        lob_item.getParent().getChildren().remove(lob_item);
-        lob_newParent.getChildren().add(lob_item);
+        Platform.runLater(() -> {
+            lob_parent.getChildren().remove(lob_item);
+            lob_newParent.getChildren().add(lob_item);
+        });
 
         lob_tree.moveFile(lob_oldFilePath, lob_newFilePath.getAbsolutePath(), lva_moveOnlyInTree);
         gco_commands.remove(iob_command);
