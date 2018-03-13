@@ -2,6 +2,7 @@ package threads.classes;
 
 import builder.RestClientBuilder;
 import fileTree.classes.TreeSingleton;
+import fileTree.interfaces.Tree;
 import models.classes.SharedDirectory;
 import restful.clients.SharedDirectoryRestClient;
 import threads.constants.FileManagerConstants;
@@ -11,7 +12,6 @@ import tools.xmlTools.DirectoryNameMapper;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Base64;
 import java.util.List;
 
 public class NotifyServerThread extends Thread {
@@ -123,6 +123,7 @@ public class NotifyServerThread extends Thread {
         lob_file = new File(lva_actualFileLocation);
         lob_newFileLocation = new File(lva_newFileLocation);
 
+        TreeSingleton.getInstance().getDuplicateOperationsPrevention().putMoved(lob_file.toPath());
         ThreadManager.addCommandToFileManager(
                 lob_file, FileManagerConstants.GC_MOVE, false,
                 lob_newFileLocation, false);
