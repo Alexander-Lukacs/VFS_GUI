@@ -168,9 +168,9 @@ class DirectoryWatchService implements Runnable{
         test.sort(PathFileComparator.PATH_COMPARATOR);
         filesAdded(test);
 
-        if (!gob_isRunning) {
-            return;
-        }
+//        if (!gob_isRunning) {
+//            return;
+//        }
 //        System.out.println("----------------------------------------------------------");
 //        for (Map.Entry<Path, FileTime> lob_entry : gob_registeredPaths.entrySet()) {
 //            System.out.println(lob_entry.getKey());

@@ -44,17 +44,16 @@ public class Utils {
     public static int getDirectoryIdFromRelativePath(String iva_relativePath, boolean iva_isPathFromServer) {
         String[] lar_fileDirectories;
 
-        if (iva_relativePath.startsWith("Shared")) {
+        if (iva_relativePath.startsWith("Shared") || iva_relativePath.startsWith(DirectoryNameMapper.getSharedDirectoryName())) {
             lar_fileDirectories = iva_relativePath.split("\\\\");
             if (iva_isPathFromServer) {
-
                 return Integer.parseInt(lar_fileDirectories[1]);
             } else {
                 return DirectoryNameMapper.getIdOfSharedDirectory(lar_fileDirectories[1]);
             }
         }
 
-        if (iva_relativePath.startsWith("Public")) {
+        if (iva_relativePath.startsWith("Public") || iva_relativePath.startsWith(DirectoryNameMapper.getPublicDirectoryName())) {
             return 0;
         }
 
@@ -80,24 +79,6 @@ public class Utils {
             iva_filePath = iva_filePath.replaceFirst("\\\\[^\\\\]*", lva_sharedDirectoryName);
             rva_absolutePath += "\\" + iva_filePath;
         }
-
-//        if (lva_directoryId <= 0) {
-//            return rva_absolutePath + "\\" + iva_filePath;
-//        } else {
-////            if (isPathFromServer) {
-////                lva_sharedDirectoryName = DirectoryNameMapper.getRenamedSharedDirectoryName(lva_directoryId);
-////                rva_absolutePath += "\\" + iva_filePath;
-////                rva_absolutePath = rva_absolutePath.replaceFirst("[^\\\\]*$", lva_sharedDirectoryName);
-////            } else {
-////                lva_sharedDirectoryName = DirectoryNameMapper.getRenamedSharedDirectoryName(lva_directoryId);
-////                rva_absolutePath += "\\" + iva_filePath;
-////                rva_absolutePath = rva_absolutePath.replaceFirst("[^\\\\]*$", lva_sharedDirectoryName);
-////            }
-////            rva_absolutePath += "\\" + iva_filePath;
-//            lva_sharedDirectoryName = "\\\\" + lva_sharedDirectoryName;
-//            iva_filePath = iva_filePath.replaceFirst("\\\\[^\\\\]*", lva_sharedDirectoryName);
-//            rva_absolutePath += "\\" + iva_filePath;
-//        }
 
         return rva_absolutePath;
     }
@@ -172,6 +153,6 @@ public class Utils {
     @SuppressWarnings("WeakerAccess")
     public static String buildPathToSharedDirectory(SharedDirectory iob_sharedDirectory) {
         return Utils.getRootDirectory() +
-                "\\" + "Shared" + "\\" + iob_sharedDirectory.getDirectoryName() + "$";
+                "\\" + DirectoryNameMapper.getSharedDirectoryName() + "\\" + iob_sharedDirectory.getDirectoryName() + "$";
     }
 }

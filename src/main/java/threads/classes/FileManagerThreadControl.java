@@ -14,6 +14,7 @@ import models.classes.User;
 import org.apache.commons.io.FileUtils;
 import restful.clients.FileRestClient;
 import restful.clients.SharedDirectoryRestClient;
+import sun.misc.GC;
 import threads.interfaces.ThreadControl;
 import tools.AlertWindows;
 import tools.TreeTool;
@@ -138,7 +139,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
                 break;
 
             case GC_DOWNLOAD_FROM_SERVER:
-                System.out.println(GC_DOWNLOAD_FROM_SERVER);
+                System.out.println(GC_DOWNLOAD_FROM_SERVER + ": " + gco_commands.size());
                 downloadFile(iob_command);
                 break;
 
@@ -182,11 +183,13 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             }
         } catch (RuntimeException ex) {
             gco_commands.remove(iob_command);
+            System.err.println("Command removed");
             return;
         }
 
         if (TreeTool.filterRootFiles(iob_command.gob_file.toPath())) {
             gco_commands.remove(iob_command);
+            System.err.println("Command removed");
             return;
         }
 
@@ -622,17 +625,26 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         File lob_newFile;
         byte[] lar_fileContent;
 
+        if (iob_command.gva_maxTries >= GC_MAX_TRIES) {
+            gco_commands.remove(iob_command);
+            System.err.println("Max Tries");
+        }
+
         try {
             lva_relativePath = getObjectFromInformationArray(iob_command, 0, String.class);
         } catch (RuntimeException ex) {
             gco_commands.remove(iob_command);
+            System.err.println("Command removed");
             return;
         }
 
         Object lob_downloadContent = gob_restClient.downloadFile(lva_relativePath);
 
         if (lob_downloadContent == null) {
-            gco_commands.remove(iob_command);
+            iob_command.gva_maxTries++;
+            gva_commandIndex.incrementAndGet();
+//            gco_commands.remove(iob_command);
+//            System.err.println("Command removed: Content null");
             return;
         }
 
@@ -654,6 +666,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
                 this.addFileWithCommando(lob_newFile, GC_ADD, false);
             } catch (IOException ex) {
                 System.out.println(ex.getMessage());
+                System.err.println("Command removed");
             }
         }
 
