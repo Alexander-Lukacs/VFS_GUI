@@ -48,6 +48,7 @@ public class TreeControl {
             TreeSingleton.setTreeRootPath(lob_userDirectory.getCanonicalPath());
             gob_tree = TreeSingleton.getInstance().getTree();
             gob_treeView = TreeSingleton.getInstance().getTreeView();
+            gob_treeView.setPrefHeight(1080);
             gob_treeView.setShowRoot(false);
 
             TreeItem<String> lob_root = new TreeItem<>(gob_tree.getRoot().getName());
