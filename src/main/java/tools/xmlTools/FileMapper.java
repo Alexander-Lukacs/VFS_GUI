@@ -13,6 +13,7 @@ import tools.Utils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.nio.file.Path;
@@ -170,6 +171,8 @@ public abstract class FileMapper {
     }
 
     private static void createXml() {
+        DataCache lob_dataCache = DataCache.getDataCache();
+        File lob_file;
         Document lob_doc;
         Element lob_rootElement;
         XMLOutputter lob_xmlOutput;
@@ -182,6 +185,16 @@ public abstract class FileMapper {
 
             lob_xmlOutput = new XMLOutputter();
             lob_xmlOutput.setFormat(Format.getPrettyFormat());
+
+            lob_file = new File(Utils.getUserBasePath() + "\\" + lob_dataCache.get(DataCache.GC_IP_KEY) + "_" +
+                    lob_dataCache.get(DataCache.GC_PORT_KEY) + "\\" + lob_dataCache.get(DataCache.GC_EMAIL_KEY)
+                    + "\\config");
+
+            if (!lob_file.exists()) {
+                lob_file.mkdir();
+            }
+
+            Files.setAttribute(lob_file.toPath(), "dos:hidden", true);
 
             lva_xmlFilePath = getXmlPath();
             lob_xmlOutput.output(lob_doc, new FileWriter(lva_xmlFilePath));
