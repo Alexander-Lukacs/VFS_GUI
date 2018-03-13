@@ -1,21 +1,21 @@
 package controller.classes;
 
 import builder.RestClientBuilder;
-import models.classes.RestResponse;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import models.classes.RestResponse;
 import models.classes.User;
 import restful.clients.UserRestClient;
 import tools.Utils;
 
 import java.util.List;
 
-import static restful.constants.HttpStatusCodes.GC_HTTP_OK;
 import static controller.constants.SettingsConstants.GC_CHANGE_IP_PORT;
 import static controller.constants.SettingsConstants.GC_CHANGE_PW;
+import static restful.constants.HttpStatusCodes.GC_HTTP_OK;
 
 /**
  * Created by Mesut on 10.02.2018.
