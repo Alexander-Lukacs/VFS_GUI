@@ -180,6 +180,7 @@ public abstract class FileMapper {
         return Objects.requireNonNull(FileMapper.class.getClassLoader().getResource(GC_FILE_NAME)).getPath();
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private static boolean fileExists() {
         return new File(getXmlPath()).exists();
     }
