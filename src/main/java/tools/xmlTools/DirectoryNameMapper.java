@@ -18,7 +18,7 @@ import java.util.List;
 
 import static tools.constants.DirectoryNameMapperConstants.*;
 
-public class DirectoryNameMapper {
+public abstract class DirectoryNameMapper {
     private static final String GC_FILE_NAME = "mapping.xml";
 
     private static void createXmlFile() {

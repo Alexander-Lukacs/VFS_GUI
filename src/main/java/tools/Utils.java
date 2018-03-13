@@ -14,7 +14,7 @@ import java.io.IOException;
 
 import static restful.constants.HttpStatusCodes.*;
 
-public class Utils {
+public abstract class Utils {
     private static final String GC_FILE_BASE_PATH = "C:\\Users\\$\\Documents\\FileSystem";
 
     public static String getUserBasePath() {

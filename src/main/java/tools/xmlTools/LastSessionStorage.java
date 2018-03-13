@@ -17,7 +17,7 @@ import static tools.constants.LastSessionConstants.*;
 /**
  * Created by Mesut on 09.02.2018.
  */
-public class LastSessionStorage {
+public abstract class LastSessionStorage {
     private static final String GC_FILE_NAME = "properties.xml";
 
     public static String getIp() {
