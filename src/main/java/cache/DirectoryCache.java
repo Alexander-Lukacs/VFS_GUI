@@ -81,7 +81,16 @@ public class DirectoryCache {
         TreeTool.createDirectory(gob_serverDirectory);
 
         //create the user directory if it does not exist
-        TreeTool.createDirectory(gob_rootDirectory);
+        TreeTool.createDirectory(gob_userDirectory);
+
+        File lob_configDirectory = new File(gob_userDirectory + "\\config");
+
+        try {
+            TreeTool.createDirectory(lob_configDirectory);
+            Files.setAttribute(lob_configDirectory.toPath(), "dos:hidden", true);
+        } catch (Exception ignore) {
+
+        }
 
         gob_publicDirectory = new File(gob_userDirectory.getAbsolutePath() + "\\" + DirectoryNameMapper.getPublicDirectoryName());
         gob_privateDirectory = new File(gob_userDirectory.getAbsolutePath() + "\\" + DirectoryNameMapper.getPrivateDirectoryName());
@@ -96,13 +105,6 @@ public class DirectoryCache {
         //create the shared directory
         TreeTool.createDirectory(gob_sharedDirectory);
 
-        File lob_configDirectory = new File(gob_userDirectory + "\\config");
 
-        try {
-            TreeTool.createDirectory(lob_configDirectory);
-            Files.setAttribute(lob_configDirectory.toPath(), "dos:hidden", true);
-        } catch (Exception ignore) {
-
-        }
     }
 }
