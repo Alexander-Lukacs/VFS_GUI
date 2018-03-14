@@ -147,7 +147,7 @@ public class Utils {
      *
      * @param iob_sharedDirectory the shared directory
      */
-    public static void createSharedDirectory(SharedDirectory iob_sharedDirectory) {
+    public static void createSharedDirectory(SharedDirectory iob_sharedDirectory, int iva_version) {
         // Declaration block -----------------------------------------------------------------------------------------------
 
         SharedDirectoryCache lob_sharedDirectoryCache = SharedDirectoryCache.getInstance();
@@ -173,7 +173,7 @@ public class Utils {
         lob_sharedDirectoryCache.put(iob_sharedDirectory.getId(), iob_sharedDirectory);
         DirectoryNameMapper.addNewSharedDirectory(iob_sharedDirectory.getId(), lob_file.getName());
         PreventDuplicateOperation.getDuplicateOperationPrevention().putCreated(lob_file.toPath());
-        ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_ADD, false, true);
+        ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_ADD, false, true, false, iva_version);
 
     }
 

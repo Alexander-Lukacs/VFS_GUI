@@ -228,6 +228,7 @@ public class NotifyServerThread extends Thread {
         SharedDirectoryRestClient lob_restClient;
         List<SharedDirectory> lli_sharedDirectories;
         String sharedDirectoryId;
+        int lva_version;
 
         sharedDirectoryId = iar_messageArray[2];
 
@@ -239,7 +240,7 @@ public class NotifyServerThread extends Thread {
                 try {
                     DirectoryNameMapper.getRenamedSharedDirectoryName(Integer.parseInt(sharedDirectoryId));
                 } catch (IllegalArgumentException ex) {
-                    Utils.createSharedDirectory(lob_tmpSharedDirectory);
+                    Utils.createSharedDirectory(lob_tmpSharedDirectory ,1);
                 }
             }
         }

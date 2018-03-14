@@ -226,7 +226,7 @@ public class SharedDirectoryController {
                 // If the shared directory was successfully to the server, add the shared directory
                 // to the tree view and to the explorer
                 lob_sharedDirectory.setId(Integer.parseInt(lob_restResponse.getResponseMessage()));
-                Utils.createSharedDirectory(lob_sharedDirectory);
+                Utils.createSharedDirectory(lob_sharedDirectory, 1);
                 closeWindow();
             }
 
