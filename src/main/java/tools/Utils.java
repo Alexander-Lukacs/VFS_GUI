@@ -3,7 +3,7 @@ package tools;
 import cache.DataCache;
 import cache.DirectoryCache;
 import cache.SharedDirectoryCache;
-import fileTree.classes.PreventDuplicateOperation;
+import models.classes.PreventDuplicateOperation;
 import models.classes.RestResponse;
 import models.classes.SharedDirectory;
 import threads.classes.ThreadManager;

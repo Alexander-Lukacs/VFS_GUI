@@ -106,6 +106,7 @@ public class FileRestClient extends RestClient {
     public boolean deleteOnServer(File iob_file) {
         String lva_relativePath = Utils.buildRelativeFilePath(iob_file);
         int lva_directoryId = getDirectoryIdFromRelativePath(lva_relativePath, false);
+        lva_relativePath = Utils.buildRelativeFilePathForServer(iob_file.toPath()).toString();
 
         Response lob_response = gob_webTarget.path("/auth/files/delete")
                 .queryParam("directoryId", lva_directoryId)

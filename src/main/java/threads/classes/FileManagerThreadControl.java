@@ -5,7 +5,7 @@ import cache.DataCache;
 import cache.DirectoryCache;
 import cache.FileMapperCache;
 import cache.SharedDirectoryCache;
-import fileTree.classes.PreventDuplicateOperation;
+import models.classes.PreventDuplicateOperation;
 import javafx.application.Platform;
 import javafx.scene.control.TreeItem;
 import models.classes.*;
@@ -18,7 +18,6 @@ import tools.AlertWindows;
 import tools.TreeTool;
 import tools.Utils;
 import tools.xmlTools.DirectoryNameMapper;
-import tools.xmlTools.FileMapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -336,7 +335,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         SharedDirectoryCache lob_sharedDirCache;
         boolean lva_addToFilePrevention = false;
         Collection<File> lco_filesToDelete;
-        File[] lar_filesToRemoveFromCache;
+        TreeItem<String> lob_itemToDelete;
 
         try {
             lva_addToFilePrevention = getObjectFromInformationArray(iob_command, 0, Boolean.class);
@@ -350,6 +349,13 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
 
         if (lva_addToFilePrevention) {
             PreventDuplicateOperation.getDuplicateOperationPrevention().putDeleted(iob_command.gob_file.toPath());
+        }
+
+        lob_itemToDelete = TreeTool.getTreeItem(iob_command.gob_file);
+
+        if (lob_itemToDelete != null) {
+            //remove the item from the tree
+            lob_itemToDelete.getParent().getChildren().remove(lob_itemToDelete);
         }
 
         if (iob_command.gob_file.exists()) {
@@ -643,12 +649,6 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             gco_commands.remove(iob_command);
             return;
         }
-
-//        if (!iob_command.gob_file.exists()) {
-//            gco_commands.remove(iob_command);
-//            System.out.println("File does not exist");
-//            return;
-//        }
 
         try {
             lva_newName = getObjectFromInformationArray(iob_command, 0, String.class);

@@ -1,8 +1,7 @@
 package threads.classes;
 
-import fileTree.classes.PreventDuplicateOperation;
+import models.classes.PreventDuplicateOperation;
 import fileTree.interfaces.FileChangeListener;
-import fileTree.classes.TreeSingleton;
 import org.apache.commons.io.comparator.PathFileComparator;
 
 import java.io.File;

@@ -1,9 +1,7 @@
 package threads.classes;
 
 import builder.RestClientBuilder;
-import fileTree.classes.PreventDuplicateOperation;
-import fileTree.classes.TreeSingleton;
-import fileTree.interfaces.Tree;
+import models.classes.PreventDuplicateOperation;
 import models.classes.SharedDirectory;
 import restful.clients.SharedDirectoryRestClient;
 import threads.constants.FileManagerConstants;

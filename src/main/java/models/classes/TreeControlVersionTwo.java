@@ -4,13 +4,17 @@ import builder.RestClientBuilder;
 import cache.DirectoryCache;
 import cache.FileMapperCache;
 import cache.SharedDirectoryCache;
-import fileTree.classes.PreventDuplicateOperation;
-import fileTree.classes.TreeCellImpl;
+import controller.classes.SharedDirectoryController;
 import fileTree.classes.TreeSingleton;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.layout.GridPane;
+import javafx.scene.image.Image;
+import javafx.stage.Stage;
 import restful.clients.SharedDirectoryRestClient;
 import threads.classes.ThreadManager;
 import threads.constants.FileManagerConstants;
@@ -26,6 +30,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
+import static controller.constants.ApplicationConstants.GC_APPLICATION_ICON_PATH;
 import static models.classes.FileService.readAllFilesFromDirectory;
 import static models.constants.TreeControlVersionTwoConstants.*;
 import static tools.TreeTool.buildFileFromItem;
@@ -153,6 +158,45 @@ public class TreeControlVersionTwo {
     private void renameFile() {
         TreeView<String> lob_treeView = TreeSingleton.getInstance().getTreeView();
         lob_treeView.edit(lob_treeView.getSelectionModel().getSelectedItem());
+    }
+
+    private void sharedDirectoryScene(TreeItem iob_treeItem) {
+        TreeView<String> lob_treeView = TreeSingleton.getInstance().getTreeView();
+        FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("views/sharedDirectoryScreen.fxml"));
+        GridPane lob_pane;
+        int lva_sharedDirectoryId;
+        String lva_selectedItemName;
+        SharedDirectoryCache lob_sharedDirectoryCache = SharedDirectoryCache.getInstance();
+        SharedDirectory lob_sharedDirectory;
+
+        lva_selectedItemName = lob_treeView.getSelectionModel().getSelectedItem().getValue();
+
+        try {
+            lob_pane = lob_loader.load();
+            Scene lob_scene = new Scene(lob_pane);
+            Stage lob_stage = new Stage();
+            lob_stage.setTitle("Shared Directory");
+            lob_stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream(GC_APPLICATION_ICON_PATH)));
+            lob_stage.setResizable(false);
+            lob_stage.setScene(lob_scene);
+            SharedDirectoryController lob_controller = lob_loader.getController();
+
+            if (iob_treeItem.getValue().equals("Shared")) {
+                lob_controller.initData(null, lob_stage, null);
+
+            } else {
+                lva_sharedDirectoryId = DirectoryNameMapper.getIdOfSharedDirectory(lva_selectedItemName);
+                lob_sharedDirectory = lob_sharedDirectoryCache.get(lva_sharedDirectoryId);
+
+                lob_controller.initData(lob_sharedDirectory, lob_stage,
+                        buildFileFromItem(lob_treeView.getSelectionModel().getSelectedItem()));
+            }
+
+            lob_stage.show();
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -302,12 +346,11 @@ public class TreeControlVersionTwo {
         rob_contextMenu = new ContextMenu();
         lob_deleteFile = new MenuItem(GC_CONTEXT_DELETE);
         lob_deleteFile.setOnAction(event -> {
-//            File lob_selectedFile = buildFileFromItem(
-//                    lob_treeView.getSelectionModel().getSelectedItem()
-//            );
-//            ThreadManager.addCommandToFileManager(lob_selectedFile, FileManagerConstants.GC_DELETE,
-//                    true, 0);
-//            addAllDeleted(lob_selectedFile);
+            File lob_selectedFile = buildFileFromItem(
+                    lob_treeView.getSelectionModel().getSelectedItem()
+            );
+            ThreadManager.addCommandToFileManager(lob_selectedFile, FileManagerConstants.GC_DELETE,
+                    true, 0);
         });
 
         lob_newDirectory = new MenuItem(GC_CONTEXT_NEW_DIRECTORY);
@@ -334,9 +377,9 @@ public class TreeControlVersionTwo {
         );
 
         lob_sharedDirectory = new MenuItem(GC_CONTEXT_PROPERTIES);
-//        lob_sharedDirectory.setOnAction(event ->
-//                sharedDirectoryScene(gob_treeView.getSelectionModel().getSelectedItem())
-//        );
+        lob_sharedDirectory.setOnAction(event ->
+                sharedDirectoryScene(lob_treeView.getSelectionModel().getSelectedItem())
+        );
 
         rob_contextMenu.getItems().addAll(lob_deleteFile,
                 lob_newDirectory,

@@ -1,4 +1,4 @@
-package fileTree.classes;
+package models.classes;
 
 import java.nio.file.Path;
 import java.util.HashMap;

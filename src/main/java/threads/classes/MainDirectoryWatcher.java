@@ -1,8 +1,7 @@
 package threads.classes;
 
-import fileTree.classes.PreventDuplicateOperation;
+import models.classes.PreventDuplicateOperation;
 import fileTree.interfaces.FileChangeListener;
-import fileTree.classes.TreeSingleton;
 import javafx.scene.control.TreeItem;
 import threads.constants.FileManagerConstants;
 import threads.interfaces.ThreadControl;
