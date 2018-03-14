@@ -13,6 +13,7 @@ public class DirectoryCache {
     private static File gob_publicDirectory;
     private static File gob_privateDirectory;
     private static File gob_sharedDirectory;
+    private static File gob_serverDirectory;
 
     public static DirectoryCache getDirectoryCache() {
         if (gob_directoryCache == null) {
@@ -42,6 +43,10 @@ public class DirectoryCache {
         return gob_sharedDirectory;
     }
 
+    public File getServerDirectory() {
+        return gob_serverDirectory;
+    }
+
     public void setPublicDirectoryName(String iva_newName) {
         String lva_newFilePath = gob_publicDirectory.getAbsolutePath();
         lva_newFilePath = lva_newFilePath.replaceFirst("[^\\\\]*$", iva_newName);
@@ -65,14 +70,14 @@ public class DirectoryCache {
         String lva_port = DataCache.getDataCache().get(DataCache.GC_PORT_KEY);
 
         gob_rootDirectory = new File(Utils.getUserBasePath());
-        File lob_serverDirectory = new File(Utils.getUserBasePath() + "\\" + lva_ip + "_" + lva_port);
-        gob_userDirectory = new File(lob_serverDirectory.getAbsolutePath() + "\\" + DataCache.getDataCache().get(DataCache.GC_EMAIL_KEY));
+        gob_serverDirectory = new File(Utils.getUserBasePath() + "\\" + lva_ip + "_" + lva_port);
+        gob_userDirectory = new File(gob_serverDirectory.getAbsolutePath() + "\\" + DataCache.getDataCache().get(DataCache.GC_EMAIL_KEY));
 
         //create the root directory if it does not exist
         TreeTool.createDirectory(gob_rootDirectory);
 
         //create the server directory if it does not exist
-        TreeTool.createDirectory(lob_serverDirectory);
+        TreeTool.createDirectory(gob_serverDirectory);
 
         //create the user directory if it does not exist
         TreeTool.createDirectory(gob_rootDirectory);

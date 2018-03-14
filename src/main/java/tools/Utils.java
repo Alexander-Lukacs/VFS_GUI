@@ -3,7 +3,7 @@ package tools;
 import cache.DataCache;
 import cache.DirectoryCache;
 import cache.SharedDirectoryCache;
-import fileTree.classes.TreeSingleton;
+import fileTree.classes.PreventDuplicateOperation;
 import models.classes.RestResponse;
 import models.classes.SharedDirectory;
 import threads.classes.ThreadManager;
@@ -172,7 +172,7 @@ public class Utils {
 
         lob_sharedDirectoryCache.put(iob_sharedDirectory.getId(), iob_sharedDirectory);
         DirectoryNameMapper.addNewSharedDirectory(iob_sharedDirectory.getId(), lob_file.getName());
-        TreeSingleton.getInstance().getDuplicateOperationsPrevention().putCreated(lob_file.toPath());
+        PreventDuplicateOperation.getDuplicateOperationPrevention().putCreated(lob_file.toPath());
         ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_ADD, false, true);
 
     }

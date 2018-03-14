@@ -21,17 +21,15 @@ import static tools.TreeTool.buildFileFromItem;
 @SuppressWarnings("WeakerAccess")
 public class TreeCellImpl extends TreeCell<String> {
     private TextField gob_textField;
-    private Tree gob_tree;
 
-    public TreeCellImpl(Tree iob_tree) {
-        gob_tree = iob_tree;
+    public TreeCellImpl() {
         setEvents();
     }
 
     @Override
     public void startEdit() {
         TreeItem<String> lob_item = getTreeItem();
-        File lob_file = TreeTool.buildFileFromItem(lob_item, gob_tree);
+        File lob_file = TreeTool.buildFileFromItem(lob_item);
 
         if (!lob_item.getValue().equals("Shared")) {
             if (lob_file.exists()) {
@@ -127,11 +125,11 @@ public class TreeCellImpl extends TreeCell<String> {
             lob_cellDragged = (TreeCell) event.getGestureSource();
             lob_treeItemDragged = lob_cellDragged.getTreeItem();
 
-            lob_fileHovered = TreeTool.buildFileFromItem(lob_treeItemHovered, gob_tree);
-            lob_fileDragged = TreeTool.buildFileFromItem(lob_treeItemDragged, gob_tree);
+            lob_fileHovered = TreeTool.buildFileFromItem(lob_treeItemHovered);
+            lob_fileDragged = TreeTool.buildFileFromItem(lob_treeItemDragged);
 
             ThreadManager.addCommandToFileManager(lob_fileDragged, FileManagerConstants.GC_MOVE, true, lob_fileHovered, false);
-            lob_treeSingleton.getDuplicateOperationsPrevention().putMoved(lob_fileDragged.toPath());
+            PreventDuplicateOperation.getDuplicateOperationPrevention().putMoved(lob_fileDragged.toPath());
 
             lob_treeSingleton.getTreeView().getSelectionModel().select(lob_treeItemHovered);
 
@@ -139,13 +137,14 @@ public class TreeCellImpl extends TreeCell<String> {
             event.consume();
         });
 
+
         this.setOnDragEntered(event -> {
             TreeItem<String> lob_selectedItem = this.getTreeItem();
             Object lva_cellDraggedValue;
             Object lva_cellHoveredValue;
             TreeCell lob_cellDragged;
 
-            if (lob_selectedItem != null && !buildFileFromItem(this.getTreeItem(), gob_tree).isFile() &&
+            if (lob_selectedItem != null && !buildFileFromItem(this.getTreeItem()).isFile() &&
                     event.getGestureSource() != this) {
 
                 lob_cellDragged = (TreeCell) event.getGestureSource();
@@ -167,7 +166,7 @@ public class TreeCellImpl extends TreeCell<String> {
             TreeCell lob_cellDragged;
 
             if (lob_selectedItem != null && event.getGestureSource() != this &&
-                    !buildFileFromItem(this.getTreeItem(), gob_tree).isFile() && !lob_selectedItem.getValue().equals("Shared")) {
+                    !buildFileFromItem(this.getTreeItem()).isFile() && !lob_selectedItem.getValue().equals("Shared")) {
 
                 lob_cellDragged = (TreeCell) event.getGestureSource();
                 lva_cellDraggedValue = lob_cellDragged.getTreeItem().getParent().getValue();

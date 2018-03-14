@@ -1,5 +1,6 @@
 package threads.classes;
 
+import fileTree.classes.PreventDuplicateOperation;
 import fileTree.interfaces.FileChangeListener;
 import fileTree.classes.TreeSingleton;
 import org.apache.commons.io.comparator.PathFileComparator;
@@ -133,8 +134,8 @@ class DirectoryWatchService implements Runnable{
         }
         ArrayList<File> test = new ArrayList<>();
         lco_scanned.keySet().forEach(lob_key -> {
-            if (TreeSingleton.getInstance().getDuplicateOperationsPrevention().wasFileCreated(lob_key)) {
-                TreeSingleton.getInstance().getDuplicateOperationsPrevention().removeCreated(lob_key);
+            if (PreventDuplicateOperation.getDuplicateOperationPrevention().wasFileCreated(lob_key)) {
+                PreventDuplicateOperation.getDuplicateOperationPrevention().removeCreated(lob_key);
                 try {
                     register(lob_key);
                 } catch (IOException ex) {

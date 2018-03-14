@@ -1,6 +1,7 @@
 package threads.classes;
 
 import builder.RestClientBuilder;
+import fileTree.classes.PreventDuplicateOperation;
 import fileTree.classes.TreeSingleton;
 import fileTree.interfaces.Tree;
 import models.classes.SharedDirectory;
@@ -123,7 +124,7 @@ public class NotifyServerThread extends Thread {
         lob_file = new File(lva_actualFileLocation);
         lob_newFileLocation = new File(lva_newFileLocation);
 
-        TreeSingleton.getInstance().getDuplicateOperationsPrevention().putMoved(lob_file.toPath());
+        PreventDuplicateOperation.getDuplicateOperationPrevention().putMoved(lob_file.toPath());
         ThreadManager.addCommandToFileManager(
                 lob_file, FileManagerConstants.GC_MOVE, false,
                 lob_newFileLocation, false);
@@ -144,7 +145,7 @@ public class NotifyServerThread extends Thread {
         lob_newFile = new File(lva_actualFilePath);
         lva_relativePath = Utils.buildRelativeFilePath(lob_newFile);
 
-        TreeSingleton.getInstance().getDuplicateOperationsPrevention().putCreated(lob_newFile.toPath());
+        PreventDuplicateOperation.getDuplicateOperationPrevention().putCreated(lob_newFile.toPath());
         ThreadManager.addCommandToFileManager(
                 null, FileManagerConstants.GC_DOWNLOAD_FROM_SERVER, true,
                 lva_relativePath);
@@ -163,7 +164,7 @@ public class NotifyServerThread extends Thread {
         lva_actualFilePath = Utils.convertRelativeToAbsolutePath(iar_messageArray[1], true);
         lob_file = new File(lva_actualFilePath);
 
-        TreeSingleton.getInstance().getDuplicateOperationsPrevention().putDeleted(lob_file.toPath());
+        PreventDuplicateOperation.getDuplicateOperationPrevention().putDeleted(lob_file.toPath());
         ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_DELETE, false);
     }
 
@@ -184,7 +185,7 @@ public class NotifyServerThread extends Thread {
 
         lob_file = new File(lva_actualFilePath);
 
-        TreeSingleton.getInstance().getDuplicateOperationsPrevention().putRenamed(lob_file.toPath());
+        PreventDuplicateOperation.getDuplicateOperationPrevention().putRenamed(lob_file.toPath());
         ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_RENAME, false,
                 lva_newFileName, true);
     }
@@ -205,7 +206,7 @@ public class NotifyServerThread extends Thread {
 
         lob_file = new File(lva_actualFilePath);
 
-        TreeSingleton.getInstance().getDuplicateOperationsPrevention().putDeleted(lob_file.toPath());
+        PreventDuplicateOperation.getDuplicateOperationPrevention().putDeleted(lob_file.toPath());
         ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_DELETE_DIR_ONLY, false);
     }
 

@@ -64,6 +64,7 @@ public class MainController {
 
     private DataCache gob_userCache;
     private TreeControl gob_treeControl;
+    private TreeControlVersionTwo gob_treeControlVersionTwo;
     private MainController gob_mainController;
 
     public void initMainControllerData(MainController iob_mainController) {
@@ -102,8 +103,15 @@ public class MainController {
                 if (Desktop.isDesktopSupported()) {
                     Desktop desktop = Desktop.getDesktop();
 
-                    if (gob_treeControl.getPathOfSelectedItem() != null) {
-                        desktop.open(new File(gob_treeControl.getPathOfSelectedItem()));
+//                    if (gob_treeControlV.getPathOfSelectedItem() != null) {
+//                        desktop.open(new File(gob_treeControl.getPathOfSelectedItem()));
+//                    } else {
+//                        desktop.open(new File(Utils.getUserBasePath() + "\\" +
+//                                lob_dataCache.get(DataCache.GC_IP_KEY) + "_" + lob_dataCache.get(DataCache.GC_PORT_KEY)));
+//                    }
+
+                    if (gob_treeControlVersionTwo.getPathOfSelectedItem() != null) {
+                        desktop.open(new File(gob_treeControlVersionTwo.getPathOfSelectedItem()));
                     } else {
                         desktop.open(new File(Utils.getUserBasePath() + "\\" +
                                 lob_dataCache.get(DataCache.GC_IP_KEY) + "_" + lob_dataCache.get(DataCache.GC_PORT_KEY)));
@@ -144,7 +152,9 @@ public class MainController {
 //        gob_treeControl = new TreeControl(gob_userCache.get(DataCache.GC_IP_KEY),
 //                gob_userCache.get(DataCache.GC_PORT_KEY), this);
 
-        TreeControlVersionTwo t = new TreeControlVersionTwo();
+        gob_treeControlVersionTwo = new TreeControlVersionTwo();
+
+//        TreeControlVersionTwo t = new TreeControlVersionTwo();
         TreeView<String> gob_treeView = TreeSingleton.getInstance().getTreeView();
         gob_vBox.getChildren().add(gob_treeView);
     }

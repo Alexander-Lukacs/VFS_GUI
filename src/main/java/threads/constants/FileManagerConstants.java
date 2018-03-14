@@ -1,6 +1,6 @@
 package threads.constants;
 
-public class FileManagerConstants {
+public abstract class FileManagerConstants {
     public static final String GC_ADD = "add";
     public static final String GC_UPLOAD_TO_SERVER = "add_on_server";
 

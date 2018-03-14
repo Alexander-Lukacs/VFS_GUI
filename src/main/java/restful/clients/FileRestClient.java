@@ -8,17 +8,13 @@ import com.sun.jersey.multipart.MultiPart;
 import com.sun.jersey.multipart.file.FileDataBodyPart;
 import com.sun.jersey.multipart.impl.MultiPartWriter;
 import com.thoughtworks.xstream.XStream;
-import fileTree.interfaces.FileNode;
-import fileTree.interfaces.Tree;
 import models.classes.DownloadedContent;
 import models.classes.MappedFile;
 import models.classes.TreeDifference;
-import fileTree.classes.TreeImpl;
 import org.apache.commons.io.IOUtils;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import tools.Utils;
-import tools.xmlTools.DirectoryNameMapper;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -27,10 +23,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -49,8 +42,10 @@ public class FileRestClient extends RestClient {
         DataCache lob_dataCache = DataCache.getDataCache();
         String lva_relativeFilePath = Utils.buildRelativeFilePath(iob_filesToUpload);
         int lva_directoryId = getDirectoryIdFromRelativePath(lva_relativeFilePath, false);
-        long lva_lastModified = 0;
-        BasicFileAttributes lob_basicFileAttributes;
+        long lva_version;
+        MappedFile lob_mappedFile;
+
+        lva_relativeFilePath = Utils.buildRelativeFilePathForServer(iob_filesToUpload.toPath()).toString();
 
         if (!iob_filesToUpload.exists()) {
             return false;
@@ -61,12 +56,14 @@ public class FileRestClient extends RestClient {
                 lob_dataCache.get(DataCache.GC_PASSWORD_KEY)
         );
 
-        try {
-            lob_basicFileAttributes = Files.readAttributes(iob_filesToUpload.toPath(), BasicFileAttributes.class);
-            lva_lastModified = lob_basicFileAttributes.lastModifiedTime().toMillis();
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
+        lob_mappedFile = FileMapperCache.getFileMapperCache().get(iob_filesToUpload.toPath());
+
+        if (lob_mappedFile == null) {
+            return false;
         }
+
+        lva_version = lob_mappedFile.getVersion();
+
         ClientConfig lob_config = new ClientConfig(lob_authDetails);
         Client lob_client = ClientBuilder.newClient(lob_config);
         lob_client.register(lob_authDetails);
@@ -75,7 +72,7 @@ public class FileRestClient extends RestClient {
                 lob_dataCache.get(DataCache.GC_PORT_KEY) + "/api/auth/files/upload")
                 .queryParam("path", lva_relativeFilePath)
                 .queryParam("directoryId", lva_directoryId)
-                .queryParam("lastModified", lva_lastModified);
+                .queryParam("version", lva_version);
         lob_target.register(MultiPartWriter.class);
 
         final FileDataBodyPart lob_filePart = new FileDataBodyPart("attachment", iob_filesToUpload);
@@ -191,9 +188,9 @@ public class FileRestClient extends RestClient {
             ))
         );
 
-        lco_mappedFilesForServer.forEach(lob_mappedFile -> {
-            lob_mappedFile.setFilePath(Utils.buildRelativeFilePathForServer(lob_mappedFile.getFilePath()));
-        });
+        lco_mappedFilesForServer.forEach(lob_mappedFile ->
+            lob_mappedFile.setFilePath(Utils.buildRelativeFilePathForServer(lob_mappedFile.getFilePath()))
+        );
 
         lva_mappedFilesAsXmlString = lob_xmlParser.toXML(lco_mappedFilesForServer);
 

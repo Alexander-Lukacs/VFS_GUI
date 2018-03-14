@@ -5,8 +5,7 @@ import cache.DataCache;
 import cache.DirectoryCache;
 import cache.FileMapperCache;
 import cache.SharedDirectoryCache;
-import fileTree.interfaces.Tree;
-import fileTree.classes.TreeSingleton;
+import fileTree.classes.PreventDuplicateOperation;
 import javafx.application.Platform;
 import javafx.scene.control.TreeItem;
 import models.classes.*;
@@ -235,7 +234,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         }
 
         if (lva_addToPrevention) {
-            TreeSingleton.getInstance().getDuplicateOperationsPrevention().putCreated(iob_command.gob_file.toPath());
+            PreventDuplicateOperation.getDuplicateOperationPrevention().putCreated(iob_command.gob_file.toPath());
         }
 
         try {
@@ -243,7 +242,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
 
             lob_mappedFile = FileMapperCache.getFileMapperCache().get(iob_command.gob_file.toPath());
 
-            if (lob_mappedFile.getFilePath() == null) {
+            if (lob_mappedFile == null) {
                 lob_mappedFile = new MappedFile(iob_command.gob_file.toPath(), lva_version, lva_lastModified);
                 FileMapperCache.getFileMapperCache().put(lob_mappedFile);
             } else {
@@ -312,19 +311,19 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
                 gva_commandIndex.incrementAndGet();
             }
         } else {
-            if (!iob_command.gob_file.exists()) {
-                try {
-                    if (!iob_command.gob_file.createNewFile()) {
-                        iob_command.gva_maxTries++;
-                        gva_commandIndex.incrementAndGet();
-                        return;
-                    }
-                } catch (IOException ex) {
-                    iob_command.gva_maxTries++;
-                    gva_commandIndex.incrementAndGet();
-                    return;
-                }
-            }
+//            if (!iob_command.gob_file.exists()) {
+//                try {
+//                    if (!iob_command.gob_file.createNewFile()) {
+//                        iob_command.gva_maxTries++;
+//                        gva_commandIndex.incrementAndGet();
+//                        return;
+//                    }
+//                } catch (IOException ex) {
+//                    iob_command.gva_maxTries++;
+//                    gva_commandIndex.incrementAndGet();
+//                    return;
+//                }
+//            }
 
             if (gob_restClient.uploadFilesToServer(iob_command.gob_file)) {
                 gco_commands.remove(iob_command);
@@ -341,6 +340,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
     /**
      * delete file on the client
      * @param iob_command expected input in gar_information
+     *                    0 boolean whether the file should be added to the duplicate prevention
      */
     private void deleteLocalFile(Command iob_command) {
         Platform.runLater(() -> TreeTool.getInstance().deleteItem(iob_command.gob_file));
@@ -362,7 +362,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         }
 
         if (lva_addToFilePrevention) {
-            TreeSingleton.getInstance().getDuplicateOperationsPrevention().putDeleted(iob_command.gob_file.toPath());
+            PreventDuplicateOperation.getDuplicateOperationPrevention().putDeleted(iob_command.gob_file.toPath());
         }
 
         if (iob_command.gob_file.exists()) {
@@ -459,7 +459,6 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         TreeItem<String> lob_item;
         TreeItem<String> lob_newParent;
         TreeItem<String> lob_parent;
-        Tree lob_tree = TreeSingleton.getInstance().getTree();
 
         if (iob_command.gob_file == null) {
             gco_commands.remove(iob_command);
@@ -510,7 +509,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             lob_newParent.getChildren().add(lob_item);
         });
 
-        lob_tree.moveFile(lob_oldFilePath, lob_newFilePath.getAbsolutePath(), lva_moveOnlyInTree);
+//        lob_tree.moveFile(lob_oldFilePath, lob_newFilePath.getAbsolutePath(), lva_moveOnlyInTree);
         gco_commands.remove(iob_command);
     }
 
@@ -568,7 +567,6 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
     private void deleteLocalDirectory(Command iob_command) {
         TreeItem<String> lob_item;
         TreeItem<String> lob_parent;
-        Tree lob_tree = TreeSingleton.getInstance().getTree();
 
         if (iob_command.gob_file == null) {
             gco_commands.remove(iob_command);
@@ -611,7 +609,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             lob_parent.getChildren().remove(lob_item)
         );
 
-        lob_tree.deleteDirectoryOnly(iob_command.gob_file);
+//        lob_tree.deleteDirectoryOnly(iob_command.gob_file);
         gco_commands.remove(iob_command);
     }
 
@@ -647,11 +645,10 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
      *                    2: boolean whether the file should be renamed in the tree view or not
      */
     private void renameLocalFile(Command iob_command) {
-        Tree lob_tree = TreeSingleton.getInstance().getTree();
         TreeItem<String> lob_item;
         String lva_newName;
         boolean lva_renameTreeItem;
-        File lob_rootFile = TreeSingleton.getInstance().getTree().getRoot();
+        File lob_rootFile = DirectoryCache.getDirectoryCache().getUserDirectory();
         File lob_privateFile = new File(lob_rootFile.toString() + "\\" + DirectoryNameMapper.getPrivateDirectoryName());
         File lob_publicFile = new File(lob_rootFile.toString() + "\\" + DirectoryNameMapper.getPublicDirectoryName());
         File lob_sharedFile = new File(lob_rootFile.toString() + "\\" + DirectoryNameMapper.getSharedDirectoryName());
@@ -706,7 +703,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             }
         }
 
-        lob_tree.renameFile(iob_command.gob_file, lva_newName);
+//        lob_tree.renameFile(iob_command.gob_file, lva_newName);
         gco_commands.remove(iob_command);
     }
 
@@ -836,7 +833,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         }
 
         if (lob_sharedDirectory.getOwner().getEmail().equals(lob_user.getEmail())) {
-            TreeSingleton.getInstance().getDuplicateOperationsPrevention().putDeleted(iob_command.gob_file.toPath());
+            PreventDuplicateOperation.getDuplicateOperationPrevention().putDeleted(iob_command.gob_file.toPath());
 
             iob_command.gar_fileInformation[0] = lob_sharedDirectory.getId();
             deleteFileOnServer(iob_command);
@@ -845,7 +842,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             lob_response = lob_restClient.deleteSharedDirectory(lob_sharedDirectory);
 
         } else if (lob_user.getEmail().equals(lob_dataCache.get(DataCache.GC_EMAIL_KEY))) {
-            TreeSingleton.getInstance().getDuplicateOperationsPrevention().putDeleted(iob_command.gob_file.toPath());
+            PreventDuplicateOperation.getDuplicateOperationPrevention().putDeleted(iob_command.gob_file.toPath());
 
             deleteLocalFile(iob_command);
 
@@ -943,35 +940,35 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         }
     }
 
-    private void addFiles(TreeDifference iob_difference, int iva_loopIndex) {
-        for (String lva_addFile : iob_difference.getFilesToInsert()) {
-            if (iva_loopIndex == 0) {
-                lva_addFile = DirectoryNameMapper.getPrivateDirectoryName() + lva_addFile;
-            }
-
-            if (iva_loopIndex == 1) {
-                lva_addFile = DirectoryNameMapper.getPublicDirectoryName() + lva_addFile;
-            }
-
-            this.addFileWithCommando(null, GC_DOWNLOAD_FROM_SERVER, true, lva_addFile);
-        }
-    }
-
-    private void deleteFiles(TreeDifference iob_difference, Tree iob_tree, int iva_loopIndex) {
-        for (String lva_deleteFile : iob_difference.getFilesToDelete()) {
-            if (iva_loopIndex == 0) {
-                lva_deleteFile = iob_tree.getRoot().getAbsolutePath() + "\\" + DirectoryNameMapper.getPrivateDirectoryName() + lva_deleteFile;
-            }
-
-            if (iva_loopIndex == 1) {
-                lva_deleteFile = iob_tree.getRoot().getAbsolutePath() + "\\" + DirectoryNameMapper.getPublicDirectoryName() + lva_deleteFile;
-
-            }
-            File lob_file = new File(lva_deleteFile);
-            iob_tree.deleteFile(lva_deleteFile);
-            TreeTool.getInstance().deleteItem(lob_file);
-        }
-    }
+//    private void addFiles(TreeDifference iob_difference, int iva_loopIndex) {
+//        for (String lva_addFile : iob_difference.getFilesToInsert()) {
+//            if (iva_loopIndex == 0) {
+//                lva_addFile = DirectoryNameMapper.getPrivateDirectoryName() + lva_addFile;
+//            }
+//
+//            if (iva_loopIndex == 1) {
+//                lva_addFile = DirectoryNameMapper.getPublicDirectoryName() + lva_addFile;
+//            }
+//
+//            this.addFileWithCommando(null, GC_DOWNLOAD_FROM_SERVER, true, lva_addFile);
+//        }
+//    }
+//
+//    private void deleteFiles(TreeDifference iob_difference, Tree iob_tree, int iva_loopIndex) {
+//        for (String lva_deleteFile : iob_difference.getFilesToDelete()) {
+//            if (iva_loopIndex == 0) {
+//                lva_deleteFile = iob_tree.getRoot().getAbsolutePath() + "\\" + DirectoryNameMapper.getPrivateDirectoryName() + lva_deleteFile;
+//            }
+//
+//            if (iva_loopIndex == 1) {
+//                lva_deleteFile = iob_tree.getRoot().getAbsolutePath() + "\\" + DirectoryNameMapper.getPublicDirectoryName() + lva_deleteFile;
+//
+//            }
+//            File lob_file = new File(lva_deleteFile);
+//            iob_tree.deleteFile(lva_deleteFile);
+//            TreeTool.getInstance().deleteItem(lob_file);
+//        }
+//    }
 
     /**
      * When an object implementing interface <code>Runnable</code> is used

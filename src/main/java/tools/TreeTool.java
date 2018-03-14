@@ -143,7 +143,7 @@ public class TreeTool {
         return true;
     }
 
-    public static File buildFileFromItem(TreeItem iob_treeItem, Tree iob_tree) {
+    public static File buildFileFromItem(TreeItem iob_treeItem) {
         StringBuilder lob_path = new StringBuilder();
 
         while (iob_treeItem != null) {
@@ -151,8 +151,8 @@ public class TreeTool {
             lob_path.insert(0, "\\");
             iob_treeItem = iob_treeItem.getParent();
         }
-        lob_path.insert(0, iob_tree.getRoot().getParent());
-        return iob_tree.getFile(lob_path.toString());
+        lob_path.insert(0, DirectoryCache.getDirectoryCache().getServerDirectory());
+        return new File(lob_path.toString());
     }
     public void deleteItem(File iob_file) {
         TreeItem<String> lob_item = searchTreeItem(iob_file);
@@ -175,14 +175,14 @@ public class TreeTool {
     }
 
     public static boolean isSharedDirectory(Path iob_path) {
-        Path lob_rootPath = TreeSingleton.getInstance().getTree().getRoot().toPath();
+        Path lob_rootPath = DirectoryCache.getDirectoryCache().getUserDirectory().toPath();
         Path lob_sharedPath = new File(lob_rootPath.toString() + "\\" + DirectoryNameMapper.getSharedDirectoryName()).toPath();
 
         return iob_path.startsWith(lob_sharedPath);
     }
 
     public static boolean isRootFile(File iob_file) {
-        File lob_rootFile = TreeSingleton.getInstance().getTree().getRoot();
+        Path lob_rootFile = DirectoryCache.getDirectoryCache().getUserDirectory().toPath();
         File lob_privateFile = new File(lob_rootFile.toString() + "\\" + DirectoryNameMapper.getPrivateDirectoryName());
         File lob_publicFile = new File(lob_rootFile.toString() + "\\" + DirectoryNameMapper.getPublicDirectoryName());
         File lob_sharedFile = new File(lob_rootFile.toString() + "\\" + DirectoryNameMapper.getSharedDirectoryName());
