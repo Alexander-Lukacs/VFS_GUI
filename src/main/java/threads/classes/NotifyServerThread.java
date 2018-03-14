@@ -223,12 +223,14 @@ public class NotifyServerThread extends Thread {
      * @param iar_messageArray at position 0: operation
      *                         at position 1: relative file path
      *                         at position 2: shared directory id
+     *                         at position 3 ... message length: all files that the shared directory contains. The Client
+     *                         needs to download the Files
      */
     private void addSharedDirectory(String[] iar_messageArray) {
         SharedDirectoryRestClient lob_restClient;
         List<SharedDirectory> lli_sharedDirectories;
         String sharedDirectoryId;
-        int lva_version;
+        String[] lar_files;
 
         sharedDirectoryId = iar_messageArray[2];
 
@@ -241,6 +243,9 @@ public class NotifyServerThread extends Thread {
                     DirectoryNameMapper.getRenamedSharedDirectoryName(Integer.parseInt(sharedDirectoryId));
                 } catch (IllegalArgumentException ex) {
                     Utils.createSharedDirectory(lob_tmpSharedDirectory ,1);
+                    for (String lva_filesPath : iar_messageArray) {
+                        ThreadManager.addCommandToFileManager(null, FileManagerConstants.GC_DOWNLOAD_FROM_SERVER, true, lva_filesPath);
+                    }
                 }
             }
         }
