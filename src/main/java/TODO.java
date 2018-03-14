@@ -4,7 +4,6 @@ public abstract class TODO {
     TODO BUG: Registrierungs bug (keine Benachrichtigung für das anlegen eines users) NICHT UMBEDINGT WICHTIG!!!!
     TODO Feature: Shared Directory muss entsprechende Löschfunktion aufrufen wenn es über den Explorer gelöscht wird
     TODO Feature: Shared DIrectory muss entsprechende Addfunktion aufrufen wenn es über den Explorer hinzugefügt wird
-    TODO Bug: beim Verschieben will Client B mit Account A die Daten auf dem Server löschen
      */
 
     /*
