@@ -5,6 +5,7 @@ import cache.DirectoryCache;
 import cache.FileMapperCache;
 import cache.SharedDirectoryCache;
 import fileTree.classes.PreventDuplicateOperation;
+import fileTree.classes.TreeCellImpl;
 import fileTree.classes.TreeSingleton;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -260,11 +261,11 @@ public class TreeControlVersionTwo {
         ContextMenu lob_contextMenu;
         lob_treeView.setPrefHeight(1080);
         lob_treeView.setShowRoot(false);
+        lob_treeView.setEditable(true);
 
         TreeItem<String> lob_root = new TreeItem<>(DirectoryCache.getDirectoryCache().getUserDirectory().getName());
         lob_root.setGraphic(TreeTool.getTreeIcon(DirectoryCache.getDirectoryCache().getUserDirectory().getAbsolutePath()));
         lob_treeView.setRoot(lob_root);
-        lob_treeView.setShowRoot(false);
 
         lob_contextMenu = initContextMenu();
         lob_treeView.setContextMenu(lob_contextMenu);
@@ -272,6 +273,18 @@ public class TreeControlVersionTwo {
         lob_treeView.setOnContextMenuRequested( event ->
             onContextMenuRequest()
         );
+
+        lob_treeView.setCellFactory(siTreeView ->
+            new TreeCellImpl()
+        );
+
+        lob_treeView.setOnEditCommit(event -> {
+            if (!event.getOldValue().equals(event.getNewValue())) {
+                File lob_renamedFile = buildFileFromItem(event.getTreeItem());
+                PreventDuplicateOperation.getDuplicateOperationPrevention().putRenamed(lob_renamedFile.toPath());
+                ThreadManager.addCommandToFileManager(lob_renamedFile, FileManagerConstants.GC_RENAME, true, event.getNewValue(), false);
+            }
+        });
     }
 
     private ContextMenu initContextMenu() {

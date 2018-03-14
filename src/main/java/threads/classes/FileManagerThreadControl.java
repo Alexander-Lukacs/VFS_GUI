@@ -18,6 +18,7 @@ import tools.AlertWindows;
 import tools.TreeTool;
 import tools.Utils;
 import tools.xmlTools.DirectoryNameMapper;
+import tools.xmlTools.FileMapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -311,20 +312,6 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
                 gva_commandIndex.incrementAndGet();
             }
         } else {
-//            if (!iob_command.gob_file.exists()) {
-//                try {
-//                    if (!iob_command.gob_file.createNewFile()) {
-//                        iob_command.gva_maxTries++;
-//                        gva_commandIndex.incrementAndGet();
-//                        return;
-//                    }
-//                } catch (IOException ex) {
-//                    iob_command.gva_maxTries++;
-//                    gva_commandIndex.incrementAndGet();
-//                    return;
-//                }
-//            }
-
             if (gob_restClient.uploadFilesToServer(iob_command.gob_file)) {
                 gco_commands.remove(iob_command);
             } else {
@@ -387,15 +374,11 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
                 FileMapperCache.getFileMapperCache().remove(lob_file.toPath());
             }
         } else {
-            try {
-                lar_filesToRemoveFromCache = getObjectFromInformationArray(iob_command, 1, File[].class);
-            } catch (RuntimeException ex) {
-                gco_commands.remove(iob_command);
-                return;
-            }
-
-            for (File lob_file : lar_filesToRemoveFromCache) {
-                FileMapperCache.getFileMapperCache().remove(lob_file.toPath());
+            //TODO prüfen auf Exception
+            for (MappedFile lob_mappedCacheFile : FileMapperCache.getFileMapperCache().getAll()) {
+                if (lob_mappedCacheFile.getFilePath().startsWith(iob_command.gob_file.toPath())) {
+                    FileMapperCache.getFileMapperCache().remove(lob_mappedCacheFile.getFilePath());
+                }
             }
         }
 
@@ -648,7 +631,10 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         TreeItem<String> lob_item;
         String lva_newName;
         boolean lva_renameTreeItem;
+        String lva_newFilePath;
+        String lva_newChildFilePath;
         File lob_rootFile = DirectoryCache.getDirectoryCache().getUserDirectory();
+        File lob_newFile;
         File lob_privateFile = new File(lob_rootFile.toString() + "\\" + DirectoryNameMapper.getPrivateDirectoryName());
         File lob_publicFile = new File(lob_rootFile.toString() + "\\" + DirectoryNameMapper.getPublicDirectoryName());
         File lob_sharedFile = new File(lob_rootFile.toString() + "\\" + DirectoryNameMapper.getSharedDirectoryName());
@@ -658,10 +644,11 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             return;
         }
 
-        if (!iob_command.gob_file.exists()) {
-            gco_commands.remove(iob_command);
-            return;
-        }
+//        if (!iob_command.gob_file.exists()) {
+//            gco_commands.remove(iob_command);
+//            System.out.println("File does not exist");
+//            return;
+//        }
 
         try {
             lva_newName = getObjectFromInformationArray(iob_command, 0, String.class);
@@ -703,7 +690,23 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             }
         }
 
-//        lob_tree.renameFile(iob_command.gob_file, lva_newName);
+        lva_newFilePath = iob_command.gob_file.toString().replaceFirst("[^^\\\\]*$", lva_newName);
+        lob_newFile = new File(lva_newFilePath);
+
+        for (MappedFile lob_mappedCacheFile : FileMapperCache.getFileMapperCache().getAll()) {
+            if (lob_mappedCacheFile.getFilePath().startsWith(iob_command.gob_file.toPath())) {
+                lva_newChildFilePath = lob_mappedCacheFile.getFilePath().toString();
+                lva_newChildFilePath = lva_newChildFilePath.replace(iob_command.gob_file.toString(), lob_newFile.toString());
+                lob_mappedCacheFile.setFilePath(new File(lva_newChildFilePath).toPath());
+            }
+        }
+
+        if (iob_command.gob_file.exists()) {
+            if (!iob_command.gob_file.renameTo(lob_newFile)) {
+                iob_command.gva_maxTries++;
+                gva_commandIndex.incrementAndGet();
+            }
+        }
         gco_commands.remove(iob_command);
     }
 

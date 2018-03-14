@@ -153,9 +153,8 @@ public class FileRestClient extends RestClient {
 // Rename a file on the server
 // ---------------------------------------------------------------------------------------------------------------------
     public boolean renameFile(File iob_file, String iva_newRelativePath) {
-        int lva_directoryId;
-        String lva_relativePath = Utils.buildRelativeFilePath(iob_file);
-        lva_directoryId  = getDirectoryIdFromRelativePath(lva_relativePath, false);
+        int lva_directoryId = Utils.getDirectoryIdFromRelativePath(Utils.buildRelativeFilePath(iob_file), false);
+        String lva_relativePath = Utils.buildRelativeFilePathForServer(iob_file.toPath()).toString();
 
         Response lob_response = gob_webTarget.path("/auth/files/rename")
                 .queryParam("path", lva_relativePath)
