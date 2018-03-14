@@ -93,6 +93,7 @@ public class Utils {
         String lva_userId = DataCache.getDataCache().get(DataCache.GC_USER_ID_KEY);
         String lva_sharedDirectoryName;
         int lva_sharedDirectoryId;
+        SharedDirectory lob_sharedDirectory;
 
         lva_filePath = lva_filePath.replace(lob_userDirectoryFile + "\\", "");
 
@@ -108,6 +109,10 @@ public class Utils {
             lva_filePath = lva_filePath.replaceFirst("^[^\\\\]*\\\\", "");
             lva_sharedDirectoryName = lva_filePath.replaceFirst("\\\\.*", "");
             lva_sharedDirectoryId = DirectoryNameMapper.getIdOfSharedDirectory(lva_sharedDirectoryName);
+            lob_sharedDirectory = SharedDirectoryCache.getInstance().get(lva_sharedDirectoryId);
+
+            lva_userName = lob_sharedDirectory.getOwner().getName();
+            lva_userId = Integer.toString(lob_sharedDirectory.getOwner().getUserId());
 
             lva_filePath = lva_filePath.replaceFirst("^[^\\\\]*", "");
             lva_filePath = lva_userName + lva_userId + "_shared\\" + lva_sharedDirectoryId + lva_filePath;
