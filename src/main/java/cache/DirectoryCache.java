@@ -73,14 +73,6 @@ public class DirectoryCache {
         gob_rootDirectory = new File(Utils.getUserBasePath());
         gob_serverDirectory = new File(Utils.getUserBasePath() + "\\" + lva_ip + "_" + lva_port);
         gob_userDirectory = new File(gob_serverDirectory.getAbsolutePath() + "\\" + DataCache.getDataCache().get(DataCache.GC_EMAIL_KEY));
-        File lob_configDirectory = new File(gob_userDirectory + "\\config");
-
-        try {
-            TreeTool.createDirectory(lob_configDirectory);
-            Files.setAttribute(lob_configDirectory.toPath(), "dos:hidden", true);
-        } catch (Exception ignore) {
-
-        }
 
         //create the root directory if it does not exist
         TreeTool.createDirectory(gob_rootDirectory);
@@ -103,5 +95,14 @@ public class DirectoryCache {
 
         //create the shared directory
         TreeTool.createDirectory(gob_sharedDirectory);
+
+        File lob_configDirectory = new File(gob_userDirectory + "\\config");
+
+        try {
+            TreeTool.createDirectory(lob_configDirectory);
+            Files.setAttribute(lob_configDirectory.toPath(), "dos:hidden", true);
+        } catch (Exception ignore) {
+
+        }
     }
 }
