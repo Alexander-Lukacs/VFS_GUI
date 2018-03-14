@@ -2,6 +2,7 @@ package controller.classes;
 
 import builder.RestClientBuilder;
 import cache.DataCache;
+import cache.DirectoryCache;
 import cache.SharedDirectoryCache;
 import fileTree.classes.TreeControl;
 import fileTree.classes.TreeSingleton;
@@ -163,6 +164,7 @@ public class MainController {
         FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("views/mainScreen.fxml"));
 
         try {
+            DirectoryCache.getDirectoryCache();
             SplitPane lob_pane = lob_loader.load();
             lob_pane.setDividerPosition(0, 0.55);
             Scene lob_scene = new Scene(lob_pane);
