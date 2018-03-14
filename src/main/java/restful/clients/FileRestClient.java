@@ -1,6 +1,8 @@
 package restful.clients;
 
 import cache.DataCache;
+import cache.DirectoryCache;
+import cache.FileMapperCache;
 import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.MultiPart;
 import com.sun.jersey.multipart.file.FileDataBodyPart;
@@ -8,8 +10,9 @@ import com.sun.jersey.multipart.impl.MultiPartWriter;
 import com.thoughtworks.xstream.XStream;
 import fileTree.interfaces.FileNode;
 import fileTree.interfaces.Tree;
-import fileTree.interfaces.TreeDifference;
-import fileTree.classes.TreeDifferenceImpl;
+import models.classes.DownloadedContent;
+import models.classes.MappedFile;
+import models.classes.TreeDifference;
 import fileTree.classes.TreeImpl;
 import org.apache.commons.io.IOUtils;
 import org.glassfish.jersey.client.ClientConfig;
@@ -29,6 +32,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static tools.Utils.getDirectoryIdFromRelativePath;
 
@@ -165,52 +169,54 @@ public class FileRestClient extends RestClient {
     }
 
 // ---------------------------------------------------------------------------------------------------------------------
-// Rename a file on the server
-// ---------------------------------------------------------------------------------------------------------------------
-    public Collection<TreeDifference> compareClientAndServerTree(Tree iob_tree) {
-        Collection<TreeDifference> lco_differences = new ArrayList<>();
-
-        try {
-            lco_differences.add(compareTreeToServer("\\" + DirectoryNameMapper.getPrivateDirectoryName(), iob_tree, -1));
-            lco_differences.add(compareTreeToServer("\\" + DirectoryNameMapper.getPublicDirectoryName(), iob_tree, 0));
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-        return lco_differences;
-    }
-
-// ---------------------------------------------------------------------------------------------------------------------
 // Compare the Client the tree to the Server version
 // ---------------------------------------------------------------------------------------------------------------------
-    private TreeDifference compareTreeToServer(String iva_directoryName, Tree iob_tree, int iva_directoryId) throws IOException {
+    public TreeDifference compareClientAndServerTree() {
         XStream lob_xmlParser = new XStream();
-        XStream.setupDefaultSecurity(lob_xmlParser); // to be removed after 1.5
+        XStream.setupDefaultSecurity(lob_xmlParser);
+        Collection<MappedFile> lco_mappedFiles = filterFilesForComparison();
+        Collection<MappedFile> lco_mappedFilesForServer = new ArrayList<>();
+        String lva_mappedFilesAsXmlString;
+        String lva_fileDifferenceAsXml;
 
-        Class[] lar_allowedClasses = {TreeDifference.class, TreeDifferenceImpl.class};
+        Class[] lar_allowedClasses = {TreeDifference.class, MappedFile.class};
         lob_xmlParser.allowTypes(lar_allowedClasses);
 
-        Tree lob_tree = new TreeImpl(iob_tree.getRoot() + iva_directoryName);
-        File lob_rootFile = new File(iob_tree.getRoot() + iva_directoryName);
-        FileNode lob_privateNode = iob_tree.getRootNode().getChild(lob_rootFile);
-        lob_tree.addFiles(getNodeSubFiles(new HashMap<>(), lob_privateNode));
-        String lva_treeXmlString = lob_xmlParser.toXML(lob_tree);
-//        System.out.println(lva_treeXmlString);
 
-        Response lob_privateResponse = gob_webTarget.path("/auth/files/compare").queryParam("DirectoryId", iva_directoryId).request()
-                .post(Entity.entity(lva_treeXmlString, MediaType.APPLICATION_XML));
+        lco_mappedFiles.forEach(lob_mappedFile ->
+            lco_mappedFilesForServer.add(new MappedFile(
+                    lob_mappedFile.getFilePath(),
+                    lob_mappedFile.getVersion(),
+                    lob_mappedFile.getLastModified()
+            ))
+        );
 
-        String lva_xmlDifferenceString = lob_privateResponse.readEntity(String.class);
-        System.out.println(lva_xmlDifferenceString);
-        return (TreeDifference) lob_xmlParser.fromXML(lva_xmlDifferenceString);
+        lco_mappedFilesForServer.forEach(lob_mappedFile -> {
+            lob_mappedFile.setFilePath(Utils.buildRelativeFilePathForServer(lob_mappedFile.getFilePath()));
+        });
+
+        lva_mappedFilesAsXmlString = lob_xmlParser.toXML(lco_mappedFilesForServer);
+
+        Response lob_response = gob_webTarget.path("/auth/files/compare").request()
+                .post(Entity.entity(lva_mappedFilesAsXmlString, MediaType.APPLICATION_XML));
+
+
+        if (lob_response.getStatus() == 200) {
+            lva_fileDifferenceAsXml = lob_response.readEntity(String.class);
+            return (TreeDifference) lob_xmlParser.fromXML(lva_fileDifferenceAsXml);
+        }
+        return null;
     }
 
 // ---------------------------------------------------------------------------------------------------------------------
 // download a file from the server
 // ---------------------------------------------------------------------------------------------------------------------
-    public Object downloadFile(String iva_filePath) {
+    public DownloadedContent downloadFile(String iva_filePath) {
         int lva_directoryId = getDirectoryIdFromRelativePath(iva_filePath, false);
+        DownloadedContent rob_downloadedContent;
+        String lva_versionAsString;
+        int lva_version;
+        byte[] lar_fileContent;
 
         Response lob_response = gob_webTarget.path("/auth/files/download")
                 .queryParam("directoryId", lva_directoryId)
@@ -221,26 +227,59 @@ public class FileRestClient extends RestClient {
         }
 
         try {
+            lva_versionAsString = (String) lob_response.getHeaders().get("Content-Disposition").get(0);
+            lva_version = Integer.parseInt(lva_versionAsString);
+
             if (lob_response.getStatus() == 204) {
-                return 0;
+                rob_downloadedContent = new DownloadedContent(null, true, lva_version);
+            } else {
+
+                InputStream lob_inputStream = lob_response.readEntity(InputStream.class);
+                lar_fileContent = IOUtils.toByteArray(lob_inputStream);
+
+                rob_downloadedContent = new DownloadedContent(lar_fileContent, false, lva_version);
             }
 
-            InputStream lob_inputStream = lob_response.readEntity(InputStream.class);
-            return IOUtils.toByteArray(lob_inputStream);
+            return rob_downloadedContent;
         } catch (Exception ex) {
             ex.printStackTrace();
         }
         return null;
     }
 
-    private Map<File, Boolean> getNodeSubFiles(Map<File, Boolean> iob_map, FileNode iob_treeNodePinter) {
-        boolean lva_isDirectory = iob_treeNodePinter.getFile().isDirectory();
-        iob_map.put(iob_treeNodePinter.getFile(), lva_isDirectory);
+    private Collection<MappedFile> filterFilesForComparison() {
+        Collection<MappedFile> lco_mappedFiles = FileMapperCache.getFileMapperCache().getAll();
+        DirectoryCache lob_directoryCache = DirectoryCache.getDirectoryCache();
 
-        for (FileNode lob_child : iob_treeNodePinter.getChildren()) {
-            getNodeSubFiles(iob_map, lob_child);
-        }
+        return lco_mappedFiles.stream().filter(lob_mappedFile -> {
+            if (lob_mappedFile.getFilePath().toFile().equals(lob_directoryCache.getPrivateDirectory())) {
+                return false;
+            }
 
-        return iob_map;
+            if (lob_mappedFile.getFilePath().toFile().equals(lob_directoryCache.getPublicDirectory())) {
+                return false;
+            }
+
+            if (lob_mappedFile.getFilePath().toFile().equals(lob_directoryCache.getSharedDirectory())) {
+                return false;
+            }
+
+            if (lob_mappedFile.getFilePath().startsWith(lob_directoryCache.getSharedDirectory().toPath())) {
+                return (lob_mappedFile.getFilePath().getNameCount() > lob_directoryCache.getSharedDirectory().toPath().getNameCount() + 1);
+            }
+
+            return !lob_mappedFile.getFilePath().toFile().equals(lob_directoryCache.getUserDirectory());
+        }).collect(Collectors.toList());
     }
+
+//    private Map<File, Boolean> getNodeSubFiles(Map<File, Boolean> iob_map, FileNode iob_treeNodePinter) {
+//        boolean lva_isDirectory = iob_treeNodePinter.getFile().isDirectory();
+//        iob_map.put(iob_treeNodePinter.getFile(), lva_isDirectory);
+//
+//        for (FileNode lob_child : iob_treeNodePinter.getChildren()) {
+//            getNodeSubFiles(iob_map, lob_child);
+//        }
+//
+//        return iob_map;
+//    }
 }

@@ -1,5 +1,7 @@
 package fileTree.interfaces;
 
+import models.classes.TreeDifference;
+
 import java.io.File;
 import java.util.Collection;
 import java.util.Map;

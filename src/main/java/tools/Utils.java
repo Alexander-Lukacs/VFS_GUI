@@ -1,6 +1,7 @@
 package tools;
 
 import cache.DataCache;
+import cache.DirectoryCache;
 import cache.SharedDirectoryCache;
 import fileTree.classes.TreeSingleton;
 import models.classes.RestResponse;
@@ -11,6 +12,7 @@ import tools.xmlTools.DirectoryNameMapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import static restful.constants.HttpStatusCodes.*;
 
@@ -77,10 +79,41 @@ public class Utils {
             lva_sharedDirectoryName = DirectoryNameMapper.getRenamedSharedDirectoryName(lva_directoryId);
             lva_sharedDirectoryName = "\\\\" + lva_sharedDirectoryName;
             iva_filePath = iva_filePath.replaceFirst("\\\\[^\\\\]*", lva_sharedDirectoryName);
+            iva_filePath = iva_filePath.replaceFirst("^[^\\\\]*", DirectoryNameMapper.getSharedDirectoryName());
             rva_absolutePath += "\\" + iva_filePath;
         }
 
         return rva_absolutePath;
+    }
+
+    public static Path buildRelativeFilePathForServer(Path iob_path) {
+        String lva_filePath = iob_path.toString();
+        File lob_userDirectoryFile = DirectoryCache.getDirectoryCache().getUserDirectory();
+        String lva_userName = DataCache.getDataCache().get(DataCache.GC_NAME_KEY);
+        String lva_userId = DataCache.getDataCache().get(DataCache.GC_USER_ID_KEY);
+        String lva_sharedDirectoryName;
+        int lva_sharedDirectoryId;
+
+        lva_filePath = lva_filePath.replace(lob_userDirectoryFile + "\\", "");
+
+        if (lva_filePath.startsWith(DirectoryNameMapper.getPublicDirectoryName())) {
+            lva_filePath = lva_filePath.replaceFirst("^[^\\\\]*", "Public");
+        }
+
+        if (lva_filePath.startsWith(DirectoryNameMapper.getPrivateDirectoryName())) {
+            lva_filePath = lva_filePath.replaceFirst("^[^\\\\]*", lva_userName + lva_userId);
+        }
+
+        if (lva_filePath.startsWith(DirectoryNameMapper.getSharedDirectoryName())) {
+            lva_filePath = lva_filePath.replaceFirst("^[^\\\\]*\\\\", "");
+            lva_sharedDirectoryName = lva_filePath.replaceFirst("\\\\.*", "");
+            lva_sharedDirectoryId = DirectoryNameMapper.getIdOfSharedDirectory(lva_sharedDirectoryName);
+
+            lva_filePath = lva_filePath.replaceFirst("^[^\\\\]*", "");
+            lva_filePath = lva_userName + lva_userId + "_shared\\" + lva_sharedDirectoryId + lva_filePath;
+        }
+
+        return new File(lva_filePath).toPath();
     }
 
     public static String buildRelativeFilePath (File iob_file) {

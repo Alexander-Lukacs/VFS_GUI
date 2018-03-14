@@ -1,6 +1,7 @@
 package fileTree.classes;
 
 import fileTree.interfaces.*;
+import models.classes.TreeDifference;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -484,64 +485,65 @@ public class TreeImpl implements Tree {
     @Override
     public TreeDifference compareTrees(Tree iob_tree) {
         //------------------Variables----------------------------
-        TreeDifference lob_difference = new TreeDifferenceImpl();
-        Collection<File> lco_thisFiles = getAll();
-        Collection<File> lco_compareFiles = iob_tree.getAll();
-        String lva_thisRootPath;
-        String lva_treeRootPath;
-        String lva_thisFilePath;
-        String lva_treeFilePath;
-        Iterator<File> lob_treeFileIterator;
-        Iterator<File> lob_thisFileIterator;
-        File lob_treeFile;
-        File lob_thisFile;
-        //-------------------------------------------------------
-
-        try {
-            lva_thisRootPath = this.gva_rootDirectory;
-            lva_treeRootPath = iob_tree.getRoot().getCanonicalPath();
-
-            for (lob_thisFileIterator = lco_thisFiles.iterator(); lob_thisFileIterator.hasNext();) {
-                lob_thisFile = lob_thisFileIterator.next();
-                //remove everything including from the path including root to get a relative path
-                lva_thisFilePath = lob_thisFile.getCanonicalPath();
-                lva_thisFilePath = lva_thisFilePath.replace(lva_thisRootPath, "");
-                for(lob_treeFileIterator = lco_compareFiles.iterator(); lob_treeFileIterator.hasNext();) {
-                    lob_treeFile = lob_treeFileIterator.next();
-                    lva_treeFilePath = lob_treeFile.getCanonicalPath();
-                    lva_treeFilePath = lva_treeFilePath.replace(lva_treeRootPath, "");
-                    //check if the relative paths are the same
-                    if (lva_thisFilePath.equals(lva_treeFilePath)) {
-                        //check if the file on the server is newer
-                        if (lob_thisFile.lastModified() > lob_treeFile.lastModified()) {
-                            //add the file to the update list
-                            lob_difference.addFileToUpdate(lva_treeFilePath);
-                            lob_treeFileIterator.remove();
-                            lob_thisFileIterator.remove();
-                            break;
-                        }
-                    }
-                }
-            }
-
-            for (File lob_file : lco_thisFiles) {
-                lva_thisFilePath = lob_file.getCanonicalPath();
-                lva_thisFilePath = lva_thisFilePath.replace(lva_thisRootPath, "");
-                lob_difference.addFileToInsert(lva_thisFilePath);
-            }
-
-            for (File lob_file : lco_compareFiles) {
-                lva_treeFilePath = lob_file.getCanonicalPath();
-                lva_treeFilePath = lva_treeFilePath.replace(lva_treeRootPath, "");
-                lob_difference.addFileToInsert(lva_treeFilePath);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-        return lob_difference;
+//        TreeDifference lob_difference = new TreeDifferenceImpl();
+//        Collection<File> lco_thisFiles = getAll();
+//        Collection<File> lco_compareFiles = iob_tree.getAll();
+//        String lva_thisRootPath;
+//        String lva_treeRootPath;
+//        String lva_thisFilePath;
+//        String lva_treeFilePath;
+//        Iterator<File> lob_treeFileIterator;
+//        Iterator<File> lob_thisFileIterator;
+//        File lob_treeFile;
+//        File lob_thisFile;
+//        //-------------------------------------------------------
+//
+//        try {
+//            lva_thisRootPath = this.gva_rootDirectory;
+//            lva_treeRootPath = iob_tree.getRoot().getCanonicalPath();
+//
+//            for (lob_thisFileIterator = lco_thisFiles.iterator(); lob_thisFileIterator.hasNext();) {
+//                lob_thisFile = lob_thisFileIterator.next();
+//                //remove everything including from the path including root to get a relative path
+//                lva_thisFilePath = lob_thisFile.getCanonicalPath();
+//                lva_thisFilePath = lva_thisFilePath.replace(lva_thisRootPath, "");
+//                for(lob_treeFileIterator = lco_compareFiles.iterator(); lob_treeFileIterator.hasNext();) {
+//                    lob_treeFile = lob_treeFileIterator.next();
+//                    lva_treeFilePath = lob_treeFile.getCanonicalPath();
+//                    lva_treeFilePath = lva_treeFilePath.replace(lva_treeRootPath, "");
+//                    //check if the relative paths are the same
+//                    if (lva_thisFilePath.equals(lva_treeFilePath)) {
+//                        //check if the file on the server is newer
+//                        if (lob_thisFile.lastModified() > lob_treeFile.lastModified()) {
+//                            //add the file to the update list
+//                            lob_difference.addFileToUpdate(lva_treeFilePath);
+//                            lob_treeFileIterator.remove();
+//                            lob_thisFileIterator.remove();
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
+//
+//            for (File lob_file : lco_thisFiles) {
+//                lva_thisFilePath = lob_file.getCanonicalPath();
+//                lva_thisFilePath = lva_thisFilePath.replace(lva_thisRootPath, "");
+//                lob_difference.addFileToInsert(lva_thisFilePath);
+//            }
+//
+//            for (File lob_file : lco_compareFiles) {
+//                lva_treeFilePath = lob_file.getCanonicalPath();
+//                lva_treeFilePath = lva_treeFilePath.replace(lva_treeRootPath, "");
+//                lob_difference.addFileToInsert(lva_treeFilePath);
+//            }
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//
+//        return lob_difference;
+        return null;
     }
 
 //    /**
