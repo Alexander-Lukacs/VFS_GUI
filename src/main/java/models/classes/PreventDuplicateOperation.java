@@ -221,6 +221,19 @@ public class PreventDuplicateOperation {
         }
     }
 
+    @Override
+    public String toString() {
+        StringBuilder rob_string = new StringBuilder();
+        for (Map.Entry<Path, FileDuplicateValue> lob_entry : gob_map.entrySet()) {
+            rob_string.append(lob_entry.getKey())
+                    .append(" Created: ").append(lob_entry.getValue().gva_created)
+                    .append(" Deleted:" ).append(lob_entry.getValue().gva_deleted)
+                    .append(" Moved: ").append(lob_entry.getValue().gva_moved)
+                    .append(" Renamed: ").append(lob_entry.getValue().gva_renamed).append("\n");
+        }
+        return rob_string.toString();
+    }
+
     //------------------------------------------------------------------------------------------------------------------
     //
     //

@@ -67,6 +67,7 @@ public class DirectoryWatchServiceNew implements Runnable {
         File lob_scannedFile;
         boolean lva_removeEntry;
 
+        gob_listener.startScan();
         lco_scannedFiles = scan(gob_root, new HashMap<>());
 
         //create a copy of the paths that are registered
@@ -190,6 +191,8 @@ public class DirectoryWatchServiceNew implements Runnable {
             System.out.println(lob_entry.getKey());
         }
         System.out.println("----------------------------------------------------------");
+
+        gob_listener.finishedScan();
     }
 
     private void filterChildren(TreeMap iob_map) {
