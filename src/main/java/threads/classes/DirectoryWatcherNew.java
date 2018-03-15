@@ -35,8 +35,9 @@ public class DirectoryWatcherNew implements ThreadControl {
 
                 @Override
                 public void fileRenamed(File iob_File, String iva_newName) {
-//                    renameFile(iob_File, iva_newName);
+                    renameFile(iob_File, iva_newName);
                 }
+
                 @Override
                 public void fileMoved(File iob_oldFile, File iob_newFile) {
 //                    movedFile(iob_oldFile, iob_newFile);
@@ -110,7 +111,7 @@ public class DirectoryWatcherNew implements ThreadControl {
         if (lob_preventDuplicates.wasFileRenamed(iob_file.toPath())) {
             lob_preventDuplicates.removeRenamed(iob_file.toPath());
         } else {
-            System.out.println("Renamed: " + iob_file + " TO " + lva_newName);
+            ThreadManager.addCommandToFileManager(iob_file, FileManagerConstants.GC_RENAME, true, lva_newName, true);
         }
     }
 
