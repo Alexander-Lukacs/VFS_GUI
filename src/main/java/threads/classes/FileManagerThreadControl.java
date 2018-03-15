@@ -847,6 +847,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         if (lob_downloadedContent.isDirectory()) {
             lob_directory = new File(lva_newFilePath);
             this.addFileWithCommando(lob_directory, GC_ADD, false, true, true, lob_downloadedContent.getVersion());
+            PreventDuplicateOperation.getDuplicateOperationPrevention().putCreated(lob_directory.toPath());
             gco_commands.remove(iob_command);
             return;
         } else {
@@ -855,11 +856,13 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
                 lob_newFile = new File(lva_newFilePath);
                 FileUtils.writeByteArrayToFile(lob_newFile, lar_fileContent);
                 this.addFileWithCommando(lob_newFile, GC_ADD, false, false, true, lob_downloadedContent.getVersion());
+                PreventDuplicateOperation.getDuplicateOperationPrevention().putCreated(lob_newFile.toPath());
             } catch (IOException ex) {
                 System.out.println(ex.getMessage());
                 System.err.println("Command removed");
             }
         }
+
 
         gco_commands.remove(iob_command);
     }

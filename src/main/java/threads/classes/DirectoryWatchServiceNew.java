@@ -187,17 +187,13 @@ public class DirectoryWatchServiceNew implements Runnable {
             gob_listener.fileMoved(lob_movedEntry.getKey(), lob_movedEntry.getValue());
         }
 
-//        System.out.println("----------------------------------------------------------");
-//        for (Map.Entry<File, BasicFileAttributes> lob_entry : gob_registeredPaths.entrySet()) {
-//            System.out.println(lob_entry.getKey());
-//        }
-//        System.out.println("----------------------------------------------------------");
+        System.out.println("----------------------------------------------------------");
+        for (Map.Entry<File, BasicFileAttributes> lob_entry : gob_registeredPaths.entrySet()) {
+            System.out.println(lob_entry.getKey());
+        }
+        System.out.println("----------------------------------------------------------");
 
         gob_listener.finishedScan();
-    }
-
-    private void filterChildren(TreeMap iob_map) {
-
     }
 
     /**

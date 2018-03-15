@@ -48,7 +48,7 @@ public class DirectoryWatcherNew implements ThreadControl {
 
                 @Override
                 public void startScan() {
-                    System.out.println(PreventDuplicateOperation.getDuplicateOperationPrevention());
+//                    System.out.println(PreventDuplicateOperation.getDuplicateOperationPrevention());
                 }
 
                 @Override
