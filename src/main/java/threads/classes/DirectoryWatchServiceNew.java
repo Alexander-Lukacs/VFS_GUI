@@ -148,6 +148,7 @@ public class DirectoryWatchServiceNew implements Runnable {
 
             if (!lob_deleteParent.equals(lob_deletePointer)) {
                 if (lob_deletePointer.startsWith(lob_deleteParent)) {
+                    gob_registeredPaths.remove(lob_deletePointer.toFile());
                     lob_iterator.remove();
                 } else {
                     lob_deleteParent = lob_deletePointer;
@@ -170,8 +171,8 @@ public class DirectoryWatchServiceNew implements Runnable {
         }
 
         for (File lob_file : lli_deleted) {
-            gob_listener.fileDeleted(lob_file);
             gob_registeredPaths.remove(lob_file);
+            gob_listener.fileDeleted(lob_file);
         }
 
         Map.Entry<File, String> lob_currentRenamedParent = null;
