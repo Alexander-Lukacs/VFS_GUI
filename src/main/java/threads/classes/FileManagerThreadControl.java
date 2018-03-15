@@ -10,6 +10,7 @@ import javafx.application.Platform;
 import javafx.scene.control.TreeItem;
 import models.classes.*;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.comparator.PathFileComparator;
 import restful.clients.FileRestClient;
 import restful.clients.SharedDirectoryRestClient;
 import threads.constants.FileManagerConstants;
@@ -22,9 +23,11 @@ import tools.xmlTools.DirectoryNameMapper;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static models.classes.FileService.readAllFilesFromDirectory;
 import static restful.constants.HttpStatusCodes.GC_HTTP_OK;
@@ -928,10 +931,14 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
      * @param iob_command expected input in gar_information:
      *                    1. tree from the client
      */
+    @SuppressWarnings("Duplicates")
     private void compareTrees(Command iob_command) {
         FileRestClient lob_restClient = RestClientBuilder.buildFileRestClientWithAuth();
         TreeDifference lob_treeDifference;
         String lva_relativeDownloadPath;
+        List<File> lco_filesToDelete;
+        Path lob_pointer;
+        Path lob_parent = null;
 
         for (MappedFile t : FileMapperCache.getFileMapperCache().getAll()) {
             System.out.println(t.toString());
@@ -945,8 +952,33 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             return;
         }
 
-        for (String lva_relativeFilePath : lob_treeDifference.getFilesToDelete()) {
-            File lob_deleteFile = new File(Utils.convertRelativeToAbsolutePath(lva_relativeFilePath, true));
+//        for (String lva_relativeFilePath : lob_treeDifference.getFilesToDelete()) {
+//            File lob_deleteFile = new File(Utils.convertRelativeToAbsolutePath(lva_relativeFilePath, true));
+//            ThreadManager.addCommandToFileManager(lob_deleteFile, FileManagerConstants.GC_DELETE, false, true);
+//        }
+
+        lco_filesToDelete = lob_treeDifference.getFilesToDelete().stream().map(File::new).collect(Collectors.toList());
+
+        lco_filesToDelete.sort(PathFileComparator.PATH_COMPARATOR);
+
+        for (Iterator<File> lob_iterator = lco_filesToDelete.iterator(); lob_iterator.hasNext();) {
+            lob_pointer = lob_iterator.next().toPath();
+
+            if (lob_parent == null) {
+                lob_parent = lob_pointer;
+            }
+
+            if (!lob_parent.equals(lob_pointer)) {
+                if (lob_pointer.startsWith(lob_parent)) {
+                    lob_iterator.remove();
+                } else {
+                    lob_parent = lob_pointer;
+                }
+            }
+        }
+
+        for (File lob_file : lco_filesToDelete) {
+            File lob_deleteFile = new File(Utils.convertRelativeToAbsolutePath(lob_file.toString(), true));
             ThreadManager.addCommandToFileManager(lob_deleteFile, FileManagerConstants.GC_DELETE, false, true);
         }
 

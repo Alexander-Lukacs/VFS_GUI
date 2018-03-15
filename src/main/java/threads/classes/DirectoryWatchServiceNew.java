@@ -55,6 +55,7 @@ public class DirectoryWatchServiceNew implements Runnable {
         gob_registeredPaths.put(iob_file, lob_attr);
     }
 
+    @SuppressWarnings("Duplicates")
     private void scanAndCompare() throws IOException{
         HashMap<File, BasicFileAttributes> lco_scannedFiles;
         TreeMap<File, BasicFileAttributes> lco_tmp;
@@ -148,6 +149,8 @@ public class DirectoryWatchServiceNew implements Runnable {
             if (!lob_deleteParent.equals(lob_deletePointer)) {
                 if (lob_deletePointer.startsWith(lob_deleteParent)) {
                     lob_iterator.remove();
+                } else {
+                    lob_deleteParent = lob_deletePointer;
                 }
             }
 
@@ -183,6 +186,8 @@ public class DirectoryWatchServiceNew implements Runnable {
             if (lob_renamedPointer != lob_currentRenamedParent) {
                 if (lob_renamedPointer.getKey().toPath().startsWith(lob_currentRenamedParent.getKey().toPath())) {
                     lob_iterator.remove();
+                } else {
+                    lob_currentRenamedParent = lob_renamedPointer;
                 }
             }
         }
@@ -203,6 +208,8 @@ public class DirectoryWatchServiceNew implements Runnable {
             if (lob_movedPointer != lob_currentMoveParent) {
                 if (lob_movedPointer.getKey().toPath().startsWith(lob_currentMoveParent.getKey().toPath())) {
                     lob_iterator.remove();
+                } else {
+                    lob_currentMoveParent = lob_movedPointer;
                 }
             }
         }

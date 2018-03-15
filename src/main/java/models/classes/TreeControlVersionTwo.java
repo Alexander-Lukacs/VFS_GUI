@@ -270,9 +270,19 @@ public class TreeControlVersionTwo {
         initSharedDirectoryCache();
         ThreadManager.getFileManagerThread().start();
         lco_files = FileService.readAllFilesFromDirectory(DirectoryCache.getDirectoryCache().getUserDirectory());
+        MappedFile lob_mappedFile;
+        int lva_version;
 
         for (File lob_file : lco_files) {
-            ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_ADD, false, true, true, FileMapperCache.getFileMapperCache().get(lob_file.toPath()).getVersion());
+
+            lob_mappedFile = FileMapperCache.getFileMapperCache().get(lob_file.toPath());
+            if (lob_mappedFile != null) {
+                lva_version = lob_mappedFile.getVersion();
+            } else {
+                lva_version = 1;
+            }
+
+            ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_ADD, false, true, true, lva_version);
         }
         ThreadManager.addCommandToFileManager(null, FileManagerConstants.GC_COMPARE_TREE, true);
 
