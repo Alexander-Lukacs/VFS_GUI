@@ -55,7 +55,7 @@ public class DirectoryWatchServiceNew implements Runnable {
 
     private void scanAndCompare() throws IOException{
         HashMap<File, BasicFileAttributes> lco_scannedFiles;
-        HashMap<File, BasicFileAttributes> lco_tmp;
+        TreeMap<File, BasicFileAttributes> lco_tmp;
         Map.Entry<File, BasicFileAttributes> lob_scannedEntry;
         Map.Entry<File, BasicFileAttributes> lob_registeredEntry;
         List<File> lli_added;
@@ -72,7 +72,8 @@ public class DirectoryWatchServiceNew implements Runnable {
         lco_scannedFiles = scan(gob_root, new HashMap<>());
 
         //create a copy of the paths that are registered
-        lco_tmp = new HashMap<>(gob_registeredPaths);
+        lco_tmp = new TreeMap<>(gob_registeredPaths);
+
 
         for (Iterator<Map.Entry<File, BasicFileAttributes>> lob_registeredIterator = lco_tmp.entrySet().iterator(); lob_registeredIterator.hasNext();) {
             lva_removeEntry = false;
@@ -104,6 +105,7 @@ public class DirectoryWatchServiceNew implements Runnable {
                             gob_registeredPaths.remove(lob_registeredEntry.getKey());
                             gob_registeredPaths.put(lob_scannedEntry.getKey(), lob_scannedEntry.getValue());
                         }
+
                     }
 
                     //check if the file was moved
@@ -112,9 +114,9 @@ public class DirectoryWatchServiceNew implements Runnable {
 
                         if (!lob_renamedMap.containsKey(lob_registeredEntry.getKey().getParentFile())) {
                             lob_movedMap.put(lob_registeredEntry.getKey(), lob_scannedEntry.getKey());
-                            gob_registeredPaths.remove(lob_registeredEntry.getKey());
-                            gob_registeredPaths.put(lob_scannedEntry.getKey(), lob_scannedEntry.getValue());
                         }
+                        gob_registeredPaths.remove(lob_registeredEntry.getKey());
+                        gob_registeredPaths.put(lob_scannedEntry.getKey(), lob_scannedEntry.getValue());
                     }
 
                     lob_scannedIterator.remove();
