@@ -149,12 +149,7 @@ public class MainController {
 
     public void initialize() {
         gob_userCache = DataCache.getDataCache();
-//        gob_treeControl = new TreeControl(gob_userCache.get(DataCache.GC_IP_KEY),
-//                gob_userCache.get(DataCache.GC_PORT_KEY), this);
-
-        gob_treeControlVersionTwo = new TreeControlVersionTwo();
-
-//        TreeControlVersionTwo t = new TreeControlVersionTwo();
+        gob_treeControlVersionTwo = new TreeControlVersionTwo(this);
         TreeView<String> gob_treeView = TreeSingleton.getInstance().getTreeView();
         gob_vBox.getChildren().add(gob_treeView);
     }

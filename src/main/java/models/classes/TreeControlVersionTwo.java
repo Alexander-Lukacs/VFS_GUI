@@ -4,6 +4,7 @@ import builder.RestClientBuilder;
 import cache.DirectoryCache;
 import cache.FileMapperCache;
 import cache.SharedDirectoryCache;
+import controller.classes.MainController;
 import controller.classes.SharedDirectoryController;
 import fileTree.classes.TreeSingleton;
 import javafx.fxml.FXMLLoader;
@@ -36,8 +37,10 @@ import static models.constants.TreeControlVersionTwoConstants.*;
 import static tools.TreeTool.buildFileFromItem;
 
 public class TreeControlVersionTwo {
+    private final MainController gob_mainController;
 
-    public TreeControlVersionTwo() {
+    public TreeControlVersionTwo(MainController iob_mainController) {
+        this.gob_mainController = iob_mainController;
         init();
     }
 
@@ -331,6 +334,11 @@ public class TreeControlVersionTwo {
                 ThreadManager.addCommandToFileManager(lob_renamedFile, FileManagerConstants.GC_RENAME, true, event.getNewValue(), false);
             }
         });
+
+        lob_treeView.getSelectionModel().selectedItemProperty()
+                .addListener((observable, old_val, new_val) ->
+                        gob_mainController.setTypeLabel(buildFileFromItem(new_val))
+        );
     }
 
     private ContextMenu initContextMenu() {
