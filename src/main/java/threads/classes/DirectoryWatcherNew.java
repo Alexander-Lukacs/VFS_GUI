@@ -6,6 +6,7 @@ import models.interfaces.FileChangeListener;
 import models.classes.PreventDuplicateOperation;
 import threads.constants.FileManagerConstants;
 import threads.interfaces.ThreadControl;
+import tools.TreeTool;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,12 +49,12 @@ public class DirectoryWatcherNew implements ThreadControl {
 
                 @Override
                 public void startScan() {
-//                    System.out.println(PreventDuplicateOperation.getDuplicateOperationPrevention());
+                    System.out.println(PreventDuplicateOperation.getDuplicateOperationPrevention());
                 }
 
                 @Override
                 public void finishedScan() {
-                    PreventDuplicateOperation.getDuplicateOperationPrevention().clear();
+//                    PreventDuplicateOperation.getDuplicateOperationPrevention().clear();
                 }
             });
             gob_watchService.start();
@@ -77,8 +78,10 @@ public class DirectoryWatcherNew implements ThreadControl {
         if (lob_preventDuplicates.wasFileCreated(iob_file.toPath())) {
             lob_preventDuplicates.removeCreated(iob_file.toPath());
         } else {
-            System.out.println("Added: " + iob_file);
-            ThreadManager.addCommandToFileManager(iob_file, FileManagerConstants.GC_ADD, true, iob_file.isDirectory(), false, 1);
+            if (TreeTool.getTreeItem(iob_file) == null) {
+                System.out.println("Added: " + iob_file);
+                ThreadManager.addCommandToFileManager(iob_file, FileManagerConstants.GC_ADD, true, iob_file.isDirectory(), false, 1);
+            }
         }
     }
 

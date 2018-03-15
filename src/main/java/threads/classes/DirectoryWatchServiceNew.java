@@ -1,5 +1,6 @@
 package threads.classes;
 
+import models.classes.PreventDuplicateOperation;
 import models.interfaces.FileChangeListener;
 import org.apache.commons.io.comparator.PathFileComparator;
 import tools.TreeTool;
@@ -191,6 +192,7 @@ public class DirectoryWatchServiceNew implements Runnable {
         for (Map.Entry<File, File> lob_movedEntry : lob_movedMap.entrySet()) {
             gob_listener.fileMoved(lob_movedEntry.getKey(), lob_movedEntry.getValue());
         }
+        PreventDuplicateOperation.getDuplicateOperationPrevention().clear();
 
         System.out.println("----------------------------------------------------------");
         for (Map.Entry<File, BasicFileAttributes> lob_entry : gob_registeredPaths.entrySet()) {

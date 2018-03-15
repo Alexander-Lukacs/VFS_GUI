@@ -66,16 +66,17 @@ public class MainApp extends Application {
         gob_notifyThread.interrupt();
 
         try {
-            for (MappedFile lob_mappedFile : FileMapper.getAllFiles()) {
-                FileMapper.removeFile(lob_mappedFile.getFilePath().toString());
-            }
+            if (DataCache.getDataCache().get(DataCache.GC_EMAIL_KEY) != null) {
+                for (MappedFile lob_mappedFile : FileMapper.getAllFiles()) {
+                    FileMapper.removeFile(lob_mappedFile.getFilePath().toString());
+                }
 
-            for (MappedFile lob_mappedFile : FileMapperCache.getFileMapperCache().getAll()) {
-                FileMapper.addFile(lob_mappedFile);
+                for (MappedFile lob_mappedFile : FileMapperCache.getFileMapperCache().getAll()) {
+                    FileMapper.addFile(lob_mappedFile);
+                }
             }
-
         } catch (RuntimeException ignore) {
-            ignore.printStackTrace();
+
         }
 
         super.stop();

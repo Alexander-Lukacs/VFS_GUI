@@ -18,7 +18,6 @@ import tools.AlertWindows;
 import tools.TreeTool;
 import tools.Utils;
 import tools.xmlTools.DirectoryNameMapper;
-import tools.xmlTools.FileMapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -239,7 +238,6 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
 
         try {
             lva_lastModified = Files.readAttributes(iob_command.gob_file.toPath(), BasicFileAttributes.class).lastModifiedTime().toMillis();
-
             lob_mappedFile = FileMapperCache.getFileMapperCache().get(iob_command.gob_file.toPath());
 
             if (lob_mappedFile == null) {
@@ -555,8 +553,6 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         int lva_requestResult;
         File lob_oldFilePath;
         File lob_newFilePath;
-        String lva_oldRelativePath;
-        String lva_newRelativePath;
 
         if (iob_command.gob_file == null) {
             gco_commands.remove(iob_command);
@@ -572,8 +568,6 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             //get all needed information from the informationArray
             lob_oldFilePath = iob_command.gob_file;
             lob_newFilePath = getObjectFromInformationArray(iob_command, 0, File.class);
-//            lva_oldRelativePath = Utils.buildRelativeFilePath(lob_oldFilePath);
-//            lva_newRelativePath = Utils.buildRelativeFilePath(lob_newFilePath);
 
         } catch (RuntimeException ex) {
             ex.printStackTrace();
