@@ -96,9 +96,12 @@ public class DirectoryWatchServiceNew implements Runnable {
                     //check if the file was moved
                     if (!lob_registeredEntry.getKey().equals(lob_scannedEntry.getKey()) &&
                         !lob_registeredEntry.getKey().getParentFile().equals(lob_scannedEntry.getKey().getParentFile())) {
-                        lob_movedMap.put(lob_registeredEntry.getKey(), lob_scannedEntry.getKey());
-                        gob_registeredPaths.remove(lob_registeredEntry.getKey());
-                        gob_registeredPaths.put(lob_scannedEntry.getKey(), lob_scannedEntry.getValue());
+
+                        if (!lob_renamedMap.containsKey(lob_registeredEntry.getKey().getParentFile())) {
+                            lob_movedMap.put(lob_registeredEntry.getKey(), lob_scannedEntry.getKey());
+                            gob_registeredPaths.remove(lob_registeredEntry.getKey());
+                            gob_registeredPaths.put(lob_scannedEntry.getKey(), lob_scannedEntry.getValue());
+                        }
                     }
 
                     //Check if the file was renamed--------------------------------------
