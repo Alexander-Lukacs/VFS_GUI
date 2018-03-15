@@ -14,18 +14,18 @@ import java.nio.file.Path;
 /**
  * this class contains 3 DirectoryWatchServices, one for the private, public and shared directory
  */
-class MainDirectoryWatcher implements ThreadControl {
-    private DirectoryWatchService gob_watchService;
+class DirectoryWatcherOld implements ThreadControl {
+    private DirectoryWatchServiceOld gob_watchService;
     private File gob_rootFile;
     private boolean gva_isRunning = false;
 
-    MainDirectoryWatcher(File iob_files) {
+    DirectoryWatcherOld(File iob_files) {
         gob_rootFile = iob_files;
     }
 
     private void init(File iob_file) {
         try {
-            gob_watchService = new DirectoryWatchService(iob_file.toPath(), new FileChangeListener() {
+            gob_watchService = new DirectoryWatchServiceOld(iob_file.toPath(), new FileChangeListener() {
                 @Override
                 public void fileAdded(Path iob_path) {
                     addFile(iob_path);

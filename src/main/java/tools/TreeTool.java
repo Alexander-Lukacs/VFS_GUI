@@ -145,7 +145,6 @@ public class TreeTool {
 
     public static File buildFileFromItem(TreeItem iob_treeItem) {
         StringBuilder lob_path = new StringBuilder();
-
         while (iob_treeItem != null) {
             lob_path.insert(0, iob_treeItem.getValue());
             lob_path.insert(0, "\\");
@@ -156,8 +155,15 @@ public class TreeTool {
     }
     public void deleteItem(File iob_file) {
         TreeItem<String> lob_item = searchTreeItem(iob_file);
+        TreeItem<String> lob_parent;
+
         if (lob_item != null) {
-            lob_item.getParent().getChildren().remove(lob_item);
+
+            lob_parent = lob_item.getParent();
+
+            if (lob_parent != null) {
+                lob_parent.getChildren().remove(lob_item);
+            }
         }
     }
     /**

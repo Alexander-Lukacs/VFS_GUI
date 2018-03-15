@@ -271,6 +271,8 @@ public class TreeControlVersionTwo {
             ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_ADD, false, true, true, FileMapperCache.getFileMapperCache().get(lob_file.toPath()).getVersion());
         }
         ThreadManager.addCommandToFileManager(null, FileManagerConstants.GC_COMPARE_TREE, true);
+
+        ThreadManager.getDirectoryWatcherThread(DirectoryCache.getDirectoryCache().getUserDirectory()).start();
     }
 
 
@@ -350,7 +352,7 @@ public class TreeControlVersionTwo {
                     lob_treeView.getSelectionModel().getSelectedItem()
             );
             ThreadManager.addCommandToFileManager(lob_selectedFile, FileManagerConstants.GC_DELETE,
-                    true, 0);
+                    true, true);
         });
 
         lob_newDirectory = new MenuItem(GC_CONTEXT_NEW_DIRECTORY);
@@ -359,12 +361,12 @@ public class TreeControlVersionTwo {
         );
 
         lob_deleteDirectoryOnly = new MenuItem(GC_CONTEXT_DELETE_ONLY_DIR);
-//        lob_deleteDirectoryOnly.setOnAction(event -> {
-//                    File lob_file = buildFileFromItem(gob_treeView.getSelectionModel().getSelectedItem(), gob_tree);
-//                    ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_DELETE_DIR_ONLY, true);
+        lob_deleteDirectoryOnly.setOnAction(event -> {
+                    File lob_file = buildFileFromItem(lob_treeView.getSelectionModel().getSelectedItem());
+                    ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_DELETE_DIR_ONLY, true);
 //                    TreeSingleton.getInstance().getDuplicateOperationsPrevention().putDeleted(lob_file.toPath());
-//                }
-//        );
+                }
+        );
 
         lob_renameFile = new MenuItem(GC_CONTEXT_RENAME);
         lob_renameFile.setOnAction(event ->
