@@ -261,7 +261,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             }
         }
 
-        print();
+//        print();
 
         gco_commands.remove(iob_command);
     }
