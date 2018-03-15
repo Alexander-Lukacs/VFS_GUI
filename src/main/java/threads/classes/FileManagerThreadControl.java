@@ -1075,8 +1075,8 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
     }
 
     private void print() {
+        System.out.println("\n-----------------------------------------------------------------------------------");
         for (MappedFile lob_mappedFile : FileMapperCache.getFileMapperCache().getAll()) {
-            System.out.println("\n-----------------------------------------------------------------------------------");
             System.out.println(lob_mappedFile);
         }
     }
