@@ -11,7 +11,6 @@ import java.io.IOException;
 public class DirectoryWatcherNew implements ThreadControl {
     private DirectoryWatchServiceNew gob_watchService;
     private File gob_rootFile;
-    private boolean gva_isRunning = false;
     private static PreventDuplicateOperation lob_preventDuplicates = PreventDuplicateOperation.getDuplicateOperationPrevention();
 
     DirectoryWatcherNew(File iob_files) {
@@ -35,11 +34,11 @@ public class DirectoryWatcherNew implements ThreadControl {
 
                 @Override
                 public void fileRenamed(File iob_File, String iva_newName) {
-//                    renameFile(iob_path, iva_newName);
+                    renameFile(iob_File, iva_newName);
                 }
                 @Override
-                public void fileMoved(File iob_oldPath, File iob_newPath) {
-
+                public void fileMoved(File iob_oldFile, File iob_newFile) {
+                    movedFile(iob_oldFile, iob_newFile);
                 }
 
                 @Override
@@ -49,7 +48,7 @@ public class DirectoryWatcherNew implements ThreadControl {
 
                 @Override
                 public void startScan() {
-                    //on purpose empty
+
                 }
 
                 @Override
@@ -81,6 +80,7 @@ public class DirectoryWatcherNew implements ThreadControl {
     }
 
     private void movedFile(File iob_oldFile, File iob_newFile) {
+        File lob_destinationFile = new File(iob_newFile.toString().replaceFirst("[^\\\\]*$", ""));
         if (lob_preventDuplicates.wasFilesMoved(iob_oldFile.toPath())) {
             lob_preventDuplicates.removeMoved(iob_oldFile.toPath());
         } else {
@@ -88,18 +88,25 @@ public class DirectoryWatcherNew implements ThreadControl {
             if (!iob_oldFile.getName().equals(iob_newFile.getName())) {
                 System.out.println("MOVED AND RENAMED");
             }
+            ThreadManager.addCommandToFileManager(iob_oldFile, FileManagerConstants.GC_MOVE, true, lob_destinationFile, true);
+        }
+    }
+
+    private void renameFile(File iob_file, String lva_newName) {
+        if (lob_preventDuplicates.wasFileRenamed(iob_file.toPath())) {
+            lob_preventDuplicates.removeRenamed(iob_file.toPath());
+        } else {
+            System.out.println("Renamed: " + iob_file + " TO " + lva_newName);
         }
     }
 
     @Override
     public void start() {
-        gva_isRunning = true;
         init(gob_rootFile);
     }
 
     @Override
     public void stop() {
-        gva_isRunning = false;
         gob_watchService.stop();
     }
 

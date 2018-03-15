@@ -7,6 +7,7 @@ import cache.SharedDirectoryCache;
 import controller.classes.MainController;
 import controller.classes.SharedDirectoryController;
 import fileTree.classes.TreeSingleton;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
@@ -337,7 +338,7 @@ public class TreeControlVersionTwo {
 
         lob_treeView.getSelectionModel().selectedItemProperty()
                 .addListener((observable, old_val, new_val) ->
-                        gob_mainController.setTypeLabel(buildFileFromItem(new_val))
+                                Platform.runLater(() -> gob_mainController.setTypeLabel(buildFileFromItem(new_val)))
         );
     }
 
@@ -372,7 +373,6 @@ public class TreeControlVersionTwo {
         lob_deleteDirectoryOnly.setOnAction(event -> {
                     File lob_file = buildFileFromItem(lob_treeView.getSelectionModel().getSelectedItem());
                     ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_DELETE_DIR_ONLY, true);
-//                    TreeSingleton.getInstance().getDuplicateOperationsPrevention().putDeleted(lob_file.toPath());
                 }
         );
 

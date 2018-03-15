@@ -99,6 +99,8 @@ public class DirectoryWatchServiceNew implements Runnable {
 //                        lli_moveFrom.add(lob_registeredEntry.getKey());
 //                        lli_moveTo.add(lob_scannedEntry.getKey());
                         lob_movedMap.put(lob_registeredEntry.getKey(), lob_scannedEntry.getKey());
+                        gob_registeredPaths.remove(lob_registeredEntry.getKey());
+                        gob_registeredPaths.put(lob_scannedEntry.getKey(), lob_scannedEntry.getValue());
                     }
 
                     //Check if the file was renamed--------------------------------------
@@ -110,6 +112,7 @@ public class DirectoryWatchServiceNew implements Runnable {
                             lob_renamedMap.put(lob_registeredFile, lob_scannedFile.getName());
                             //the file was renamed -> remove the old path
                             gob_registeredPaths.remove(lob_registeredEntry.getKey());
+                            gob_registeredPaths.put(lob_scannedEntry.getKey(), lob_scannedEntry.getValue());
                         }
                     }
 
@@ -146,20 +149,55 @@ public class DirectoryWatchServiceNew implements Runnable {
             gob_registeredPaths.remove(lob_file);
         }
 
-//        for (Map.Entry<File, File> lob_movedEntry : lob_movedMap.entrySet()) {
-//            gob_listener.fileMoved(lob_movedEntry.getKey(), lob_movedEntry.getValue());
-//        }
-//
-//        for (Map.Entry<File, String> lob_renamedEntry : lob_renamedMap.entrySet()) {
-//            gob_listener.fileRenamed();
-//        }
+        Map.Entry<File, String> lob_currentRenamedParent = null;
+        Map.Entry<File, String> lob_renamedPointer;
+        for (Iterator<Map.Entry<File, String>> lob_iterator = lob_renamedMap.entrySet().iterator(); lob_iterator.hasNext();) {
+            lob_renamedPointer = lob_iterator.next();
 
+            if (lob_currentRenamedParent == null) {
+                lob_currentRenamedParent = lob_renamedPointer;
+            }
+
+            if (lob_renamedPointer != lob_currentRenamedParent) {
+                if (lob_renamedPointer.getKey().toPath().startsWith(lob_currentRenamedParent.getKey().toPath())) {
+                    lob_iterator.remove();
+                }
+            }
+        }
+
+        for (Map.Entry<File, String> lob_renamedEntry : lob_renamedMap.entrySet()) {
+            gob_listener.fileRenamed(lob_renamedEntry.getKey(), lob_renamedEntry.getValue());
+        }
+
+        Map.Entry<File, File> lob_currentMoveParent = null;
+        Map.Entry<File, File> lob_movedPointer;
+        for (Iterator<Map.Entry<File, File>> lob_iterator = lob_movedMap.entrySet().iterator(); lob_iterator.hasNext();) {
+            lob_movedPointer = lob_iterator.next();
+
+            if (lob_currentMoveParent == null) {
+                lob_currentMoveParent = lob_movedPointer;
+            }
+
+            if (lob_movedPointer != lob_currentMoveParent) {
+                if (lob_movedPointer.getKey().toPath().startsWith(lob_currentMoveParent.getKey().toPath())) {
+                    lob_iterator.remove();
+                }
+            }
+        }
+
+        for (Map.Entry<File, File> lob_movedEntry : lob_movedMap.entrySet()) {
+            gob_listener.fileMoved(lob_movedEntry.getKey(), lob_movedEntry.getValue());
+        }
 
         System.out.println("----------------------------------------------------------");
         for (Map.Entry<File, BasicFileAttributes> lob_entry : gob_registeredPaths.entrySet()) {
             System.out.println(lob_entry.getKey());
         }
         System.out.println("----------------------------------------------------------");
+    }
+
+    private void filterChildren(TreeMap iob_map) {
+
     }
 
     /**

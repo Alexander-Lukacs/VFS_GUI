@@ -75,7 +75,7 @@ public class MainApp extends Application {
             }
 
         } catch (RuntimeException ignore) {
-
+            ignore.printStackTrace();
         }
 
         super.stop();

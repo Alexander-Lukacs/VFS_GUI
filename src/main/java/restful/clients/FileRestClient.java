@@ -132,16 +132,22 @@ public class FileRestClient extends RestClient {
 // ---------------------------------------------------------------------------------------------------------------------
 // Move a file on the server
 // ---------------------------------------------------------------------------------------------------------------------
-    public int moveFile(String iva_relativePath, String iva_newRelativePath) {
-        int lva_sourceDirectoryId = getDirectoryIdFromRelativePath(iva_relativePath, false);
-        int lva_destinationDirectoryId = getDirectoryIdFromRelativePath(iva_newRelativePath, false);
+    public int moveFile(File iob_oldRelativeFile, File iob_newRelativeFile) {
+        String lva_oldRelativeFilePath = Utils.buildRelativeFilePath(iob_oldRelativeFile);
+        String lva_newRelativeFilePath = Utils.buildRelativeFilePath(iob_newRelativeFile);
+
+        int lva_sourceDirectoryId = getDirectoryIdFromRelativePath(lva_oldRelativeFilePath, false);
+        int lva_destinationDirectoryId = getDirectoryIdFromRelativePath(lva_newRelativeFilePath, false);
+        lva_oldRelativeFilePath = Utils.buildRelativeFilePathForServer(iob_oldRelativeFile.toPath()).toString();
+        lva_newRelativeFilePath = Utils.buildRelativeFilePathForServer(iob_newRelativeFile.toPath()).toString();
+
 
         Response lob_response = gob_webTarget.path("/auth/files/move")
-                .queryParam("path", iva_relativePath)
+                .queryParam("path", lva_oldRelativeFilePath)
                 .queryParam("sourceDirectoryId", lva_sourceDirectoryId)
                 .queryParam("destinationDirectoryId", lva_destinationDirectoryId)
                 .request()
-                .post(Entity.entity(iva_newRelativePath, MediaType.TEXT_PLAIN));
+                .post(Entity.entity(lva_newRelativeFilePath, MediaType.TEXT_PLAIN));
 
         switch (lob_response.getStatus()) {
             case 200: return 0;
