@@ -787,7 +787,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         }
 
         lob_newFile = new File(iob_command.gob_file.toString().replaceFirst("[^\\\\]*$", lva_newName));
-        if (TreeTool.isRootFile(lob_newFile) || TreeTool.isSharedDirectory(lob_newFile.toPath())) {
+        if (TreeTool.isRootFile(lob_newFile)) {
             gco_commands.remove(iob_command);
             System.out.println("Filter root file");
             return;

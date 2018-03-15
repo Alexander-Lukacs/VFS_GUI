@@ -1,9 +1,8 @@
 public abstract class TODO {
     /*
-    TODO FEATURE: Dateien müssen synchronisiert werden wenn sie auf dem pc aktualisiert werden (Höchste PRIO!!!!)
-    TODO BUG: Registrierungs bug (keine Benachrichtigung für das anlegen eines users) NICHT UMBEDINGT WICHTIG!!!!
-    TODO Feature: Shared Directory muss entsprechende Löschfunktion aufrufen wenn es über den Explorer gelöscht wird
-    TODO Feature: Shared DIrectory muss entsprechende Addfunktion aufrufen wenn es über den Explorer hinzugefügt wird
+    TODO Erledigt: aktualisieren von Dateien
+    TODO Erledigt: hinzufügen von Dateien
+    TODO Erledigt:
      */
 
     /*

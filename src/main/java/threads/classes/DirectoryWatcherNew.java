@@ -1,5 +1,7 @@
 package threads.classes;
 
+import cache.FileMapperCache;
+import models.classes.MappedFile;
 import models.interfaces.FileChangeListener;
 import models.classes.PreventDuplicateOperation;
 import threads.constants.FileManagerConstants;
@@ -22,13 +24,11 @@ public class DirectoryWatcherNew implements ThreadControl {
             gob_watchService = new DirectoryWatchServiceNew(iob_file, new FileChangeListener() {
                 @Override
                 public void fileAdded(File iob_File) {
-//                    addFile(iob_path);
                     addFile(iob_File);
                 }
 
                 @Override
                 public void fileDeleted(File iob_File) {
-//                    deleteFile(iob_path);
                     deleteFile(iob_File);
                 }
 
@@ -42,8 +42,8 @@ public class DirectoryWatcherNew implements ThreadControl {
                 }
 
                 @Override
-                public void fileUpdate(File iob_File) {
-                    System.out.println("Updated: " + iob_File);
+                public void fileUpdate(File iob_file) {
+                    updateFile(iob_file);
                 }
 
                 @Override
@@ -60,6 +60,12 @@ public class DirectoryWatcherNew implements ThreadControl {
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
+    }
+
+    private void updateFile(File iob_file) {
+        MappedFile lob_mappedFile = FileMapperCache.getFileMapperCache().get(iob_file.toPath());
+        lob_mappedFile.setVersion(lob_mappedFile.getVersion() + 1);
+        ThreadManager.addCommandToFileManager(iob_file, FileManagerConstants.GC_UPLOAD_TO_SERVER, true, false);
     }
 
     private void addFile(File iob_file) {
