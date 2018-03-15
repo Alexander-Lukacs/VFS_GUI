@@ -71,13 +71,13 @@ public class MainApp extends Application {
             }
 
             for (MappedFile lob_mappedFile : FileMapperCache.getFileMapperCache().getAll()) {
-//            FileMapper.removeFile(lob_mappedFile.getFilePath().toString());
                 FileMapper.addFile(lob_mappedFile);
             }
 
         } catch (RuntimeException ignore) {
 
         }
+
         super.stop();
     }
 }

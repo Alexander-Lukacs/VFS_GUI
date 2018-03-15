@@ -12,7 +12,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.*;
 
-class DirectoryWatchService implements Runnable{
+class DirectoryWatchServiceOld implements Runnable{
     private HashMap<Path, FileTime> gob_registeredPaths;
     private Path gob_root;
     private FileChangeListener gob_listener;
@@ -26,7 +26,7 @@ class DirectoryWatchService implements Runnable{
      * @param iob_listener call the fitting method if something happens in the registered directories
      * @throws IOException if the root is no directory or does not exist.
      */
-    DirectoryWatchService(Path iob_root, FileChangeListener iob_listener) throws IOException {
+    DirectoryWatchServiceOld(Path iob_root, FileChangeListener iob_listener) throws IOException {
         //-------------------------------Variables--------------------------------------
         Collection<Path> lco_firstScan;
         //------------------------------------------------------------------------------
@@ -167,15 +167,6 @@ class DirectoryWatchService implements Runnable{
 
         test.sort(PathFileComparator.PATH_COMPARATOR);
         filesAdded(test);
-
-//        if (!gob_isRunning) {
-//            return;
-//        }
-//        System.out.println("----------------------------------------------------------");
-//        for (Map.Entry<Path, FileTime> lob_entry : gob_registeredPaths.entrySet()) {
-//            System.out.println(lob_entry.getKey());
-//        }
-//        System.out.println("----------------------------------------------------------");
     }
 
     private void filesRenamed(ArrayList<File> ili_files, HashMap<File, File> ico_renamed) {
@@ -306,7 +297,7 @@ class DirectoryWatchService implements Runnable{
      * start the scan routine in a new ThreadControl
      */
     public void start() {
-        gob_thread = new Thread(this, DirectoryWatchService.class.getSimpleName());
+        gob_thread = new Thread(this, DirectoryWatchServiceOld.class.getSimpleName());
         gob_thread.setDaemon(true);
         gob_thread.start();
     }

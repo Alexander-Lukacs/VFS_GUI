@@ -137,7 +137,6 @@ public class MainController {
         Stage stage = ((Stage) gob_btnSettings.getScene().getWindow());
         stage.close();
 
-        gob_userCache.clearDataCache();
         lob_sharedDirectoryCache.clearDataCache();
         LoginController ob_x = new LoginController();
         try {

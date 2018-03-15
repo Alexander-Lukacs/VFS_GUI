@@ -96,6 +96,7 @@ public class FileRestClient extends RestClient {
                 .queryParam("directoryId", lva_directoryId)
                 .request()
                 .post(Entity.entity(lva_relativePath, MediaType.TEXT_PLAIN));
+        System.out.println("UPLOAD: " + iob_file.getName() + ": " + lob_response.getStatus());
         return lob_response.getStatus() == 200;
     }
 
