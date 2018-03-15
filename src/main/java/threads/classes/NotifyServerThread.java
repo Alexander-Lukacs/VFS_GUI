@@ -222,7 +222,7 @@ public class NotifyServerThread extends Thread {
      * Add new shared directory to explorer and tree view
      * @param iar_messageArray at position 0: operation
      *                         at position 1: relative file path
-     *                         at position 2: shared directory id
+     *                         at position last position: shared directory id
      *                         at position 3 ... message length: all files that the shared directory contains. The Client
      *                         needs to download the Files
      */
@@ -230,9 +230,9 @@ public class NotifyServerThread extends Thread {
         SharedDirectoryRestClient lob_restClient;
         List<SharedDirectory> lli_sharedDirectories;
         String sharedDirectoryId;
-        String[] lar_files;
+        String lva_relativeFilePath;
 
-        sharedDirectoryId = iar_messageArray[2];
+        sharedDirectoryId = iar_messageArray[iar_messageArray.length - 1];
 
         lob_restClient = RestClientBuilder.buildSharedDirectoryClientWithAuth();
         lli_sharedDirectories = lob_restClient.getAllSharedDirectoriesOfUser();
@@ -243,8 +243,12 @@ public class NotifyServerThread extends Thread {
                     DirectoryNameMapper.getRenamedSharedDirectoryName(Integer.parseInt(sharedDirectoryId));
                 } catch (IllegalArgumentException ex) {
                     Utils.createSharedDirectory(lob_tmpSharedDirectory ,1);
-                    for (String lva_filesPath : iar_messageArray) {
-                        ThreadManager.addCommandToFileManager(null, FileManagerConstants.GC_DOWNLOAD_FROM_SERVER, true, lva_filesPath);
+
+                    for (int i = 2; i < iar_messageArray.length - 1; i++) {
+                        lva_relativeFilePath = iar_messageArray[i];
+                        lva_relativeFilePath = Utils.convertRelativeToAbsolutePath(lva_relativeFilePath, true);
+                        lva_relativeFilePath = Utils.buildRelativeFilePath(new File(lva_relativeFilePath));
+                        ThreadManager.addCommandToFileManager(null, FileManagerConstants.GC_DOWNLOAD_FROM_SERVER, true, lva_relativeFilePath);
                     }
                 }
             }
