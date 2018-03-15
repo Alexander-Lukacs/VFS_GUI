@@ -12,7 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 
-public class DirectoryWatchServiceNew implements Runnable {
+public class DirectoryWatchService implements Runnable {
     private HashMap<File, BasicFileAttributes> gob_registeredPaths;
     private File gob_root;
     private FileChangeListener gob_listener;
@@ -26,7 +26,7 @@ public class DirectoryWatchServiceNew implements Runnable {
      * @param iob_listener call the fitting method if something happens in the registered directories
      * @throws IOException if the root is no directory or does not exist.
      */
-    DirectoryWatchServiceNew(File iob_root, FileChangeListener iob_listener) throws IOException {
+    DirectoryWatchService(File iob_root, FileChangeListener iob_listener) throws IOException {
         gob_root = iob_root;
         gob_listener = iob_listener;
         if (!iob_root.exists() || !iob_root.isDirectory()) {
@@ -281,7 +281,7 @@ public class DirectoryWatchServiceNew implements Runnable {
      * start the scan routine in a new ThreadControl
      */
     public void start() {
-        gob_thread = new Thread(this, DirectoryWatchServiceOld.class.getSimpleName());
+        gob_thread = new Thread(this, DirectoryWatchService.class.getSimpleName());
         gob_thread.setDaemon(true);
         gob_thread.start();
     }

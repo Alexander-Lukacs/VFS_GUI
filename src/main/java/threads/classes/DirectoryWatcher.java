@@ -11,18 +11,18 @@ import tools.TreeTool;
 import java.io.File;
 import java.io.IOException;
 
-public class DirectoryWatcherNew implements ThreadControl {
-    private DirectoryWatchServiceNew gob_watchService;
+public class DirectoryWatcher implements ThreadControl {
+    private DirectoryWatchService gob_watchService;
     private File gob_rootFile;
     private static PreventDuplicateOperation lob_preventDuplicates = PreventDuplicateOperation.getDuplicateOperationPrevention();
 
-    DirectoryWatcherNew(File iob_files) {
+    DirectoryWatcher(File iob_files) {
         gob_rootFile = iob_files;
     }
 
     private void init(File iob_file) {
         try {
-            gob_watchService = new DirectoryWatchServiceNew(iob_file, new FileChangeListener() {
+            gob_watchService = new DirectoryWatchService(iob_file, new FileChangeListener() {
                 @Override
                 public void fileAdded(File iob_File) {
                     addFile(iob_File);

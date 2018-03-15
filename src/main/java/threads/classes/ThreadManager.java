@@ -7,7 +7,7 @@ import threads.interfaces.ThreadControl;
 import java.io.File;
 
 public class ThreadManager {
-    private static DirectoryWatcherNew gob_directoryWatcherInstance;
+    private static DirectoryWatcher gob_directoryWatcherInstance;
     private static FileManagerThreadControl gob_fileManagerInstance;
     private static DirectoryCounterThread gob_directoryCounterInstance;
 
@@ -18,7 +18,7 @@ public class ThreadManager {
      */
     public static ThreadControl getDirectoryWatcherThread(File iob_files) {
         if (gob_directoryWatcherInstance == null) {
-            gob_directoryWatcherInstance = new DirectoryWatcherNew(iob_files);
+            gob_directoryWatcherInstance = new DirectoryWatcher(iob_files);
         }
         return gob_directoryWatcherInstance;
     }

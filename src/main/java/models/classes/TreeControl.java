@@ -36,10 +36,10 @@ import static controller.constants.ApplicationConstants.GC_APPLICATION_ICON_PATH
 import static models.constants.TreeControlVersionTwoConstants.*;
 import static tools.TreeTool.buildFileFromItem;
 
-public class TreeControlVersionTwo {
+public class TreeControl {
     private final MainController gob_mainController;
 
-    public TreeControlVersionTwo(MainController iob_mainController) {
+    public TreeControl(MainController iob_mainController) {
         this.gob_mainController = iob_mainController;
         init();
     }
@@ -290,33 +290,13 @@ public class TreeControlVersionTwo {
 
 
     private void initFileMapperCache() {
-//        Collection<File> lco_files = readAllFilesFromDirectory(DirectoryCache.getDirectoryCache().getUserDirectory());
-//        MappedFile lob_mappedFile;
-//        long lva_lastModified;
         FileMapperCache lob_fileMapperCache = FileMapperCache.getFileMapperCache();
 
-        for (MappedFile lob_mappedFile2 : FileMapper.getAllFiles()) {
-            lob_fileMapperCache.put(lob_mappedFile2);
+        for (MappedFile lob_mappedFile : FileMapper.getAllFiles()) {
+            if (lob_mappedFile.getFilePath().toFile().exists()) {
+                lob_fileMapperCache.put(lob_mappedFile);
+            }
         }
-
-//        for (File lob_file : lco_files) {
-//            lob_mappedFile = FileMapper.getFile(lob_file.toPath().toString());
-//            try {
-//                lva_lastModified = Files.readAttributes(lob_file.toPath(), BasicFileAttributes.class).lastModifiedTime().toMillis();
-//                if (lob_mappedFile.getFilePath() == null) {
-//                    lob_mappedFile = new MappedFile(lob_file.toPath(), 1, lva_lastModified);
-//                    lob_fileMapperCache.put(lob_mappedFile);
-//                } else {
-//                    if (lob_mappedFile.getLastModified() < lva_lastModified) {
-//                        lob_mappedFile.setLastModified(lva_lastModified);
-//                        lob_mappedFile.setVersion(lob_mappedFile.getVersion() + 1);
-//                    }
-//                    lob_fileMapperCache.put(lob_mappedFile);
-//                }
-//            } catch (IOException ignore) {
-//
-//            }
-//        }
     }
 
     private void initTreeView() {
@@ -385,7 +365,7 @@ public class TreeControlVersionTwo {
         lob_deleteDirectoryOnly = new MenuItem(GC_CONTEXT_DELETE_ONLY_DIR);
         lob_deleteDirectoryOnly.setOnAction(event -> {
                     File lob_file = buildFileFromItem(lob_treeView.getSelectionModel().getSelectedItem());
-                    ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_DELETE_DIR_ONLY, true);
+                    ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_DELETE_DIR_ONLY, false);
                 }
         );
 

@@ -591,6 +591,8 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
     private void deleteLocalDirectory(Command iob_command) {
         TreeItem<String> lob_item;
         TreeItem<String> lob_parent;
+        File lob_parentFile;
+        Collection<File> lco_files;
 
         if (iob_command.gob_file == null) {
             gco_commands.remove(iob_command);
@@ -624,13 +626,38 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             }
         }
 
-        Platform.runLater(() ->
-            lob_parent.getChildren().addAll(lob_item.getChildren())
-        );
+        lob_parentFile = iob_command.gob_file.getParentFile();
+        for (File lob_file : Objects.requireNonNull(iob_command.gob_file.listFiles())) {
+            addFileWithCommando(lob_file, GC_MOVE, true, lob_parentFile, true);
+        }
 
-        Platform.runLater(() ->
-            lob_parent.getChildren().remove(lob_item)
-        );
+        lco_files = readAllFilesFromDirectory(iob_command.gob_file);
+
+        for (File lob_file : lco_files) {
+            PreventDuplicateOperation.getDuplicateOperationPrevention().putMoved(lob_file.toPath());
+        }
+
+        try {
+            for (File lob_file : Objects.requireNonNull(iob_command.gob_file.listFiles())) {
+                if (lob_file.isDirectory()) {
+                    FileUtils.moveDirectoryToDirectory(lob_file, lob_parentFile, false);
+                } else {
+                    FileUtils.moveFileToDirectory(lob_file, lob_parentFile, false);
+                }
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        addFileWithCommando(iob_command.gob_file, GC_DELETE, true, true);
+
+//        Platform.runLater(() ->
+//            lob_parent.getChildren().addAll(lob_item.getChildren())
+//        );
+//
+//        Platform.runLater(() ->
+//            lob_parent.getChildren().remove(lob_item)
+//        );
 
         gco_commands.remove(iob_command);
     }
@@ -1027,36 +1054,6 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             throw new RuntimeException();
         }
     }
-
-//    private void addFiles(TreeDifference iob_difference, int iva_loopIndex) {
-//        for (String lva_addFile : iob_difference.getFilesToInsert()) {
-//            if (iva_loopIndex == 0) {
-//                lva_addFile = DirectoryNameMapper.getPrivateDirectoryName() + lva_addFile;
-//            }
-//
-//            if (iva_loopIndex == 1) {
-//                lva_addFile = DirectoryNameMapper.getPublicDirectoryName() + lva_addFile;
-//            }
-//
-//            this.addFileWithCommando(null, GC_DOWNLOAD_FROM_SERVER, true, lva_addFile);
-//        }
-//    }
-//
-//    private void deleteFiles(TreeDifference iob_difference, Tree iob_tree, int iva_loopIndex) {
-//        for (String lva_deleteFile : iob_difference.getFilesToDelete()) {
-//            if (iva_loopIndex == 0) {
-//                lva_deleteFile = iob_tree.getRoot().getAbsolutePath() + "\\" + DirectoryNameMapper.getPrivateDirectoryName() + lva_deleteFile;
-//            }
-//
-//            if (iva_loopIndex == 1) {
-//                lva_deleteFile = iob_tree.getRoot().getAbsolutePath() + "\\" + DirectoryNameMapper.getPublicDirectoryName() + lva_deleteFile;
-//
-//            }
-//            File lob_file = new File(lva_deleteFile);
-//            iob_tree.deleteFile(lva_deleteFile);
-//            TreeTool.getInstance().deleteItem(lob_file);
-//        }
-//    }
 
     /**
      * When an object implementing interface <code>Runnable</code> is used

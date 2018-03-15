@@ -2,9 +2,7 @@ package controller.classes;
 
 import builder.RestClientBuilder;
 import cache.DataCache;
-import cache.DirectoryCache;
 import cache.SharedDirectoryCache;
-import fileTree.classes.TreeControl;
 import fileTree.classes.TreeSingleton;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -18,7 +16,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import models.classes.TreeControlVersionTwo;
+import models.classes.TreeControl;
 import org.apache.commons.io.FileUtils;
 import restful.clients.RestClient;
 import threads.classes.DirectoryCounterThread;
@@ -65,7 +63,7 @@ public class MainController {
 
     private DataCache gob_userCache;
     private TreeControl gob_treeControl;
-    private TreeControlVersionTwo gob_treeControlVersionTwo;
+    private TreeControl gob_treeControlVersionTwo;
     private MainController gob_mainController;
 
     public void initMainControllerData(MainController iob_mainController) {
@@ -149,7 +147,7 @@ public class MainController {
 
     public void initialize() {
         gob_userCache = DataCache.getDataCache();
-        gob_treeControlVersionTwo = new TreeControlVersionTwo(this);
+        gob_treeControlVersionTwo = new TreeControl(this);
         TreeView<String> gob_treeView = TreeSingleton.getInstance().getTreeView();
         gob_vBox.getChildren().add(gob_treeView);
     }
