@@ -8,6 +8,7 @@ import tools.TreeTool;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 
@@ -134,6 +135,23 @@ public class DirectoryWatchServiceNew implements Runnable {
 
         lli_deleted = new ArrayList<>(lco_tmp.keySet());
         lli_deleted.sort(PathFileComparator.PATH_COMPARATOR);
+
+        Path lob_deletePointer;
+        Path lob_deleteParent = null;
+        for (Iterator<File> lob_iterator = lli_deleted.iterator(); lob_iterator.hasNext();) {
+            lob_deletePointer = lob_iterator.next().toPath();
+
+            if (lob_deleteParent == null) {
+                lob_deleteParent = lob_deletePointer;
+            }
+
+            if (!lob_deleteParent.equals(lob_deletePointer)) {
+                if (lob_deletePointer.startsWith(lob_deleteParent)) {
+                    lob_iterator.remove();
+                }
+            }
+
+        }
 
         lli_updated.sort(PathFileComparator.PATH_COMPARATOR);
 

@@ -35,21 +35,21 @@ public class DirectoryWatcherNew implements ThreadControl {
 
                 @Override
                 public void fileRenamed(File iob_File, String iva_newName) {
-                    renameFile(iob_File, iva_newName);
+//                    renameFile(iob_File, iva_newName);
                 }
                 @Override
                 public void fileMoved(File iob_oldFile, File iob_newFile) {
-                    movedFile(iob_oldFile, iob_newFile);
+//                    movedFile(iob_oldFile, iob_newFile);
                 }
 
                 @Override
                 public void fileUpdate(File iob_file) {
-                    updateFile(iob_file);
+//                    updateFile(iob_file);
                 }
 
                 @Override
                 public void startScan() {
-                    System.out.println(PreventDuplicateOperation.getDuplicateOperationPrevention());
+//                    System.out.println(PreventDuplicateOperation.getDuplicateOperationPrevention());
                 }
 
                 @Override
@@ -89,7 +89,7 @@ public class DirectoryWatcherNew implements ThreadControl {
         if (lob_preventDuplicates.wasFileDeleted(iob_file.toPath())) {
             lob_preventDuplicates.removeDeleted(iob_file.toPath());
         } else {
-            System.out.println("Deleted: " + iob_file);
+            ThreadManager.addCommandToFileManager(iob_file, FileManagerConstants.GC_DELETE, true, true);
         }
     }
 

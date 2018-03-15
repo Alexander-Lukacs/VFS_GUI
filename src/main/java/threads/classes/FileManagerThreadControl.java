@@ -247,7 +247,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
                 lob_mappedFile.setVersion(lva_version);
                 lob_mappedFile.setLastModified(lva_lastModified);
             }
-
+            System.out.println(lob_mappedFile);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -258,6 +258,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
                 return;
             }
         }
+
 
 //        print();
 
@@ -379,12 +380,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
                 FileMapperCache.getFileMapperCache().remove(lob_file.toPath());
             }
         } else {
-            //TODO Funktioniert so nicht, muss überarbeitet werden
-            for (MappedFile lob_mappedCacheFile : FileMapperCache.getFileMapperCache().getAll()) {
-                if (lob_mappedCacheFile.getFilePath().startsWith(iob_command.gob_file.toPath())) {
-                    FileMapperCache.getFileMapperCache().remove(lob_mappedCacheFile.getFilePath());
-                }
-            }
+            FileMapperCache.getFileMapperCache().remove(iob_command.gob_file.toPath());
         }
 
         lva_relativeFilePath = Utils.buildRelativeFilePath(iob_command.gob_file);
@@ -1069,12 +1065,5 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         private File gob_file;
         private String gva_command;
         private int gva_maxTries;
-    }
-
-    private void print() {
-        System.out.println("\n-----------------------------------------------------------------------------------");
-        for (MappedFile lob_mappedFile : FileMapperCache.getFileMapperCache().getAll()) {
-            System.out.println(lob_mappedFile);
-        }
     }
 }

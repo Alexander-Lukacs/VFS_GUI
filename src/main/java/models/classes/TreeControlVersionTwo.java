@@ -281,29 +281,33 @@ public class TreeControlVersionTwo {
 
 
     private void initFileMapperCache() {
-        Collection<File> lco_files = readAllFilesFromDirectory(DirectoryCache.getDirectoryCache().getUserDirectory());
-        MappedFile lob_mappedFile;
-        long lva_lastModified;
+//        Collection<File> lco_files = readAllFilesFromDirectory(DirectoryCache.getDirectoryCache().getUserDirectory());
+//        MappedFile lob_mappedFile;
+//        long lva_lastModified;
         FileMapperCache lob_fileMapperCache = FileMapperCache.getFileMapperCache();
 
-        for (File lob_file : lco_files) {
-            lob_mappedFile = FileMapper.getFile(lob_file.toPath().toString());
-            try {
-                lva_lastModified = Files.readAttributes(lob_file.toPath(), BasicFileAttributes.class).lastModifiedTime().toMillis();
-                if (lob_mappedFile.getFilePath() == null) {
-                    lob_mappedFile = new MappedFile(lob_file.toPath(), 1, lva_lastModified);
-                    lob_fileMapperCache.put(lob_mappedFile);
-                } else {
-                    if (lob_mappedFile.getLastModified() < lva_lastModified) {
-                        lob_mappedFile.setLastModified(lva_lastModified);
-                        lob_mappedFile.setVersion(lob_mappedFile.getVersion() + 1);
-                    }
-                    lob_fileMapperCache.put(lob_mappedFile);
-                }
-            } catch (IOException ignore) {
-
-            }
+        for (MappedFile lob_mappedFile2 : FileMapper.getAllFiles()) {
+            lob_fileMapperCache.put(lob_mappedFile2);
         }
+
+//        for (File lob_file : lco_files) {
+//            lob_mappedFile = FileMapper.getFile(lob_file.toPath().toString());
+//            try {
+//                lva_lastModified = Files.readAttributes(lob_file.toPath(), BasicFileAttributes.class).lastModifiedTime().toMillis();
+//                if (lob_mappedFile.getFilePath() == null) {
+//                    lob_mappedFile = new MappedFile(lob_file.toPath(), 1, lva_lastModified);
+//                    lob_fileMapperCache.put(lob_mappedFile);
+//                } else {
+//                    if (lob_mappedFile.getLastModified() < lva_lastModified) {
+//                        lob_mappedFile.setLastModified(lva_lastModified);
+//                        lob_mappedFile.setVersion(lob_mappedFile.getVersion() + 1);
+//                    }
+//                    lob_fileMapperCache.put(lob_mappedFile);
+//                }
+//            } catch (IOException ignore) {
+//
+//            }
+//        }
     }
 
     private void initTreeView() {

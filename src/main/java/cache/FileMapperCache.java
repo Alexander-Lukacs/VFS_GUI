@@ -5,6 +5,7 @@ import models.classes.MappedFile;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class FileMapperCache {
@@ -43,5 +44,15 @@ public class FileMapperCache {
         gob_fileMapperCacheMap.remove(iob_oldPath);
         iob_mappedFile.setFilePath(iob_newPath);
         gob_fileMapperCacheMap.put(iob_newPath, iob_mappedFile);
+    }
+
+    public void removeFileAndChildren(Path iob_path) {
+        Path lob_path;
+        for (Iterator<Map.Entry<Path, MappedFile>> lob_iterator = gob_fileMapperCacheMap.entrySet().iterator(); lob_iterator.hasNext();) {
+            lob_path = lob_iterator.next().getKey();
+            if (lob_path.startsWith(iob_path)) {
+                lob_iterator.remove();
+            }
+        }
     }
 }
