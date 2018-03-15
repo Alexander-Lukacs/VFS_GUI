@@ -63,9 +63,14 @@ public class DirectoryWatcherNew implements ThreadControl {
     }
 
     private void updateFile(File iob_file) {
-        MappedFile lob_mappedFile = FileMapperCache.getFileMapperCache().get(iob_file.toPath());
-        lob_mappedFile.setVersion(lob_mappedFile.getVersion() + 1);
-        ThreadManager.addCommandToFileManager(iob_file, FileManagerConstants.GC_UPLOAD_TO_SERVER, true, false);
+        if (lob_preventDuplicates.wasFileCreated(iob_file.toPath())) {
+            lob_preventDuplicates.removeCreated(iob_file.toPath());
+        } else {
+            MappedFile lob_mappedFile = FileMapperCache.getFileMapperCache().get(iob_file.toPath());
+            lob_mappedFile.setVersion(lob_mappedFile.getVersion() + 1);
+            ThreadManager.addCommandToFileManager(iob_file, FileManagerConstants.GC_UPLOAD_TO_SERVER, true, false);
+
+        }
     }
 
     private void addFile(File iob_file) {
