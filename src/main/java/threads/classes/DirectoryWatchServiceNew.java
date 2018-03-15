@@ -2,6 +2,7 @@ package threads.classes;
 
 import models.interfaces.FileChangeListener;
 import org.apache.commons.io.comparator.PathFileComparator;
+import tools.TreeTool;
 
 import java.io.File;
 import java.io.IOException;
@@ -186,11 +187,11 @@ public class DirectoryWatchServiceNew implements Runnable {
             gob_listener.fileMoved(lob_movedEntry.getKey(), lob_movedEntry.getValue());
         }
 
-        System.out.println("----------------------------------------------------------");
-        for (Map.Entry<File, BasicFileAttributes> lob_entry : gob_registeredPaths.entrySet()) {
-            System.out.println(lob_entry.getKey());
-        }
-        System.out.println("----------------------------------------------------------");
+//        System.out.println("----------------------------------------------------------");
+//        for (Map.Entry<File, BasicFileAttributes> lob_entry : gob_registeredPaths.entrySet()) {
+//            System.out.println(lob_entry.getKey());
+//        }
+//        System.out.println("----------------------------------------------------------");
 
         gob_listener.finishedScan();
     }
@@ -207,6 +208,9 @@ public class DirectoryWatchServiceNew implements Runnable {
      */
     private HashMap<File, BasicFileAttributes> scan(File iob_file, HashMap<File, BasicFileAttributes> ico_files) throws IOException {
         BasicFileAttributes attr = Files.readAttributes(iob_file.toPath(), BasicFileAttributes.class);
+        if (TreeTool.filterRootFiles(iob_file.toPath()) && !iob_file.equals(gob_root)) {
+            return ico_files;
+        }
         ico_files.put(iob_file, attr);
         File[] lar_children = iob_file.listFiles();
         if (lar_children != null) {

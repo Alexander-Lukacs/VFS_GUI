@@ -261,6 +261,8 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             }
         }
 
+        print();
+
         gco_commands.remove(iob_command);
     }
 
@@ -1070,5 +1072,12 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         private File gob_file;
         private String gva_command;
         private int gva_maxTries;
+    }
+
+    private void print() {
+        for (MappedFile lob_mappedFile : FileMapperCache.getFileMapperCache().getAll()) {
+            System.out.println("\n-----------------------------------------------------------------------------------");
+            System.out.println(lob_mappedFile);
+        }
     }
 }
