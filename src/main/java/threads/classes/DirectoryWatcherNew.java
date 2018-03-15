@@ -45,7 +45,7 @@ public class DirectoryWatcherNew implements ThreadControl {
 
                 @Override
                 public void fileUpdate(File iob_file) {
-//                    updateFile(iob_file);
+                    updateFile(iob_file);
                 }
 
                 @Override

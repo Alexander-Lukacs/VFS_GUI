@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Objects;
 
 import static controller.constants.ApplicationConstants.GC_APPLICATION_ICON_PATH;
-import static models.classes.FileService.readAllFilesFromDirectory;
 import static models.constants.TreeControlVersionTwoConstants.*;
 import static tools.TreeTool.buildFileFromItem;
 
