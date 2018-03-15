@@ -244,7 +244,7 @@ public class NotifyServerThread extends Thread {
                 } catch (IllegalArgumentException ex) {
                     Utils.createSharedDirectory(lob_tmpSharedDirectory ,1);
 
-                    for (int i = 2; i < iar_messageArray.length - 1; i++) {
+                    for (int i = 2; i <= iar_messageArray.length - 2; i++) {
                         lva_relativeFilePath = iar_messageArray[i];
                         lva_relativeFilePath = Utils.convertRelativeToAbsolutePath(lva_relativeFilePath, true);
                         lva_relativeFilePath = Utils.buildRelativeFilePath(new File(lva_relativeFilePath));
