@@ -40,7 +40,7 @@ public class DirectoryWatcherNew implements ThreadControl {
 
                 @Override
                 public void fileMoved(File iob_oldFile, File iob_newFile) {
-//                    movedFile(iob_oldFile, iob_newFile);
+                    movedFile(iob_oldFile, iob_newFile);
                 }
 
                 @Override
@@ -99,11 +99,14 @@ public class DirectoryWatcherNew implements ThreadControl {
         if (lob_preventDuplicates.wasFilesMoved(iob_oldFile.toPath())) {
             lob_preventDuplicates.removeMoved(iob_oldFile.toPath());
         } else {
-            System.out.println("Moved: " + iob_oldFile + " TO " + iob_newFile);
-            if (!iob_oldFile.getName().equals(iob_newFile.getName())) {
-                System.out.println("MOVED AND RENAMED");
-            }
-            ThreadManager.addCommandToFileManager(iob_oldFile, FileManagerConstants.GC_MOVE, true, lob_destinationFile, true);
+//            System.out.println("Moved: " + iob_oldFile + " TO " + iob_newFile);
+//            if (!iob_oldFile.getName().equals(iob_newFile.getName())) {
+//                System.out.println("MOVED AND RENAMED");
+//                ThreadManager.addCommandToFileManager(iob_oldFile, FileManagerConstants.GC_RENAME, true, iob_newFile.getName());
+//            } else {
+                ThreadManager.addCommandToFileManager(iob_oldFile, FileManagerConstants.GC_MOVE, true, lob_destinationFile, true);
+//            }
+
         }
     }
 

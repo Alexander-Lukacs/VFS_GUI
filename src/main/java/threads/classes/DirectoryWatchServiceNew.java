@@ -94,7 +94,9 @@ public class DirectoryWatchServiceNew implements Runnable {
                     if (lob_registeredEntry.getValue().lastModifiedTime().compareTo(lob_scannedEntry.getValue().lastModifiedTime()) < 0) {
                         lli_updated.add(lob_scannedEntry.getKey());
                         //update the registered value
-                        gob_registeredPaths.put(lob_registeredEntry.getKey(), lob_scannedEntry.getValue());
+                        gob_registeredPaths.replace(lob_registeredEntry.getKey(), lob_scannedEntry.getValue());
+                        lob_scannedEntry.getValue().fileKey();
+//                        gob_registeredPaths.put(lob_registeredEntry.getKey(), lob_scannedEntry.getValue());
                     }
 
                     //Check if the file was renamed--------------------------------------
@@ -108,7 +110,6 @@ public class DirectoryWatchServiceNew implements Runnable {
                             gob_registeredPaths.remove(lob_registeredEntry.getKey());
                             gob_registeredPaths.put(lob_scannedEntry.getKey(), lob_scannedEntry.getValue());
                         }
-
                     }
 
                     //check if the file was moved
