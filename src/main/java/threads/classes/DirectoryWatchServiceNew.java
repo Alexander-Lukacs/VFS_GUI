@@ -93,17 +93,6 @@ public class DirectoryWatchServiceNew implements Runnable {
                         gob_registeredPaths.put(lob_registeredEntry.getKey(), lob_scannedEntry.getValue());
                     }
 
-                    //check if the file was moved
-                    if (!lob_registeredEntry.getKey().equals(lob_scannedEntry.getKey()) &&
-                        !lob_registeredEntry.getKey().getParentFile().equals(lob_scannedEntry.getKey().getParentFile())) {
-
-                        if (!lob_renamedMap.containsKey(lob_registeredEntry.getKey().getParentFile())) {
-                            lob_movedMap.put(lob_registeredEntry.getKey(), lob_scannedEntry.getKey());
-                            gob_registeredPaths.remove(lob_registeredEntry.getKey());
-                            gob_registeredPaths.put(lob_scannedEntry.getKey(), lob_scannedEntry.getValue());
-                        }
-                    }
-
                     //Check if the file was renamed--------------------------------------
                     lob_scannedFile = lob_scannedEntry.getKey();
                     lob_registeredFile = lob_registeredEntry.getKey();
@@ -112,6 +101,17 @@ public class DirectoryWatchServiceNew implements Runnable {
                         if (!lob_scannedFile.getName().equals(lob_registeredFile.getName())) {
                             lob_renamedMap.put(lob_registeredFile, lob_scannedFile.getName());
                             //the file was renamed -> remove the old path
+                            gob_registeredPaths.remove(lob_registeredEntry.getKey());
+                            gob_registeredPaths.put(lob_scannedEntry.getKey(), lob_scannedEntry.getValue());
+                        }
+                    }
+
+                    //check if the file was moved
+                    if (!lob_registeredEntry.getKey().equals(lob_scannedEntry.getKey()) &&
+                            !lob_registeredEntry.getKey().getParentFile().equals(lob_scannedEntry.getKey().getParentFile())) {
+
+                        if (!lob_renamedMap.containsKey(lob_registeredEntry.getKey().getParentFile())) {
+                            lob_movedMap.put(lob_registeredEntry.getKey(), lob_scannedEntry.getKey());
                             gob_registeredPaths.remove(lob_registeredEntry.getKey());
                             gob_registeredPaths.put(lob_scannedEntry.getKey(), lob_scannedEntry.getValue());
                         }
