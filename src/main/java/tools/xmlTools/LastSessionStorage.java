@@ -8,7 +8,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -17,7 +17,7 @@ import static tools.constants.LastSessionConstants.*;
 /**
  * Created by Mesut on 09.02.2018.
  */
-public class LastSessionStorage {
+public abstract class LastSessionStorage {
     private static final String GC_FILE_NAME = "properties.xml";
 
     public static String getIp() {
@@ -122,7 +122,7 @@ public class LastSessionStorage {
             lob_xmlOutput.setFormat(Format.getPrettyFormat());
 
             lva_xmlFilePath = getXmlFilePath(GC_FILE_NAME);
-            lob_xmlOutput.output(lob_doc, new FileWriter(lva_xmlFilePath));
+            lob_xmlOutput.output(lob_doc, new FileOutputStream(lva_xmlFilePath));
 
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -175,7 +175,7 @@ public class LastSessionStorage {
             XMLOutputter xmlOutput = new XMLOutputter();
 
             xmlOutput.setFormat(Format.getPrettyFormat());
-            xmlOutput.output(lob_doc, new FileWriter(getXmlFilePath(iva_fileName)));
+            xmlOutput.output(lob_doc, new FileOutputStream(getXmlFilePath(iva_fileName)));
 
         } catch (JDOMException | IOException ex) {
             ex.printStackTrace();

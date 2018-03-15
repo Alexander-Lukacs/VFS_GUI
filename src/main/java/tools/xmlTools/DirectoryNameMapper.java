@@ -10,7 +10,7 @@ import org.jdom2.output.XMLOutputter;
 import tools.Utils;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Iterator;
@@ -18,7 +18,7 @@ import java.util.List;
 
 import static tools.constants.DirectoryNameMapperConstants.*;
 
-public class DirectoryNameMapper {
+public abstract class DirectoryNameMapper {
     private static final String GC_FILE_NAME = "mapping.xml";
 
     private static void createXmlFile() {
@@ -75,7 +75,7 @@ public class DirectoryNameMapper {
             Files.setAttribute(lob_file.toPath(), "dos:hidden", true);
 
             lva_xmlFilePath = getXmlFilePath();
-            lob_xmlOutput.output(lob_doc, new FileWriter(lva_xmlFilePath));
+            lob_xmlOutput.output(lob_doc, new FileOutputStream(lva_xmlFilePath));
 
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -193,7 +193,7 @@ public class DirectoryNameMapper {
             lob_xmlOutput.setFormat(Format.getPrettyFormat());
 
             lva_xmlFilePath = getXmlFilePath();
-            lob_xmlOutput.output(lob_doc, new FileWriter(lva_xmlFilePath));
+            lob_xmlOutput.output(lob_doc, new FileOutputStream(lva_xmlFilePath));
 
         } catch (IOException | JDOMException ex) {
             ex.printStackTrace();
@@ -233,7 +233,7 @@ public class DirectoryNameMapper {
             lob_xmlOutput.setFormat(Format.getPrettyFormat());
 
             lva_xmlFilePath = getXmlFilePath();
-            lob_xmlOutput.output(lob_doc, new FileWriter(lva_xmlFilePath));
+            lob_xmlOutput.output(lob_doc, new FileOutputStream(lva_xmlFilePath));
 
         } catch (IOException | JDOMException ex) {
             ex.printStackTrace();
@@ -273,7 +273,7 @@ public class DirectoryNameMapper {
             XMLOutputter xmlOutput = new XMLOutputter();
 
             xmlOutput.setFormat(Format.getPrettyFormat());
-            xmlOutput.output(lob_doc, new FileWriter(getXmlFilePath()));
+            xmlOutput.output(lob_doc, new FileOutputStream(getXmlFilePath()));
 
         } catch (JDOMException | IOException ex) {
             ex.printStackTrace();
@@ -403,7 +403,7 @@ public class DirectoryNameMapper {
             XMLOutputter xmlOutput = new XMLOutputter();
 
             xmlOutput.setFormat(Format.getPrettyFormat());
-            xmlOutput.output(lob_doc, new FileWriter(getXmlFilePath()));
+            xmlOutput.output(lob_doc, new FileOutputStream(getXmlFilePath()));
 
         } catch (JDOMException | IOException ex) {
             ex.printStackTrace();
