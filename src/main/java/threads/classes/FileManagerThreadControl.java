@@ -383,7 +383,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
                 FileMapperCache.getFileMapperCache().remove(lob_file.toPath());
             }
         } else {
-            FileMapperCache.getFileMapperCache().remove(iob_command.gob_file.toPath());
+            FileMapperCache.getFileMapperCache().removeFileAndChildren(iob_command.gob_file.toPath());
         }
 
         lva_relativeFilePath = Utils.buildRelativeFilePath(iob_command.gob_file);

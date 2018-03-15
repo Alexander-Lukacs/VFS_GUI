@@ -1,6 +1,7 @@
 package cache;
 
 import models.classes.MappedFile;
+import models.classes.PreventDuplicateOperation;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -51,6 +52,7 @@ public class FileMapperCache {
         for (Iterator<Map.Entry<Path, MappedFile>> lob_iterator = gob_fileMapperCacheMap.entrySet().iterator(); lob_iterator.hasNext();) {
             lob_path = lob_iterator.next().getKey();
             if (lob_path.startsWith(iob_path)) {
+                PreventDuplicateOperation.getDuplicateOperationPrevention().putDeleted(lob_path);
                 lob_iterator.remove();
             }
         }
