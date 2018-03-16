@@ -107,6 +107,7 @@ public class DirectoryWatcher implements ThreadControl {
         if (lob_preventDuplicates.wasFileRenamed(iob_file.toPath())) {
             lob_preventDuplicates.removeRenamed(iob_file.toPath());
         } else {
+            System.out.println("WATCHER: RENAME");
             ThreadManager.addCommandToFileManager(iob_file, FileManagerConstants.GC_RENAME, true, lva_newName, true);
         }
     }

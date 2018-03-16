@@ -178,8 +178,10 @@ public class DirectoryWatchService implements Runnable {
 
         Map.Entry<File, String> lob_currentRenamedParent = null;
         Map.Entry<File, String> lob_renamedPointer;
+        boolean lva_wasRemoved;
         for (Iterator<Map.Entry<File, String>> lob_iterator = lob_renamedMap.entrySet().iterator(); lob_iterator.hasNext();) {
             lob_renamedPointer = lob_iterator.next();
+            lva_wasRemoved = false;
 
             if (lob_currentRenamedParent == null) {
                 lob_currentRenamedParent = lob_renamedPointer;
@@ -188,9 +190,19 @@ public class DirectoryWatchService implements Runnable {
             if (lob_renamedPointer != lob_currentRenamedParent) {
                 if (lob_renamedPointer.getKey().toPath().startsWith(lob_currentRenamedParent.getKey().toPath())) {
                     lob_iterator.remove();
+                    lva_wasRemoved = true;
                 } else {
                     lob_currentRenamedParent = lob_renamedPointer;
                 }
+            }
+
+            if (!lva_wasRemoved && TreeTool.isRootFile(lob_renamedPointer.getKey())) {
+                lob_iterator.remove();
+                lva_wasRemoved = true;
+            }
+
+            if (!lva_wasRemoved && TreeTool.isSharedDirectory(lob_renamedPointer.getKey().toPath())) {
+                lob_iterator.remove();
             }
         }
 
