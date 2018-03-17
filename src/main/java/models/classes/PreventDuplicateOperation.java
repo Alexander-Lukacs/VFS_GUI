@@ -43,7 +43,6 @@ public class PreventDuplicateOperation {
             } else {
                 lob_value.gva_created = true;
             }
-            System.out.println("put created: " + iob_key);
         } finally {
             if (gob_lock.isHeldByCurrentThread()) {
                 gob_lock.unlock();
@@ -113,7 +112,6 @@ public class PreventDuplicateOperation {
                     lob_value.gva_created = false;
                 }
             }
-            System.out.println("remove created: " + iob_key);
         } finally {
             if (gob_lock.isHeldByCurrentThread()) {
                 gob_lock.unlock();

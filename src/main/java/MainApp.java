@@ -7,6 +7,8 @@ import javafx.stage.Stage;
 import models.classes.MappedFile;
 import restful.clients.RestClient;
 import threads.classes.NotifyServerThread;
+import threads.classes.ThreadManager;
+import threads.interfaces.ThreadControl;
 import tools.AlertWindows;
 import tools.xmlTools.FileMapper;
 
@@ -64,6 +66,7 @@ public class MainApp extends Application {
 
         // Stops the NotifyServerThread
         gob_notifyThread.interrupt();
+        ThreadManager.stopAndClear();
 
         try {
             if (DataCache.getDataCache().get(DataCache.GC_EMAIL_KEY) != null) {
