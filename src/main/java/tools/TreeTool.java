@@ -1,7 +1,6 @@
 package tools;
 
 import cache.DirectoryCache;
-import fileTree.interfaces.Tree;
 import fileTree.classes.TreeSingleton;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Node;
@@ -13,18 +12,9 @@ import tools.xmlTools.DirectoryNameMapper;
 import javax.swing.filechooser.FileSystemView;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 
 public class TreeTool {
-    private static TreeTool ourInstance = new TreeTool();
-
-    public static TreeTool getInstance() {
-        return ourInstance;
-    }
-
-    private TreeTool() {
-    }
 
     @SuppressWarnings("WeakerAccess")
     public static void addTreeItem(TreeItem<String> iob_parent, File iob_file) {
@@ -153,19 +143,7 @@ public class TreeTool {
         lob_path.insert(0, DirectoryCache.getDirectoryCache().getServerDirectory());
         return new File(lob_path.toString());
     }
-    public void deleteItem(File iob_file) {
-        TreeItem<String> lob_item = searchTreeItem(iob_file);
-        TreeItem<String> lob_parent;
 
-        if (lob_item != null) {
-
-            lob_parent = lob_item.getParent();
-
-            if (lob_parent != null) {
-                lob_parent.getChildren().remove(lob_item);
-            }
-        }
-    }
     /**
      * filter all new files on the same level as public, shared and private
      * @return return true if the file is on the same level, otherwise false

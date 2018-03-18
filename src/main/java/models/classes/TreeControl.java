@@ -33,9 +33,13 @@ import java.util.List;
 import java.util.Objects;
 
 import static controller.constants.ApplicationConstants.GC_APPLICATION_ICON_PATH;
-import static models.constants.TreeControlVersionTwoConstants.*;
+import static models.constants.TreeControlConstants.*;
 import static tools.TreeTool.buildFileFromItem;
 
+/**
+ * This class is responsible for the initialization of the tree view in the main screen.
+ * It also provides every method for the context menu
+ */
 public class TreeControl {
     private final MainController gob_mainController;
 
@@ -45,12 +49,12 @@ public class TreeControl {
     }
 
     /**
-     //     * Returns the path of the current selected treeItem
-     //     * If the selected is a file, the parent directory path gets returned
-     //     * If nothing is selected return null
-     //     *
-     //     * @return path of selected treeItem
-     //     */
+      * Returns the path of the current selected treeItem
+      * If the selected is a file, the parent directory path gets returned
+      * If nothing is selected return null
+      *
+      * @return path of selected treeItem
+      */
     public String getPathOfSelectedItem() {
         TreeView<String> lob_treeView = TreeSingleton.getInstance().getTreeView();
         TreeItem<String> lob_treeItem = lob_treeView.getSelectionModel().getSelectedItem();
@@ -142,17 +146,17 @@ public class TreeControl {
     }
 
         private void createNewDirectory() {
-        File lob_newFile = buildNewFile("\\new Directory$");
+        File lob_newFile = buildNewFile(GC_NEW_DIRECTORY);
         ThreadManager.addCommandToFileManager(lob_newFile, FileManagerConstants.GC_ADD,
-                true, true, true, 1);
+                true, true, true, GC_ONE);
             PreventDuplicateOperation.getDuplicateOperationPrevention().putCreated(lob_newFile.toPath());
 
     }
 
     private void createNewFile() {
-        File lob_newFile = buildNewFile("\\new File$.txt");
+        File lob_newFile = buildNewFile(GC_NEW_FILE);
         ThreadManager.addCommandToFileManager(lob_newFile, FileManagerConstants.GC_ADD,
-                true, false, true, 1);
+                true, false, true, GC_ONE);
 
         PreventDuplicateOperation.getDuplicateOperationPrevention().putCreated(lob_newFile.toPath());
 
@@ -165,7 +169,7 @@ public class TreeControl {
 
     private void sharedDirectoryScene(TreeItem iob_treeItem) {
         TreeView<String> lob_treeView = TreeSingleton.getInstance().getTreeView();
-        FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource("views/sharedDirectoryScreen.fxml"));
+        FXMLLoader lob_loader = new FXMLLoader(getClass().getClassLoader().getResource(GC_SHARED_DIRECTORY_SCREEN_FXML));
         GridPane lob_pane;
         int lva_sharedDirectoryId;
         String lva_selectedItemName;
@@ -178,13 +182,13 @@ public class TreeControl {
             lob_pane = lob_loader.load();
             Scene lob_scene = new Scene(lob_pane);
             Stage lob_stage = new Stage();
-            lob_stage.setTitle("Shared Directory");
+            lob_stage.setTitle(GC_SHARED_DIRECTORY);
             lob_stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream(GC_APPLICATION_ICON_PATH)));
             lob_stage.setResizable(false);
             lob_stage.setScene(lob_scene);
             SharedDirectoryController lob_controller = lob_loader.getController();
 
-            if (iob_treeItem.getValue().equals("Shared")) {
+            if (iob_treeItem.getValue().equals(GC_SHARED)) {
                 lob_controller.initData(null, lob_stage, null);
 
             } else {
@@ -206,12 +210,12 @@ public class TreeControl {
 //helper methods
 //----------------------------------------------------------------------------------------------------------------------
     private void isFileSharedDirectory(File lob_selectedFile, MenuItem lob_item) {
-        if (lob_selectedFile.getName().equals("Shared")) {
+        if (lob_selectedFile.getName().equals(GC_SHARED)) {
             lob_item.setDisable(false);
-            lob_item.setText("New shared directory");
-        } else if (lob_selectedFile.getParentFile().getName().equals("Shared")) {
+            lob_item.setText(GC_MENU_ITEM_NEW_SHARED_DIR);
+        } else if (lob_selectedFile.getParentFile().getName().equals(GC_SHARED)) {
             lob_item.setDisable(false);
-            lob_item.setText("Properties");
+            lob_item.setText(GC_MENU_ITEM_PROPERTIES);
         } else {
             lob_item.setDisable(true);
         }
@@ -241,11 +245,11 @@ public class TreeControl {
         }
 
         lva_newFilePath += iva_name;
-        lob_newFile = new File(lva_newFilePath.replaceFirst("\\$", ""));
+        lob_newFile = new File(lva_newFilePath.replaceFirst(GC_REPLACEMENT, GC_EMPTY));
 
         if (lob_newFile.exists()) {
             do {
-                lob_newFile = new File(lva_newFilePath.replaceFirst("\\$", "(" + lva_counter + ")"));
+                lob_newFile = new File(lva_newFilePath.replaceFirst(GC_REPLACEMENT, GC_OPENING_BRACKETS + lva_counter + GC_CLOSING_BRACKETS));
                 lva_counter++;
             } while (lob_newFile.exists());
         }
@@ -260,29 +264,34 @@ public class TreeControl {
      * initialize all needed resources
      */
     private void init() {
-        Collection<File> lco_files;
-        //init all needed directories
         DirectoryCache.getDirectoryCache();
 
         initFileMapperCache();
         initTreeView();
         initSharedDirectoryCache();
-        ThreadManager.getFileManagerThread().start();
-        lco_files = FileService.readAllFilesFromDirectory(DirectoryCache.getDirectoryCache().getUserDirectory());
-        MappedFile lob_mappedFile;
-        int lva_version;
 
-        for (File lob_file : lco_files) {
+        Runnable task1 = () -> {
+            Collection<File> lco_files = FileService.readAllFilesFromDirectory(DirectoryCache.getDirectoryCache().getUserDirectory());
+            FileMapperCache lob_fileMapperCache = FileMapperCache.getFileMapperCache();
+            MappedFile lob_mappedFile;
+            int lva_version;
+            for (File lob_file : lco_files) {
 
-            lob_mappedFile = FileMapperCache.getFileMapperCache().get(lob_file.toPath());
-            if (lob_mappedFile != null) {
-                lva_version = lob_mappedFile.getVersion();
-            } else {
-                lva_version = 1;
+                lob_mappedFile = lob_fileMapperCache.get(lob_file.toPath());
+                if (lob_mappedFile != null) {
+                    lva_version = lob_mappedFile.getVersion();
+                } else {
+                    lva_version = 1;
+                }
+
+                ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_ADD, false, true, true, lva_version);
             }
+        };
 
-            ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_ADD, false, true, true, lva_version);
-        }
+
+        Thread thread1 = new Thread(task1);
+        thread1.start();
+        ThreadManager.getFileManagerThread().start();
         ThreadManager.addCommandToFileManager(null, FileManagerConstants.GC_COMPARE_TREE, true);
 
         ThreadManager.getDirectoryWatcherThread(DirectoryCache.getDirectoryCache().getUserDirectory()).start();
@@ -302,7 +311,7 @@ public class TreeControl {
     private void initTreeView() {
         TreeView<String> lob_treeView = TreeSingleton.getInstance().getTreeView();
         ContextMenu lob_contextMenu;
-        lob_treeView.setPrefHeight(1080);
+        lob_treeView.setPrefHeight(GC_PREF_HEIGHT);
         lob_treeView.setShowRoot(false);
         lob_treeView.setEditable(true);
 
@@ -416,7 +425,7 @@ public class TreeControl {
             }
 
             lob_sharedDirectoryFile = new File(
-                    lva_sharedDirectoryPath + "\\" +
+                    lva_sharedDirectoryPath + GC_BACK_SLASH +
                             DirectoryNameMapper.getRenamedSharedDirectoryName(lob_sharedDirectory.getId())
             );
 
@@ -425,7 +434,7 @@ public class TreeControl {
                     lob_sharedDirectoryFile.mkdir();
 
                     lva_lastModified = Files.readAttributes(lob_sharedDirectoryFile.toPath(), BasicFileAttributes.class).lastModifiedTime().toMillis();
-                    lob_mappedFile = new MappedFile(lob_sharedDirectoryFile.toPath(), 1, lva_lastModified);
+                    lob_mappedFile = new MappedFile(lob_sharedDirectoryFile.toPath(), GC_ONE, lva_lastModified);
                     FileMapperCache.getFileMapperCache().put(lob_mappedFile);
                 } catch (IOException ignore) {
 

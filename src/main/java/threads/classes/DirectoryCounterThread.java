@@ -10,8 +10,8 @@ import java.io.File;
  * Created by Mesut on 05.03.2018.
  */
 public class DirectoryCounterThread extends Thread implements ThreadControl{
-    private File gob_file;
-    private Label gob_content_label;
+    private final File gob_file;
+    private final Label gob_content_label;
     private int countDir = 0;
     private int countFiles = 0;
 

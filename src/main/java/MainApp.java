@@ -7,10 +7,10 @@ import javafx.stage.Stage;
 import models.classes.MappedFile;
 import restful.clients.RestClient;
 import threads.classes.NotifyServerThread;
+import threads.classes.ThreadManager;
 import tools.AlertWindows;
 import tools.xmlTools.FileMapper;
 
-import java.io.FileNotFoundException;
 import java.net.ServerSocket;
 
 import static cache.DataCache.GC_EMAIL_KEY;
@@ -64,6 +64,7 @@ public class MainApp extends Application {
 
         // Stops the NotifyServerThread
         gob_notifyThread.interrupt();
+        ThreadManager.stopAndClear();
 
         try {
             if (DataCache.getDataCache().get(DataCache.GC_EMAIL_KEY) != null) {

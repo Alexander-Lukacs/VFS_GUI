@@ -9,15 +9,17 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.util.*;
 
-public class DirectoryWatchService implements Runnable {
+class DirectoryWatchService implements Runnable {
     private HashMap<File, BasicFileAttributes> gob_registeredPaths;
-    private File gob_root;
-    private FileChangeListener gob_listener;
-    private static boolean gob_isRunning = false;
+    private final File gob_root;
+    private final FileChangeListener gob_listener;
     private static Thread gob_thread;
+    private static HashSet<Long> gob_creationTimes;
 
     /**
      * Register the WatchService on the root directory. Scan at the same time all children of the root directory and
@@ -34,28 +36,45 @@ public class DirectoryWatchService implements Runnable {
         }
 
         gob_registeredPaths = new HashMap<>();
+        gob_creationTimes = new HashSet<>();
+    }
+
+    private void init() throws IOException{
+        System.out.println("Start Registration");
         for (File lob_path : scan(gob_root, new HashMap<>()).keySet()) {
             register(lob_path);
         }
-
-        System.out.println("----------------------------------------------------------");
-        for (Map.Entry<File, BasicFileAttributes> lob_entry : gob_registeredPaths.entrySet()) {
-            System.out.println(lob_entry.getKey());
-        }
-        System.out.println("----------------------------------------------------------");
+        System.out.println("Finished Registration");
     }
 
     /**
-     * register a new path to the WatcherService
+     * We chick if the creation time of the file was already scanned, if that is true we increase the creation time by
+     * one. This process is repeated until we have a creation time that was not scanned yet. This ensures that the file
+     * has a unique creation time. Later the files can be identified by the creation time. After the unique creation
+     * time is saved we register the file to the service
      * @param iob_file path to watch
      */
     private void register(File iob_file) throws IOException{
-        gob_isRunning = true;
-        BasicFileAttributes lob_attr = Files.readAttributes(iob_file.toPath(), BasicFileAttributes.class);
+        BasicFileAttributeView lob_attrView = Files.getFileAttributeView(iob_file.toPath(), BasicFileAttributeView.class);
+        BasicFileAttributes lob_attr = lob_attrView.readAttributes();
+        FileTime lob_creationTime;
+        FileTime lob_lastAccessTime = lob_attr.lastAccessTime();
+        FileTime lob_lastModifiedTime = lob_attr.lastModifiedTime();
+        long lva_creationTime = lob_attr.creationTime().toMillis();
+        long lva_tmp = lva_creationTime;
+
+        while(gob_creationTimes.contains(lva_creationTime)) {
+            lva_creationTime++;
+        }
+        gob_creationTimes.add(lva_creationTime);
+
+        if (lva_tmp != lva_creationTime) {
+            lob_creationTime = FileTime.fromMillis(lva_creationTime);
+            lob_attrView.setTimes(lob_lastModifiedTime, lob_lastAccessTime, lob_creationTime);
+        }
         gob_registeredPaths.put(iob_file, lob_attr);
     }
 
-    @SuppressWarnings("Duplicates")
     private void scanAndCompare() throws IOException{
         HashMap<File, BasicFileAttributes> lco_scannedFiles;
         TreeMap<File, BasicFileAttributes> lco_tmp;
@@ -249,17 +268,17 @@ public class DirectoryWatchService implements Runnable {
      * @return collection of all found paths
      */
     private HashMap<File, BasicFileAttributes> scan(File iob_file, HashMap<File, BasicFileAttributes> ico_files) throws IOException {
-        BasicFileAttributes attr = Files.readAttributes(iob_file.toPath(), BasicFileAttributes.class);
-        if (TreeTool.filterRootFiles(iob_file.toPath()) && !iob_file.equals(gob_root)) {
-            return ico_files;
-        }
-        ico_files.put(iob_file, attr);
-        File[] lar_children = iob_file.listFiles();
-        if (lar_children != null) {
-            for (File lob_file : lar_children) {
-                scan(lob_file, ico_files);
-            }
-        }
+        Files.walk(iob_file.toPath())
+                .filter(lob_file -> !TreeTool.filterRootFiles(lob_file) && iob_file.equals(gob_root))
+                .forEach( lob_path -> {
+                    BasicFileAttributes lob_attr;
+                    try {
+                        lob_attr = Files.readAttributes(lob_path, BasicFileAttributes.class);
+                        ico_files.put(lob_path.toFile(), lob_attr);
+                    } catch (IOException ignore) {
+
+                    }
+                });
         return ico_files;
     }
 
@@ -275,10 +294,12 @@ public class DirectoryWatchService implements Runnable {
      *
      * @see Thread#run()
      */
+    @SuppressWarnings("InfiniteLoopStatement")
     @Override
     public void run() {
         try {
-            while (gob_isRunning) {
+            init();
+            while (true) {
                 Thread.sleep(10000);
                 scanAndCompare();
             }
@@ -302,7 +323,6 @@ public class DirectoryWatchService implements Runnable {
      * stop the WatchService
      */
     public void stop() {
-        gob_isRunning = false;
         gob_thread.interrupt();
     }
 

@@ -87,7 +87,7 @@ public abstract class DirectoryNameMapper {
             createXmlFile();
         }
 
-        return readXml(GC_PRIVATE_DIR_ELEMENT, GC_FILE_NAME);
+        return readXml(GC_PRIVATE_DIR_ELEMENT);
     }
 
     public static void setPrivateDirectoryName(String iva_dirName) {
@@ -95,7 +95,7 @@ public abstract class DirectoryNameMapper {
             createXmlFile();
         }
 
-        modify(GC_PRIVATE_DIR_ELEMENT, iva_dirName, GC_FILE_NAME);
+        modify(GC_PRIVATE_DIR_ELEMENT, iva_dirName);
     }
 
     public static String getPublicDirectoryName() {
@@ -103,7 +103,7 @@ public abstract class DirectoryNameMapper {
             createXmlFile();
         }
 
-        return readXml(GC_PUBLIC_DIR_ELEMENT, GC_FILE_NAME);
+        return readXml(GC_PUBLIC_DIR_ELEMENT);
     }
 
     public static void setPublicDirectoryName(String iva_dirName) {
@@ -111,7 +111,7 @@ public abstract class DirectoryNameMapper {
             createXmlFile();
         }
 
-        modify(GC_PUBLIC_DIR_ELEMENT, iva_dirName, GC_FILE_NAME);
+        modify(GC_PUBLIC_DIR_ELEMENT, iva_dirName);
     }
 
     public static String getSharedDirectoryName() {
@@ -119,7 +119,7 @@ public abstract class DirectoryNameMapper {
             createXmlFile();
         }
 
-        return readXml(GC_SHARED_DIR_ELEMENT, GC_FILE_NAME);
+        return readXml(GC_SHARED_DIR_ELEMENT);
     }
 
     public static void setSharedDirectoryName(String iva_dirName) {
@@ -127,7 +127,7 @@ public abstract class DirectoryNameMapper {
             createXmlFile();
         }
 
-        modify(GC_SHARED_DIR_ELEMENT, iva_dirName, GC_FILE_NAME);
+        modify(GC_SHARED_DIR_ELEMENT, iva_dirName);
     }
 
     public static String getRenamedSharedDirectoryName(int iva_originalDirId) {
@@ -357,7 +357,7 @@ public abstract class DirectoryNameMapper {
                 + "\\config\\" + GC_FILE_NAME;
     }
 
-    private static String readXml(String iva_elementToRead, String iva_fileName) {
+    private static String readXml(String iva_elementToRead) {
         File lob_inputFile;
         SAXBuilder lob_saxBuilder;
 
@@ -383,7 +383,7 @@ public abstract class DirectoryNameMapper {
         return lob_elementValue;
     }
 
-    private static void modify(String iva_elementName, String iva_newValue, String iva_fileName) {
+    private static void modify(String iva_elementName, String iva_newValue) {
         File lob_inputFile;
         SAXBuilder lob_saxBuilder;
         Document lob_doc;

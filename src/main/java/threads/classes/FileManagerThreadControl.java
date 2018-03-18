@@ -5,7 +5,6 @@ import cache.DataCache;
 import cache.DirectoryCache;
 import cache.FileMapperCache;
 import cache.SharedDirectoryCache;
-import models.classes.PreventDuplicateOperation;
 import javafx.application.Platform;
 import javafx.scene.control.TreeItem;
 import models.classes.*;
@@ -28,6 +27,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.lang.Thread;
 
 import static models.classes.FileService.readAllFilesFromDirectory;
 import static restful.constants.HttpStatusCodes.GC_HTTP_OK;
@@ -36,24 +36,25 @@ import static threads.constants.FileManagerConstants.*;
 public class FileManagerThreadControl implements ThreadControl, Runnable {
     private volatile boolean isRunning;
     private FileRestClient gob_restClient;
-    private AtomicInteger gva_commandIndex = new AtomicInteger(0);
-    private volatile List<Command> gco_commands = Collections.synchronizedList(new ArrayList<Command>());
+    private final AtomicInteger gva_commandIndex = new AtomicInteger(0);
+    private final List<Command> gco_commands = Collections.synchronizedList(new ArrayList<Command>());
     private static final int GC_MAX_TRIES = 20;
+    private static Thread gob_thread;
 
     @Override
     public void start() {
         if (!isRunning) {
-            java.lang.Thread lob_runnerThread = new java.lang.Thread(this, FileManagerThreadControl.class.getSimpleName());
-            lob_runnerThread.setDaemon(true);
+            gob_thread = new Thread(this, FileManagerThreadControl.class.getSimpleName());
+            gob_thread.setDaemon(true);
             gob_restClient = RestClientBuilder.buildFileRestClientWithAuth();
             isRunning = true;
-            lob_runnerThread.start();
+            gob_thread.start();
         }
     }
 
     @Override
     public void stop() {
-        isRunning = false;
+        gob_thread.interrupt();
     }
 
     @Override
@@ -250,7 +251,7 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
                 lob_mappedFile.setVersion(lva_version);
                 lob_mappedFile.setLastModified(lva_lastModified);
             }
-            System.out.println(lob_mappedFile);
+//            System.out.println(lob_mappedFile);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -967,9 +968,9 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
         Path lob_pointer;
         Path lob_parent = null;
 
-        for (MappedFile t : FileMapperCache.getFileMapperCache().getAll()) {
-            System.out.println(t.toString());
-        }
+//        for (MappedFile lob_mappedFile : FileMapperCache.getFileMapperCache().getAll()) {
+//            System.out.println(t.toString());
+//        }
 
         lob_treeDifference = lob_restClient.compareClientAndServerTree();
 
@@ -978,11 +979,6 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
             gva_commandIndex.incrementAndGet();
             return;
         }
-
-//        for (String lva_relativeFilePath : lob_treeDifference.getFilesToDelete()) {
-//            File lob_deleteFile = new File(Utils.convertRelativeToAbsolutePath(lva_relativeFilePath, true));
-//            ThreadManager.addCommandToFileManager(lob_deleteFile, FileManagerConstants.GC_DELETE, false, true);
-//        }
 
         lco_filesToDelete = lob_treeDifference.getFilesToDelete().stream().map(File::new).collect(Collectors.toList());
 
@@ -1066,10 +1062,11 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
      *
      * @see java.lang.Thread#run()
      */
+    @SuppressWarnings("InfiniteLoopStatement")
     @Override
     public void run() {
         Command lob_command;
-        while (isRunning) {
+        while (true) {
             try {
                 if (!(gva_commandIndex.get() >= gco_commands.size() || gva_commandIndex.get() < 0)) {
                     lob_command = gco_commands.get(gva_commandIndex.get());
@@ -1078,8 +1075,8 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
                     gva_commandIndex.set(0);
                     try {
                         java.lang.Thread.sleep(100);
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
+                    } catch (InterruptedException ignore) {
+
                     }
                 }
             } catch (Exception ex) {

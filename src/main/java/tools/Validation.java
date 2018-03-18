@@ -41,6 +41,7 @@ public class Validation {
         return iva_name.trim().length() >= 3;
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean passwordEqualsValidation(String iva_password1, String iva_password2) {
         return iva_password1.equals(iva_password2);
     }

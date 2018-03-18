@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class PreventDuplicateOperation {
-    private Map<Path, FileDuplicateValue> gob_map;
-    private ReentrantLock gob_lock;
+    private final Map<Path, FileDuplicateValue> gob_map;
+    private final ReentrantLock gob_lock;
     private static PreventDuplicateOperation gob_preventDuplicateOperation;
 
     public static PreventDuplicateOperation getDuplicateOperationPrevention() {
@@ -43,7 +43,6 @@ public class PreventDuplicateOperation {
             } else {
                 lob_value.gva_created = true;
             }
-            System.out.println("put created: " + iob_key);
         } finally {
             if (gob_lock.isHeldByCurrentThread()) {
                 gob_lock.unlock();
@@ -113,7 +112,6 @@ public class PreventDuplicateOperation {
                     lob_value.gva_created = false;
                 }
             }
-            System.out.println("remove created: " + iob_key);
         } finally {
             if (gob_lock.isHeldByCurrentThread()) {
                 gob_lock.unlock();
