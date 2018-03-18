@@ -18,7 +18,7 @@ public abstract class TreeControlConstants {
     public static final String GC_DIR_NAME = "Shared";
 
     public static final String GC_NEW_DIRECTORY = "\\new Directory$";
-    public static final String GC_NEW_FILE = "new File$.txt";
+    public static final String GC_NEW_FILE = "\\new File$.txt";
 
     public static final String GC_REPLACEMENT = "\\$";
     public static final String GC_EMPTY = "";

@@ -65,6 +65,7 @@ class DirectoryWatchService implements Runnable {
 
         while(gob_creationTimes.contains(lva_creationTime)) {
             lva_creationTime++;
+            System.out.println("UPDATE CREATION DATE: " + iob_file);
         }
         gob_creationTimes.add(lva_creationTime);
 
