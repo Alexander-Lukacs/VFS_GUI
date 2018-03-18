@@ -1,9 +1,9 @@
 package models.classes;
 
 public class DownloadedContent {
-    private boolean gva_isDirectory;
-    private byte[] gar_contentAsByteArray;
-    private int gva_version;
+    private final boolean gva_isDirectory;
+    private final byte[] gar_contentAsByteArray;
+    private final int gva_version;
 
     public DownloadedContent(byte[] iar_contentAsByteArray, boolean iva_isDirectory, int iva_version) {
         this.gar_contentAsByteArray = iar_contentAsByteArray;

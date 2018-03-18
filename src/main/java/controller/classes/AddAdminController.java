@@ -38,9 +38,7 @@ public class AddAdminController {
 
         gob_userList = lob_restClient.getAllUser();
 
-        if (gob_userList == null) {
-
-        } else {
+        if (gob_userList != null) {
             listView.loadSettingsList(gob_lvOptions);
             listView.loadUserList(gob_lvUser, gob_userList);
         }

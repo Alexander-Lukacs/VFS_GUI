@@ -5,7 +5,6 @@ import cache.DataCache;
 import cache.DirectoryCache;
 import cache.FileMapperCache;
 import cache.SharedDirectoryCache;
-import models.classes.PreventDuplicateOperation;
 import javafx.application.Platform;
 import javafx.scene.control.TreeItem;
 import models.classes.*;
@@ -37,8 +36,8 @@ import static threads.constants.FileManagerConstants.*;
 public class FileManagerThreadControl implements ThreadControl, Runnable {
     private volatile boolean isRunning;
     private FileRestClient gob_restClient;
-    private AtomicInteger gva_commandIndex = new AtomicInteger(0);
-    private volatile List<Command> gco_commands = Collections.synchronizedList(new ArrayList<Command>());
+    private final AtomicInteger gva_commandIndex = new AtomicInteger(0);
+    private final List<Command> gco_commands = Collections.synchronizedList(new ArrayList<Command>());
     private static final int GC_MAX_TRIES = 20;
     private static Thread gob_thread;
 

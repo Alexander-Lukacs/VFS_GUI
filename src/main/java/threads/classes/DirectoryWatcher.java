@@ -13,8 +13,8 @@ import java.io.IOException;
 
 public class DirectoryWatcher implements ThreadControl {
     private DirectoryWatchService gob_watchService;
-    private File gob_rootFile;
-    private static PreventDuplicateOperation lob_preventDuplicates = PreventDuplicateOperation.getDuplicateOperationPrevention();
+    private final File gob_rootFile;
+    private static final PreventDuplicateOperation lob_preventDuplicates = PreventDuplicateOperation.getDuplicateOperationPrevention();
 
     DirectoryWatcher(File iob_files) {
         gob_rootFile = iob_files;

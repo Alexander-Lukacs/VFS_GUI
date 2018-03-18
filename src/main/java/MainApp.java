@@ -8,11 +8,9 @@ import models.classes.MappedFile;
 import restful.clients.RestClient;
 import threads.classes.NotifyServerThread;
 import threads.classes.ThreadManager;
-import threads.interfaces.ThreadControl;
 import tools.AlertWindows;
 import tools.xmlTools.FileMapper;
 
-import java.io.FileNotFoundException;
 import java.net.ServerSocket;
 
 import static cache.DataCache.GC_EMAIL_KEY;

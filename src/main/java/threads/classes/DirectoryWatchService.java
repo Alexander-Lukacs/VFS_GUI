@@ -14,10 +14,10 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.*;
 
-public class DirectoryWatchService implements Runnable {
+class DirectoryWatchService implements Runnable {
     private HashMap<File, BasicFileAttributes> gob_registeredPaths;
-    private File gob_root;
-    private FileChangeListener gob_listener;
+    private final File gob_root;
+    private final FileChangeListener gob_listener;
     private static Thread gob_thread;
     private static HashSet<Long> gob_creationTimes;
 

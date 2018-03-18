@@ -233,6 +233,7 @@ public class LoginController {
      * @param iva_confirmPassword contains the confirmed passowrd
      * @return true if the inputs are valid
      */
+    @SuppressWarnings("Duplicates")
     private boolean checkIfRegisterDataValid(String iva_ip, String iva_port, String iva_name, String iva_email,
                                              String iva_password, String iva_confirmPassword) {
         StringBuilder lob_sb = new StringBuilder();

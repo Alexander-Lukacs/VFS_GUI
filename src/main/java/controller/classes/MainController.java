@@ -61,12 +61,12 @@ public class MainController {
     private Label gob_txt_label_content;
 
 
-    private DataCache gob_userCache;
-    private TreeControl gob_treeControl;
+//    private DataCache gob_userCache;
+//    private TreeControl gob_treeControl;
     private TreeControl gob_treeControlVersionTwo;
     private MainController gob_mainController;
 
-    public void initMainControllerData(MainController iob_mainController) {
+    private void initMainControllerData(MainController iob_mainController) {
         gob_mainController = iob_mainController;
     }
 
@@ -146,7 +146,7 @@ public class MainController {
     }
 
     public void initialize() {
-        gob_userCache = DataCache.getDataCache();
+//        gob_userCache = DataCache.getDataCache();
         gob_treeControlVersionTwo = new TreeControl(this);
         TreeView<String> gob_treeView = TreeSingleton.getInstance().getTreeView();
         gob_vBox.getChildren().add(gob_treeView);

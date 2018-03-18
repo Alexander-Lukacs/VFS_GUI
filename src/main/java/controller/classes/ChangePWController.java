@@ -122,6 +122,7 @@ public class ChangePWController {
      * @param iva_confirmPassword   contains the confirm of the new password
      * @return true if input of old Password is equal with old password and the new Password is valid
      */
+    @SuppressWarnings("Duplicates")
     private boolean isPasswordDataValid(String iva_oldPassword, String iva_oldCachedPassword, String iva_newPassword,
                                         String iva_confirmPassword) {
 

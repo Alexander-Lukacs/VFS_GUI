@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class PreventDuplicateOperation {
-    private Map<Path, FileDuplicateValue> gob_map;
-    private ReentrantLock gob_lock;
+    private final Map<Path, FileDuplicateValue> gob_map;
+    private final ReentrantLock gob_lock;
     private static PreventDuplicateOperation gob_preventDuplicateOperation;
 
     public static PreventDuplicateOperation getDuplicateOperationPrevention() {

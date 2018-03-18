@@ -1,4 +1,4 @@
-public abstract class TODO {
+abstract class TODO {
     /*
     TODO Erledigt: aktualisieren von Dateien
     TODO Erledigt: hinzufügen von Dateien

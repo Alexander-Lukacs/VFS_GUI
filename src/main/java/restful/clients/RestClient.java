@@ -76,19 +76,19 @@ public class RestClient {
         return lob_restResponse;
     }
 
-    RestResponse createPostRequest(String iva_requestPath, Object iob_entity) {
-        RestResponse lob_restResponse = new RestResponse();
-
-        try {
-            Response response = gob_webTarget.path(iva_requestPath).request()
-                    .post(Entity.entity(iob_entity, MediaType.APPLICATION_JSON));
-
-            lob_restResponse.setResponseMessage(response.readEntity(String.class));
-            lob_restResponse.setHttpStatus(response.getStatus());
-        } catch (Exception ex) {
-            new AlertWindows().createExceptionAlert(ex.getMessage(), ex);
-        }
-
-        return lob_restResponse;
-    }
+//    RestResponse createPostRequest(String iva_requestPath, Object iob_entity) {
+//        RestResponse lob_restResponse = new RestResponse();
+//
+//        try {
+//            Response response = gob_webTarget.path(iva_requestPath).request()
+//                    .post(Entity.entity(iob_entity, MediaType.APPLICATION_JSON));
+//
+//            lob_restResponse.setResponseMessage(response.readEntity(String.class));
+//            lob_restResponse.setHttpStatus(response.getStatus());
+//        } catch (Exception ex) {
+//            new AlertWindows().createExceptionAlert(ex.getMessage(), ex);
+//        }
+//
+//        return lob_restResponse;
+//    }
 }

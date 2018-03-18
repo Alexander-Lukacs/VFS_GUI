@@ -13,11 +13,11 @@ import static cache.DataCache.GC_IS_ADMIN_KEY;
 import static controller.constants.SettingsConstants.*;
 
 @SuppressWarnings("WeakerAccess")
-/**
- * Created by Mesut on 01.03.2018.
- * ListView
- * Loads the ListView of the Settings Scene
- *
+/*
+  Created by Mesut on 01.03.2018.
+  ListView
+  Loads the ListView of the Settings Scene
+
  */
 public class ListView {
     public void loadSettingsList(javafx.scene.control.ListView<String> gob_lvOptions) {
