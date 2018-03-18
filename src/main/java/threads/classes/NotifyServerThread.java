@@ -84,7 +84,8 @@ public class NotifyServerThread extends Thread {
                             break;
                     }
 
-                } catch (InterruptedIOException ignore) {
+                } catch (Exception ignore) {
+
                 }
 
                 if (lob_client != null) {
