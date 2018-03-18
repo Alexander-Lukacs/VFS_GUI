@@ -286,13 +286,14 @@ public class TreeControl {
 
                 ThreadManager.addCommandToFileManager(lob_file, FileManagerConstants.GC_ADD, false, true, true, lva_version);
             }
+
+            ThreadManager.addCommandToFileManager(null, FileManagerConstants.GC_COMPARE_TREE, true);
         };
 
 
         Thread thread1 = new Thread(task1);
         thread1.start();
         ThreadManager.getFileManagerThread().start();
-        ThreadManager.addCommandToFileManager(null, FileManagerConstants.GC_COMPARE_TREE, true);
 
         ThreadManager.getDirectoryWatcherThread(DirectoryCache.getDirectoryCache().getUserDirectory()).start();
     }
