@@ -46,11 +46,7 @@ public class ThreadManager {
     }
 
     public static ThreadControl getDirectoryCounterThread(File iob_file, Label iob_label) {
-        if (gob_directoryCounterInstance == null) {
-            gob_directoryCounterInstance = new DirectoryCounterThread(iob_file, iob_label);
-        }
-
-        return gob_directoryCounterInstance;
+        return gob_directoryCounterInstance = new DirectoryCounterThread(iob_file, iob_label);
     }
 
     public static void stopAndClear() {
@@ -65,6 +61,12 @@ public class ThreadManager {
             gob_fileManagerInstance.clear();
         }
         gob_fileManagerInstance = null;
+
+        if (gob_directoryCounterInstance != null) {
+            gob_directoryCounterInstance.stop();
+        }
+
+        gob_directoryCounterInstance = null;
 
         TreeSingleton.getInstance().reset();
     }

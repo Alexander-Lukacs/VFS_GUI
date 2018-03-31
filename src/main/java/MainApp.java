@@ -62,10 +62,6 @@ public class MainApp extends Application {
             new AlertWindows().createExceptionAlert(ex.getMessage(), ex);
         }
 
-        // Stops the NotifyServerThread
-        gob_notifyThread.interrupt();
-        ThreadManager.stopAndClear();
-
         try {
             if (DataCache.getDataCache().get(DataCache.GC_EMAIL_KEY) != null) {
                 for (MappedFile lob_mappedFile : FileMapper.getAllFiles()) {
@@ -79,6 +75,9 @@ public class MainApp extends Application {
         } catch (RuntimeException ignore) {
 
         }
+        // Stops the NotifyServerThread
+        gob_notifyThread.interrupt();
+        ThreadManager.stopAndClear();
 
         super.stop();
     }

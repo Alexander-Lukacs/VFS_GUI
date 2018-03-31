@@ -204,6 +204,10 @@ public class SharedDirectoryController {
 
             lob_sharedDirectory.setDirectoryName(gob_tf_directory_name.getText());
             lob_owner.setEmail(lob_dataCache.get(DataCache.GC_EMAIL_KEY));
+            lob_owner.setName(lob_dataCache.get(DataCache.GC_NAME_KEY));
+            lob_owner.setUserId(Integer.parseInt(lob_dataCache.get(DataCache.GC_USER_ID_KEY)));
+            lob_owner.setAdminId(Integer.parseInt(lob_dataCache.get(DataCache.GC_ADMIN_ID_KEY)));
+            lob_owner.setIsAdmin(Boolean.parseBoolean(lob_dataCache.get(DataCache.GC_IS_ADMIN_KEY)));
             lob_sharedDirectory.setOwner(lob_owner);
 
             for (String lob_email : gob_memberListView.getItems()) {

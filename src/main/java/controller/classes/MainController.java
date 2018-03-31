@@ -21,6 +21,7 @@ import org.apache.commons.io.FileUtils;
 import restful.clients.RestClient;
 import threads.classes.DirectoryCounterThread;
 import threads.classes.ThreadManager;
+import threads.interfaces.ThreadControl;
 import tools.AlertWindows;
 import tools.Utils;
 
@@ -172,16 +173,20 @@ public class MainController {
     }
 
     public void setTypeLabel(File iob_file) {
-        Thread lob_thread;
+//        Thread lob_thread;
+        ThreadControl lob_threadControl;
         long lva_fileSize_kb;
 
         if (iob_file.isDirectory()) {
             gob_label_type.setText("Directory");
             gob_txt_label_content.setVisible(true);
             gob_label_content.setVisible(true);
-            lob_thread = new DirectoryCounterThread(iob_file, gob_label_content);
-            lob_thread.setName("FileInformationThread");
-            lob_thread.start();
+//            lob_thread = new DirectoryCounterThread(iob_file, gob_label_content);
+//            lob_thread.setName("FileInformationThread");
+//            lob_thread.start();
+
+            lob_threadControl = ThreadManager.getDirectoryCounterThread(iob_file, gob_label_content);
+            lob_threadControl.start();
         } else {
             gob_label_type.setText("File");
             gob_txt_label_content.setVisible(false);

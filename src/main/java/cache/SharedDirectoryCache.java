@@ -52,10 +52,10 @@ public class SharedDirectoryCache {
      * Replace a value
      *
      * @param iva_key   key
-     * @param iva_value new value
+     * @param iob_value new value
      */
-    public void replaceData(Integer iva_key, SharedDirectory iva_value) {
-        gob_dataCacheMap.replace(iva_key, iva_value);
+    public void replaceData(Integer iva_key, SharedDirectory iob_value) {
+        gob_dataCacheMap.replace(iva_key, iob_value);
     }
 
     public void removeData(Integer iva_key) {

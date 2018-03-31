@@ -1,6 +1,7 @@
 package threads.classes;
 
 import builder.RestClientBuilder;
+import cache.SharedDirectoryCache;
 import models.classes.PreventDuplicateOperation;
 import models.classes.SharedDirectory;
 import restful.clients.SharedDirectoryRestClient;
@@ -230,18 +231,21 @@ public class NotifyServerThread extends Thread {
     private void addSharedDirectory(String[] iar_messageArray) {
         SharedDirectoryRestClient lob_restClient;
         List<SharedDirectory> lli_sharedDirectories;
-        String sharedDirectoryId;
+        String sharedDirectoryIdAsString;
         String lva_relativeFilePath;
+        int sharedDirectoryId;
 
-        sharedDirectoryId = iar_messageArray[iar_messageArray.length - 1];
+        sharedDirectoryIdAsString = iar_messageArray[iar_messageArray.length - 1];
+        sharedDirectoryId = Integer.parseInt(sharedDirectoryIdAsString);
 
         lob_restClient = RestClientBuilder.buildSharedDirectoryClientWithAuth();
         lli_sharedDirectories = lob_restClient.getAllSharedDirectoriesOfUser();
 
         for (SharedDirectory lob_tmpSharedDirectory : lli_sharedDirectories) {
-            if (lob_tmpSharedDirectory.getId() == Integer.parseInt(sharedDirectoryId)) {
+            if (lob_tmpSharedDirectory.getId() == sharedDirectoryId) {
                 try {
-                    DirectoryNameMapper.getRenamedSharedDirectoryName(Integer.parseInt(sharedDirectoryId));
+                    DirectoryNameMapper.getRenamedSharedDirectoryName(Integer.parseInt(sharedDirectoryIdAsString));
+                    SharedDirectoryCache.getInstance().replaceData(sharedDirectoryId, lob_tmpSharedDirectory);
                 } catch (IllegalArgumentException ex) {
                     Utils.createSharedDirectory(lob_tmpSharedDirectory ,1);
 

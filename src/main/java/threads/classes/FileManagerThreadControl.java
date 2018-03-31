@@ -1065,25 +1065,31 @@ public class FileManagerThreadControl implements ThreadControl, Runnable {
     @SuppressWarnings("InfiniteLoopStatement")
     @Override
     public void run() {
+        System.out.println("run");
         Command lob_command;
-        while (true) {
-            try {
-                if (!(gva_commandIndex.get() >= gco_commands.size() || gva_commandIndex.get() < 0)) {
-                    lob_command = gco_commands.get(gva_commandIndex.get());
-                    executeCommand(lob_command);
-                } else {
-                    gva_commandIndex.set(0);
-                    try {
-                        java.lang.Thread.sleep(100);
-                    } catch (InterruptedException ignore) {
-
+        try {
+            while (true) {
+                try {
+                    if (!(gva_commandIndex.get() >= gco_commands.size() || gva_commandIndex.get() < 0)) {
+                        lob_command = gco_commands.get(gva_commandIndex.get());
+                        executeCommand(lob_command);
+                    } else {
+                        gva_commandIndex.set(0);
+//                        try {
+                            java.lang.Thread.sleep(100);
+//                        } catch (InterruptedException ignore) {
+//
+//                        }
                     }
+                } catch (NullPointerException ex) {
+                    ex.printStackTrace();
+                    gco_commands.remove(gco_commands.get(gva_commandIndex.get()));
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                gco_commands.remove(gco_commands.get(gva_commandIndex.get()));
             }
+        } catch (InterruptedException ignore) {
+            ignore.printStackTrace();
         }
+        System.out.println("stop run");
     }
 
     private class Command {

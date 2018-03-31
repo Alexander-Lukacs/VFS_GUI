@@ -309,6 +309,7 @@ class DirectoryWatchService implements Runnable {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        System.out.println("stop");
     }
 
     /**
@@ -324,6 +325,7 @@ class DirectoryWatchService implements Runnable {
      * stop the WatchService
      */
     public void stop() {
+        gob_thread.interrupt();
         gob_thread.interrupt();
     }
 
